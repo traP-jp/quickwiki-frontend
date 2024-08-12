@@ -9,6 +9,7 @@
         <router-link to="/lectures">Lectures</router-link>|
         <router-link to="/mysodan">MySodan</router-link>|
         <router-link to="/creatememo">CreateMemo</router-link>|
+        <router-link to="/apitest">apitest</router-link>|
         <router-link to="/tekitounayatu">notfound</router-link>|
       </header>
 

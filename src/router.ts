@@ -7,7 +7,7 @@ import Lectures from './pages/Lectures.vue'
 import Search from './pages/Search.vue'
 import MySodan from './pages/MySodan.vue'
 import CreateMemo from './pages/CreateMemo.vue'
-
+import ApiTest from './pages/ApiTest.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomePage },
@@ -17,6 +17,7 @@ const routes = [
   { path: '/lectures', name: 'lectures', component: Lectures },
   { path: '/mysodan', name: 'mysodan', component: MySodan },
   { path: '/creatememo', name: 'creatememo', component: CreateMemo },
+  { path: '/apitest', name: 'apitest', component: ApiTest },
   { path: '/:path(.*)*', component: NotFound }
 ]
 
