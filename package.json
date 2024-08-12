@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vitejs/plugin-vue-jsx": "^4.0.0",
     "vue": "^3.4.35",
     "vue-router": "^4.4.3"
   },
