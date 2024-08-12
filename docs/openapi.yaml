@@ -41,7 +41,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/lectureAbstract'
+                $ref: '#/components/schemas/lecture'
   /lecture/{lectureId}/content:
     get:
       tags:
@@ -60,7 +60,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/lectureContent'
+                $ref: '#/components/schemas/lecture'
   /lecture/byFolder/id/{folderId}:
     get:
       tags:
@@ -279,7 +279,7 @@ components:
         message:
           type: string
           example: Pong
-    lectureAbstract:
+    lecture:
       type: object
       properties:
         id:
@@ -288,34 +288,16 @@ components:
         title:
           type: string
           example: Introduction to Computer Science
-        description:
-          type: string
-          example: これはコンピュータサイエンスの入門コースです．
-        folderpath:
-          type: string
-          example: /School/ComputerScience
-    lectureContent:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 123
-        title:
-          type: string
-          example: Introduction to Computer Science
-        description:
-          type: string
-          example: これはコンピュータサイエンスの入門コースです．
-        folderpath:
-          type: string
-          example: /School/ComputerScience
         content:
           type: string
-          example: マークダウン形式のコンテンツ
+          example: マークダウン形式 資料へのリンク
+        folderpath:
+          type: string
+          example: /School/ComputerScience
     lectureList:
       type: array
       items:
-        $ref: '#/components/schemas/lectureContent'
+        $ref: '#/components/schemas/lecture'
     wikiList:
       type: array
       items:
