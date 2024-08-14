@@ -380,8 +380,10 @@ components:
       type: object
       properties:
         query:
-          type: string
-          example: 検索キーワード
+          type: array
+          items:
+            type: string
+          example: [なにか, キーワード]
         tags:
           type: array
           items:
