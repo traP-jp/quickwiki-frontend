@@ -8,6 +8,7 @@ import Wiki from './pages/Wiki.vue'
 import MyWiki from './pages/MyWiki.vue'
 import LikeWiki from './pages/LikeWiki.vue'
 import MySodan from './pages/MySodan.vue'
+import Search from './pages/Search.vue'
 import CreateMemo from './pages/CreateMemo.vue'
 import ApiTest from './pages/ApiTest.vue'
 
@@ -21,10 +22,12 @@ const routes = [
           component: MyWiki
         },
         {
-          // /user/:id/posts がマッチした時に
-          // UserPosts は User の <router-view> 内部で描画されます
           path: 'like',
           component: LikeWiki
+        },
+        {
+          path: 'search',
+          component: Search
         }
       ] },
   { path: '/lectures', name: 'lectures', component: Lectures },
