@@ -8,6 +8,7 @@ import Search from './pages/Search.vue'
 import MySodan from './pages/MySodan.vue'
 import CreateMemo from './pages/CreateMemo.vue'
 import ApiTest from './pages/ApiTest.vue'
+import API_URL from ''
 
 const routes = [
   { path: '/mywiki', name: 'mywiki', component: MyWiki },
