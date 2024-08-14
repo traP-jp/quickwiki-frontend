@@ -160,6 +160,13 @@ paths:
       tags:
         - wiki
       summary: 特定のsodanを取得
+      parameters:
+        - name: wikiId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: wikiID
       responses:
         '200':
           description: OK
@@ -173,6 +180,13 @@ paths:
       tags:
         - wiki
       summary: 備忘録の取得
+      parameters:
+        - name: wikiId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: wikiID
       responses:
         '200':
           description: OK
@@ -380,10 +394,8 @@ components:
       type: object
       properties:
         query:
-          type: array
-          items:
-            type: string
-          example: [なにか, キーワード]
+          type: string
+          example: 検索キーワード
         tags:
           type: array
           items:
