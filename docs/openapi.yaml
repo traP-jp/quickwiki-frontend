@@ -155,25 +155,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/wikiList'
-  /wiki/{wikiId}:
-    get:
-      tags:
-        - wiki
-      summary: 1つのsodan/備忘録の取得
-      parameters:
-        - name: wikiId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: wikiID
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/wikiAbstract'
   /sodan:
     get:
       tags:
