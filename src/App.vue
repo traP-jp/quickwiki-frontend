@@ -15,8 +15,9 @@
         <router-link to="/mywiki">QuickWiki</router-link>|
         <router-link to="/createsodan">CreateSodan</router-link>|
         <router-link to="/sodan/1">Sodan1</router-link>|
-        <router-link to="/search">Search</router-link>|
-        <router-link to="/lectures/sougou">Lectures</router-link>|
+        <router-link to="/wiki/like">LikeWiki</router-link>|
+        <router-link to="/wiki/mywiki">MyWiki</router-link>|
+        <router-link to="/lectures">Lectures</router-link>|
         <router-link to="/mysodan">MySodan</router-link>|
         <router-link to="/creatememo">CreateMemo</router-link>|
         <router-link to="/mywiki">MyWiki</router-link>|
