@@ -71,7 +71,7 @@ const TagClick = (tag :string) => {
             <!-- <button type="button" @click="SelectWiki(wiki)"> -->
                 <th class="title">{{ wiki.title }}</th>
                 <th class="content">{{ wiki.Abstract }}</th>
-                <th>
+                <th class="tags">
                     <div  v-for="tag in wiki.tags" :key="tag" class="tag">
                         <button type="button" @click.stop="TagClick(tag)"> {{ tag }}</button>
                     </div>
@@ -89,12 +89,15 @@ button{
 tr:hover{
     background-color: rgb(211, 211, 211);
 }
+tr:has(.tag:hover){
+    background-color: rgb(244, 244, 244);
+}
 tr{
     background-color: rgb(244, 244, 244);
     padding-right: 4px;
     width: 30%;
     height: 70px;
-    transition: background-color 0.25ms;
+    transition: background-color 0.175s 0.075s ease-out;
 }
 table {
     border-spacing: 0 2px;
@@ -112,7 +115,8 @@ table {
 .tag{
     background-color: rgb(200, 200, 200);
     border-radius: 2px;
-    margin: 2px;
+    margin: 3px;
+    margin-right: 7px;
     font-size: 10px;
 }
 </style>

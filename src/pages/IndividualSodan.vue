@@ -113,7 +113,7 @@ const TagClick = (tag :string) => {
 
 <style scoped>
 .tag{
-    background-color: rgb(220, 220, 220);
+    background-color: rgb(244, 244, 244);
     border-radius: 2px;
     margin: 2px;
     font-size: 13px;
@@ -127,7 +127,7 @@ h2{
     text-align: left;
 }
 .msg{
-    background-color: rgb(231, 231, 231);
+    background-color: rgb(244, 244, 244);
     margin-top: 15px;
     padding:5px;
     font-weight:bold;
