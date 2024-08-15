@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, transformVNodeArgs } from 'vue'
+import { ref } from 'vue'
 import router from '../router';
 
 const SearchWord = ref<string>("");
