@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import router from '../router';
+
 
 type Wiki = {
     id: number,
@@ -14,28 +15,39 @@ type Wiki = {
     tags: string[]
 }
 const ErrorMessage = ref<string>("");
-const tags = ref<string[]>([]);
-const keywords = ref<string[]>([]);
+const getTags = ref<string[]>([]);
+const getKeywords = ref<string[]>([]);
 const route = useRoute();
 const wikis = ref<Wiki[]>([])
 
-onMounted(async () => {
-    if(route.query.keywords != null && route.query.tags != null && typeof(route.query.keywords) == 'string' && typeof(route.query.tags) == 'string'){
-        keywords.value = route.query.keywords.split(',');
-        tags.value = route.query.tags.split(',');
-    }
+async function Search(keywords :string[],tags :string[]) {
     const responce = await fetch('/api/wiki/search', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            query: keywords.value[0], 
-            tags: tags.value})
+            query: keywords[0], 
+            tags: tags})
     }).catch((e) => console.log(e))
     if(responce && responce.ok){
         wikis.value = await responce.json();
     }
+}
+onMounted(() =>{
+    if(route.query.keywords != null && route.query.tags != null && typeof(route.query.keywords) == 'string' && typeof(route.query.tags) == 'string'){
+        getKeywords.value = route.query.keywords.split(',');
+        getTags.value = route.query.tags.split(',');
+    }
+    Search(getKeywords.value, getTags.value);
+});
+onBeforeRouteUpdate((to, from) => {
+    console.log('search')
+    if(to.query.keywords != null && to.query.tags != null && typeof(to.query.keywords) == 'string' && typeof(to.query.tags) == 'string'){
+        getKeywords.value = to.query.keywords.split(',');
+        getTags.value = to.query.tags.split(',');
+    }
+    Search(getKeywords.value,getTags.value);
 });
 const SelectWiki = (wiki :Wiki) =>{
     console.log(wiki)

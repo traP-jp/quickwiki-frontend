@@ -7,7 +7,7 @@ const Words = ref<string[]>([])
 const ErrorMessage = ref<string>("");
 const tags = ref<string[]>([]);
 const keywords = ref<string[]>([]);
-const submit = () => {
+const Submit = () => {
     if(SearchWord.value == ''){
         return false;
     }
@@ -33,7 +33,7 @@ const submit = () => {
 </script>
 
 <template>
-    <input v-model="SearchWord" type="text">
-    <input type="button" @click="submit" value="検索">
+    <input v-model="SearchWord" type="text" @keypress.enter="Submit">
+    <input type="button" @click="Submit" value="検索">
     <router-view />
 </template>
