@@ -12,6 +12,7 @@ import Search from './pages/Search.vue'
 import CreateMemo from './pages/CreateMemo.vue'
 import TagPage from './pages/TagPage.vue'
 import ApiTest from './pages/ApiTest.vue'
+import API_URL from ''
 
 const routes = [
   { path: '/createsodan', name: 'createsodan', component: CreateSodan },
