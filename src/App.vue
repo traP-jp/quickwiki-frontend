@@ -1,8 +1,18 @@
 <template>
   <main>
+    <h1 :class="$style.theme">QuickWiki</h1>
     <div :class="$style.container">
       <header :class="$style.header">
-        <router-link to="/">Home</router-link>|
+        <router-link to="/mywiki">QuickWiki</router-link>|
+        <router-link to="/createsodan">匿名質問</router-link>|
+        <router-link to="/creatememo">Wikiを書く</router-link>|
+        <router-link to="/lectures/sougou">講習会資料</router-link>|
+      </header>
+
+    </div>
+    <div :class="$style.container">
+      <header :class="$style.header">
+        <router-link to="/mywiki">QuickWiki</router-link>|
         <router-link to="/createsodan">CreateSodan</router-link>|
         <router-link to="/sodan/1">Sodan1</router-link>|
         <router-link to="/wiki/like">LikeWiki</router-link>|
@@ -21,6 +31,10 @@
 </template>
 
 <style module>
+.theme {
+  color: rgb(253, 122, 0);
+}
+
 .container {
   max-width: fit-content;
   margin: auto;

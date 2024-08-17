@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from './pages/HomePage.vue'
+import MyWiki from './pages/MyWiki.vue'
 import NotFound from './pages/NotFound.vue'
 import CreateSodan from './pages/CreateSodan.vue'
 import IndividualSodan from './pages/IndividualSodan.vue'
@@ -12,11 +12,14 @@ import Search from './pages/Search.vue'
 import CreateMemo from './pages/CreateMemo.vue'
 import TagPage from './pages/TagPage.vue'
 import ApiTest from './pages/ApiTest.vue'
+import API_URL from ''
 
 const routes = [
-  { path: '/', name: 'home', component: HomePage },
+  { path: '/mywiki', name: 'mywiki', component: MyWiki },
   { path: '/createsodan', name: 'createsodan', component: CreateSodan },
   { path: '/sodan/:id', name: 'individualsodan', component: IndividualSodan },
+  { path: '/search', name: 'search', component: Search },
+  { path: '/lectures/:teams', name: 'teamlectures', component: Lectures},
   { path: '/wiki', name: 'wiki', component: Wiki, children: [
         {
           path: 'mywiki',
