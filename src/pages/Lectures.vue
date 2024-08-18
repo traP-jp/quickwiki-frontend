@@ -36,14 +36,14 @@ const isUrl = (url :string) =>{
         </div>
         <sidebar :class="$style.sidebar">
             <h2>講習会</h2>
-            <router-link to="/lectures/sougou">総合/融合</router-link>
-            <router-link to="/lectures/SysAd">SysAd</router-link>
-            <router-link to="/lectures/algorithm">アルゴリズム</router-link>
-            <router-link to="/lectures/CTF">CTF</router-link>
-            <router-link to="/lectures/Kaggle">Kaggle</router-link>
-            <router-link to="/lectures/Game">ゲーム</router-link>
-            <router-link to="/lectures/sound">サウンド</router-link>
-            <router-link to="/lectures/graphics">グラフィック/デザイン</router-link>
+            <router-link to="/lectures/sougou">総合/融合</router-link>|
+            <router-link to="/lectures/SysAd">SysAd</router-link>|
+            <router-link to="/lectures/algorithm">アルゴリズム</router-link>|
+            <router-link to="/lectures/CTF">CTF</router-link>|
+            <router-link to="/lectures/Kaggle">Kaggle</router-link>|
+            <router-link to="/lectures/Game">ゲーム</router-link>|
+            <router-link to="/lectures/sound">サウンド</router-link>|
+            <router-link to="/lectures/graphics">グラフィック/デザイン</router-link>|
             <router-link to="/lectures/others"><h2>その他講習会</h2></router-link>
         </sidebar>
     </div>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import router from '../router';
+
 
 type Wiki = {
     id: number,
@@ -14,28 +15,39 @@ type Wiki = {
     tags: string[]
 }
 const ErrorMessage = ref<string>("");
-const tags = ref<string[]>([]);
-const keywords = ref<string[]>([]);
+const getTags = ref<string[]>([]);
+const getKeywords = ref<string[]>([]);
 const route = useRoute();
 const wikis = ref<Wiki[]>([])
 
-onMounted(async () => {
-    if(route.query.keywords != null && route.query.tags != null && typeof(route.query.keywords) == 'string' && typeof(route.query.tags) == 'string'){
-        keywords.value = route.query.keywords.split(',');
-        tags.value = route.query.tags.split(',');
-    }
+async function Search(keywords :string[],tags :string[]) {
     const responce = await fetch('/api/wiki/search', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            query: keywords.value[0], 
-            tags: tags.value})
+            query: keywords[0], 
+            tags: tags})
     }).catch((e) => console.log(e))
     if(responce && responce.ok){
         wikis.value = await responce.json();
     }
+}
+onMounted(() =>{
+    if(route.query.keywords != null && route.query.tags != null && typeof(route.query.keywords) == 'string' && typeof(route.query.tags) == 'string'){
+        getKeywords.value = route.query.keywords.split(',');
+        getTags.value = route.query.tags.split(',');
+    }
+    Search(getKeywords.value, getTags.value);
+});
+onBeforeRouteUpdate((to, from) => {
+    console.log('search')
+    if(to.query.keywords != null && to.query.tags != null && typeof(to.query.keywords) == 'string' && typeof(to.query.tags) == 'string'){
+        getKeywords.value = to.query.keywords.split(',');
+        getTags.value = to.query.tags.split(',');
+    }
+    Search(getKeywords.value,getTags.value);
 });
 const SelectWiki = (wiki :Wiki) =>{
     console.log(wiki)
@@ -59,7 +71,7 @@ const TagClick = (tag :string) => {
             <!-- <button type="button" @click="SelectWiki(wiki)"> -->
                 <th class="title">{{ wiki.title }}</th>
                 <th class="content">{{ wiki.Abstract }}</th>
-                <th>
+                <th class="tags">
                     <div  v-for="tag in wiki.tags" :key="tag" class="tag">
                         <button type="button" @click.stop="TagClick(tag)"> {{ tag }}</button>
                     </div>
@@ -77,12 +89,15 @@ button{
 tr:hover{
     background-color: rgb(211, 211, 211);
 }
+tr:has(.tag:hover){
+    background-color: rgb(244, 244, 244);
+}
 tr{
     background-color: rgb(244, 244, 244);
     padding-right: 4px;
     width: 30%;
     height: 70px;
-    transition: background-color 0.25ms;
+    transition: background-color 0.175s 0.075s ease-out;
 }
 table {
     border-spacing: 0 2px;
@@ -100,7 +115,8 @@ table {
 .tag{
     background-color: rgb(200, 200, 200);
     border-radius: 2px;
-    margin: 2px;
+    margin: 3px;
+    margin-right: 7px;
     font-size: 10px;
 }
 </style>

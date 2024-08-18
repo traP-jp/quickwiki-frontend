@@ -15,7 +15,6 @@ import ApiTest from './pages/ApiTest.vue'
 import API_URL from ''
 
 const routes = [
-  { path: '/mywiki', name: 'mywiki', component: MyWiki },
   { path: '/createsodan', name: 'createsodan', component: CreateSodan },
   { path: '/sodan/:id', name: 'individualsodan', component: IndividualSodan },
   { path: '/search', name: 'search', component: Search },
@@ -23,7 +22,8 @@ const routes = [
   { path: '/wiki', name: 'wiki', component: Wiki, children: [
         {
           path: 'mywiki',
-          component: MyWiki
+          component: MyWiki,
+          alias: '/'
         },
         {
           path: 'like',
@@ -34,7 +34,6 @@ const routes = [
           component: Search
         }
       ] },
-  { path: '/lectures', name: 'lectures', component: Lectures },
   { path: '/mysodan', name: 'mysodan', component: MySodan },
   { path: '/creatememo', name: 'creatememo', component: CreateMemo },
   { path: '/tag/:name', name: 'tagpage', component: TagPage },
