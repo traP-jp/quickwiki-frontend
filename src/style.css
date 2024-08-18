@@ -26,7 +26,7 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
+  width: 100vw;
   min-height: 100vh;
 }
 
@@ -58,13 +58,6 @@ button:focus-visible {
   padding: 2em;
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -77,3 +70,31 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+article {
+  display: grid;
+  grid-template-columns: 12% 88%;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer {
+  height: 150px;
+  background: lightgreen;
+  padding: 20px;
+}
+
+
+

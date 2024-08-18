@@ -1,17 +1,13 @@
-<template>
-  <main>
-    <h1 :class="$style.theme">QuickWiki</h1>
-    <div :class="$style.container">
-      <header :class="$style.header">
-        <router-link to="/mywiki">QuickWiki</router-link>|
-        <router-link to="/createsodan">匿名質問</router-link>|
-        <router-link to="/creatememo">Wikiを書く</router-link>|
-        <router-link to="/lectures/sougou">講習会資料</router-link>|
-      </header>
+<script setup lang="ts">
+import Header from "./components/Header.vue";
+</script>
 
-    </div>
-    <div :class="$style.container">
-      <header :class="$style.header">
+<template>
+  <div>
+    <Header />
+    <router-view />
+    <div>
+      <footer>
         <router-link to="/mywiki">QuickWiki</router-link>|
         <router-link to="/createsodan">CreateSodan</router-link>|
         <router-link to="/sodan/1">Sodan1</router-link>|
@@ -22,25 +18,7 @@
         <router-link to="/mywiki">MyWiki</router-link>|
         <router-link to="/apitest">apitest</router-link>|
         <router-link to="/tekitounayatu">notfound</router-link>|
-      </header>
-
-      <router-view />
+      </footer>
     </div>
-  </main>
+  </div>
 </template>
-
-<style module>
-.theme {
-  color: rgb(253, 122, 0);
-}
-
-.container {
-  max-width: fit-content;
-  margin: auto;
-}
-
-.header {
-  display: flex;
-  justify-content: center;
-}
-</style>
