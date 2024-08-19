@@ -23,6 +23,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ping'
+  /lecture: 
+    post: 
+      tags:
+        - lecture
+      summary: 新しい講習会情報の作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/lectureWithoutId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lecture'
   /lecture/{lectureId}:
     get:
       tags:
@@ -101,17 +119,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/folderList'
   /wiki/search:
-    get:
+    post:
       tags:
         - wiki
       summary: sodanと備忘録の検索
-      parameters:
-        - name: keyword
-          in: query
-          required: true
-          schema:
-            type: string
-          description: 検索キーワード
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/searchRequest'
       responses:
         '200':
           description: OK
@@ -138,14 +155,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/wikiList'
-  /wiki/{wikiId}:
+  /sodan:
     get:
       tags:
         - wiki
-      summary: 1つのsodan/備忘録の取得
+      summary: 特定のsodanを取得
       parameters:
         - name: wikiId
-          in: path
+          in: query
           required: true
           schema:
             type: string
@@ -156,8 +173,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/wikiContent'
+                $ref: '#/components/schemas/sodan'
+      description: answerMessagesには，回答に対してもう一度する質問も含まれる
   /memo:
+    get:
+      tags:
+        - wiki
+      summary: 備忘録の取得
+      parameters:
+        - name: wikiId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: wikiID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/memo'
     post:
       tags:
         - wiki
@@ -174,7 +210,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/wikiContent'
+                $ref: '#/components/schemas/wikiAbstract'
     patch:
       tags:
         - wiki
@@ -191,7 +227,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/wikiContent'
+                $ref: '#/components/schemas/wikiAbstract'
     delete:
       tags:
         - wiki
@@ -212,7 +248,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/wikiContent'
+                $ref: '#/components/schemas/wikiAbstract'
   /memo/user/{userId}: 
     get:
       tags:
@@ -283,8 +319,8 @@ components:
     wikiList:
       type: array
       items:
-        $ref: '#/components/schemas/wikiContent'
-    wikiContent:
+        $ref: '#/components/schemas/wikiAbstract'
+    wikiAbstract:
       type: object
       properties:
         id:
@@ -296,7 +332,7 @@ components:
         title:
           type: string
           example: Introduction to Computer Science
-        content:
+        Abstract:
           type: string
           example: This is an introductory course to computer science
         createdAt:
@@ -354,3 +390,98 @@ components:
         ownerTraqId:
           type: string
           example: kavos
+    searchRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          example: 検索キーワード
+        tags:
+          type: array
+          items:
+            type: string
+          example: [ComputerScience, Python]
+    lectureWithoutId:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Introduction to Computer Science
+        content:
+          type: string
+          example: マークダウン形式 資料へのリンク
+        folderpath:
+          type: string
+          example: /School/ComputerScience
+    sodan:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        title:
+          type: string
+          example: Introduction to Computer Science
+        tags:
+          type: array
+          items:
+            type: string
+            example: ComputerScience
+        questionMessage:
+          $ref: '#/components/schemas/message'
+        answerMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/message'
+    message:
+      type: object
+      properties:
+        userTraqId:
+          type: string
+          example: kavos
+        content:
+          type: string
+          example: メッセージの中身
+        createdAt:
+          type: string
+          example: 2021-01-01 00:00:00
+        updatedAt:
+          type: string
+          example: 2021-01-01 00:00:00
+        stamps:
+          type: array
+          items:
+            type: object
+            properties:
+              stampId:
+                type: string
+                example: abcd-efgh-ijkl
+              count:
+                type: integer
+                example: 3
+    memo: 
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        title:
+          type: string
+          example: Introduction to Computer Science
+        content:
+          type: string
+          example: This is an introductory course to computer science
+        ownerTraqId:
+          type: string
+          example: kavos
+        tags:
+          type: array
+          items:
+            type: string
+            example: ComputerScience
+        createdAt:
+          type: string
+          example: 2021-01-01 00:00:00
+        updatedAt:
+          type: string
+          example: 2021-01-01 00:00:00
