@@ -66,14 +66,14 @@ const TagClick = (tag :string) => {
 </script>
 
 <template>
-    <table>
+    <table class="searchCard">
         <tr v-for="wiki in wikis" :key="wiki.id" @click="SelectWiki(wiki)">
             <!-- <button type="button" @click="SelectWiki(wiki)"> -->
                 <th class="title">{{ wiki.title }}</th>
                 <th class="content">{{ wiki.Abstract }}</th>
                 <th class="tags">
                     <div  v-for="tag in wiki.tags" :key="tag" class="tag">
-                        <button type="button" @click.stop="TagClick(tag)"> {{ tag }}</button>
+                        <button class="tagbutton" type="button" @click.stop="TagClick(tag)"> {{ tag }}</button>
                     </div>
                 </th>
             <!-- </button> -->
@@ -81,30 +81,29 @@ const TagClick = (tag :string) => {
     </table>
 </template>
 <style scoped>
-button{
+.tagbutton{
     width: 100%;
     height:100%;
     border-radius: 0%;
 }
-tr:hover{
+.searchCard tr:hover{
     background-color: rgb(211, 211, 211);
 }
-tr:has(.tag:hover){
+.searchCard tr:has(.tag:hover){
     background-color: rgb(244, 244, 244);
 }
-tr{
+.searchCard tr{
     background-color: rgb(244, 244, 244);
     padding-right: 4px;
     width: 30%;
     height: 70px;
     transition: background-color 0.175s 0.075s ease-out;
 }
-table {
+.searchCard{
     border-spacing: 0 2px;
     width: 90%;
     table-layout: fixed;
-    margin: 0 auto;
-    
+    margin: 0 auto; 
 }
 .title{
     font-size: 20px;
