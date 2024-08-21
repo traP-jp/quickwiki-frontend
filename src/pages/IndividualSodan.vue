@@ -3,6 +3,9 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import router from '../router'
 import { Marked } from 'marked'
+import hljs from 'highlight.js'
+import { markedHighlight } from 'marked-highlight'
+import 'highlight.js/styles/github-dark.css'
 
 type Sodan = {
   id: number,
@@ -35,10 +38,19 @@ type Sodan = {
     }
   ]
 }
-const question = ref<string>( );
+const title = ref<string>("");
+const question = ref<string>("");
 const answers = ref<string[]>([]);
 const route = useRoute();
-const marked = new Marked();
+const marked = new Marked(markedHighlight({
+      langPrefix: 'hljs language-',
+      highlight(code, lang) {
+        const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+        return hljs.highlight(code, { language }).value
+      }
+    })
+);
+marked.setOptions({ breaks: true });
 const sodan = ref<Sodan>({
   id: 0,
   title: "",
@@ -74,17 +86,18 @@ const sodan = ref<Sodan>({
 });
 
 onMounted(async () => {
-    
-    const responce = await fetch('/api/sodan?wikiId=' + route.params.id)
-    if(responce.ok){
-        sodan.value = await responce.json();
-    }
-    question.value = await marked.parse(sodan.value.questionMessage.content);
-    for(let i=0; i < sodan.value.answerMessages.length; i++){
-      answers.value[i] = await marked.parse(sodan.value.answerMessages[i].content);
-      sodan.value.answerMessages[i].content = answers.value[i]
 
-    }
+  const responce = await fetch('/api/sodan?wikiId=' + route.params.id)
+  if(responce.ok){
+      sodan.value = await responce.json();
+  }
+  title.value = await marked.parse(sodan.value.title);
+  question.value = await marked.parse(sodan.value.questionMessage.content);
+  for(let i=0; i < sodan.value.answerMessages.length; i++){
+    answers.value[i] = await marked.parse(sodan.value.answerMessages[i].content);
+    sodan.value.answerMessages[i].content = answers.value[i]
+
+  }
 })
 const TagClick = (tag :string) => {
     router.push('/tag/' + tag)
@@ -94,24 +107,37 @@ const TagClick = (tag :string) => {
 </script>
 
 <template>
-    <h1>{{ sodan.title }}</h1>
-    <div class="clear">
+  <h2>title:</h2>
+  <div class="title" v-html="title"></div>
+  <div class="tagcontainer">
     <button type="button" @click="TagClick(tag)" v-for="tag in sodan.tags" :key="tag" class="tag">{{ tag }}</button>
+  </div>
+  <br>
+  <br>
+  <h2>question:</h2>
+  <div v-html="question" class="msg leftContent"></div>
+  <!-- markdownにする！！！！！！！ -->
+  <h2>answer:</h2>
+  <div v-for="msg in sodan.answerMessages" :key="msg.createdAt" class="leftContent">
+    <div>
+      <div v-html="msg.content" class="msg" :class="{ isOthers: msg.userTraqId != sodan.questionMessage.userTraqId }"></div>
     </div>
-    <br>
-    <br>
-    <h2>question:</h2>
-    <div v-html="question" class="msg leftContent"></div>
-    <!-- markdownにする！！！！！！！ -->
-     <h2>answer:</h2>
-     <div v-for="msg in sodan.answerMessages" :key="msg.createdAt" :class="{leftContent: msg.userTraqId == sodan.questionMessage.userTraqId}">
-        <div :class="{rightContent: msg.userTraqId != sodan.questionMessage.userTraqId}">
-            <div v-html="msg.content" class="msg"></div>
-        </div>
-     </div>
+  </div>
 </template>
 
 <style scoped>
+.title{
+    text-align: left;
+    background-color: rgb(244, 244, 244);
+    margin-top: 5px;
+    padding:5px;
+    font-weight:bold;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+.tagcontainer{
+  margin-top: 10px;
+}
 .tag{
     background-color: rgb(244, 244, 244);
     border-radius: 2px;
@@ -133,6 +159,9 @@ h2{
     font-weight:bold;
     padding-left: 40px;
     padding-right: 40px;
+}
+.isOthers{
+  background-color: rgb(228, 228, 228);
 }
 .leftContent{
     text-align: left;

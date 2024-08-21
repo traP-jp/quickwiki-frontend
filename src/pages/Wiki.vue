@@ -33,7 +33,7 @@ const Submit = () => {
 </script>
 
 <template>
-    <input v-model="SearchWord" type="text" @keypress.enter="Submit">
+    <input v-model="SearchWord" type="search" @keypress.enter="Submit">
     <input type="button" @click="Submit" value="検索">
     <router-view />
 </template>
