@@ -17,9 +17,13 @@ const SubmitSodan = async() =>{
 }
 </script>
 <template>
-    <h1>CreateSodan</h1>
-    <MarkDownEditor />
+    <div :class="$style.contents">
+        <h1>CreateSodan</h1>
+        <MarkDownEditor />
+    </div>
 </template>
 <style module>
-
+.contents{
+    padding-left: 20px;
+}
 </style>

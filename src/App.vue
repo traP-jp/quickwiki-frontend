@@ -5,6 +5,14 @@ import Header from "./components/Header.vue";
 <template>
   <div>
     <Header />
-    <router-view />
+    <div :class="$style.contents">
+      <router-view />
+    </div>
   </div>
 </template>
+<style module>
+.contents {
+  margin-top: 100px;
+  height: 100vh;
+}
+</style>
