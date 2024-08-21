@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@vitejs/plugin-vue-jsx": "^4.0.0",
+    "highlight.js": "^11.10.0",
+    "marked": "^14.0.0",
+    "marked-highlight": "^2.1.4",
     "vue": "^3.4.35",
     "vue-router": "^4.4.3"
   },
