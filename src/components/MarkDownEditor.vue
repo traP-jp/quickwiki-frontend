@@ -4,6 +4,13 @@ import { Marked } from 'marked'
 import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
+import router from '../router'
+import {useToast} from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+
+const props = defineProps({
+    isSodan: Boolean
+})
 
 const title = ref<string>('');
 const Content = ref<string>("");
@@ -17,6 +24,8 @@ const enterFlg = ref<boolean>(false);
 const lockFlg = ref<boolean>(false);
 const tabFlg = ref<boolean>(false);
 const shiftTabFlg = ref<boolean>(false);
+const wikiId = ref<number>(-1);
+const $toast = useToast();
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
@@ -78,7 +87,7 @@ const CheckList = (kaigyouIndex: number, corsorpos: number) => {
     
     if(afterContents.value[kaigyouIndex-1].startsWith("- ",countTab*2)){
         if(afterContents.value[kaigyouIndex-1].slice(countTab*2) == "- "){
-            afterContents.value = afterContents.value.slice(0,kaigyouIndex-1).concat(afterContents.value.slice(count));
+            afterContents.value = afterContents.value.slice(0,kaigyouIndex-1).concat(afterContents.value.slice(kaigyouIndex));
             return corsorpos-3-countTab*2
             // afterContents.value[kaigyouIndex-1] = "";
             
@@ -221,7 +230,8 @@ const ChangeCorsorPos = (kaigyouIndex: number, corsorPos: number,maxRowIndex: nu
     }else{
         corsorColnum = getColnum(Content.value.slice(getPosBeforeKaigyou(beforeCorsorPos),beforeCorsorPos) + "|") -1;
     } 
-
+    console.log(corsorColnum);
+    
     let beforekaigyouPos = 0;
     for(let i=0; i < kaigyouIndex -1; i++){
         beforekaigyouPos += afterContents.value[i].length + 1;
@@ -231,12 +241,15 @@ const ChangeCorsorPos = (kaigyouIndex: number, corsorPos: number,maxRowIndex: nu
     let i = 0
     let targetRowContents = [""]
     if(moveTwoLine){
+        console.log("two");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex+1])
         setCorsorPos = nextkaigyouPos + afterContents.value[kaigyouIndex].length + 1;
     }else if(maxRowIndex < kaigyouIndex){
+        console.log("max < kaigy");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex-1])
         setCorsorPos = beforekaigyouPos;
     }else{
+        console.log("other:row");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex])
         setCorsorPos = nextkaigyouPos;
     }
@@ -267,15 +280,19 @@ const CheckTable = (kaigyouIndex: number, corsorPos: number) =>{
     }
     afterContents.value.splice(tables.maxRow + 1,1)
     if(addRowFlg && kaigyouIndex - 1 != tables.minRow ){
+        console.log("k-1=min");
         afterContents.value.splice(kaigyouIndex, 0, CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 1, false);
     }else if(addRowFlg && tables.maxRow == tables.minRow){
+        console.log("max=min");
         afterContents.value.splice(kaigyouIndex, 0, CreateRow(colnum, maxlength, true), CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 2, true);
     }else if(addRowFlg && tables.maxRow - tables.minRow == 1){
+        console.log("max-1=min");
         afterContents.value.splice(kaigyouIndex + 1, 0, CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 1, true);
     }else{
+        console.log("other");
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow, kaigyouIndex - 1 == tables.minRow);
     }
     addRowFlg = true;
@@ -367,7 +384,7 @@ const CreateTable = () =>{
         document.querySelector('textarea')?.focus();
         document.querySelector('textarea')?.setSelectionRange(corsorPos+12,corsorPos+12);
     }else{
-        Content.value += "| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text     | Text     |"
+        Content.value += "| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text     | Text     |\n\n"
         document.querySelector('textarea')?.focus();
         document.querySelector('textarea')?.setSelectionRange(3,3);
     }
@@ -421,8 +438,114 @@ watch(contentHistory,() =>{
     }
     },{ deep: true }
 );
+
+const Update = async() =>{
+    if(props.isSodan){
+        console.log("sodan");
+        // const responce = await fetch('/api/sodan', {
+        //     method: 'PATCH',
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify({
+        //         title: title.value, 
+        //         content: Content.value,
+        //         ownerTraqId: "test"})
+        // }).catch((e) => console.log(e))
+        // if(responce && responce.ok){
+        //     const wikiAbstract = await responce.json();
+        //     router.push("/memo/" + wikiAbstract.id)
+        // }
+    }else{
+        const responce = await fetch('/api/memo', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: wikiId.value,
+                title: title.value, 
+                content: Content.value,
+                ownerTraqId: "test"})
+        }).catch((e) =>{
+            $toast.error("something wrong", {
+                duration: 1200,
+                position:  'top-right'
+            })
+            return e})
+        if(responce.ok){
+            $toast.success("saved!!", {
+                duration: 1200,
+                position:  'top-right'
+            })
+        }
+    }
+    console.log(props.isSodan);
+}
+const Create = async(CreateButtonDown: boolean) =>{ 
+    if(props.isSodan){
+        console.log("sodan");
+        // const responce = await fetch('/api/sodan', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify({
+        //         title: title.value, 
+        //         content: Content.value,
+        //         ownerTraqId: "test"})
+        // }).catch((e) => console.log(e))
+        // if(responce && responce.ok){
+        //     const wikiAbstract = await responce.json();
+        //     wikiId.value = wikiAbstract.id;
+        //     if(CreateButtonDown)router.push("/sodan/" + wikiAbstract.id);
+        // }
+    }else{
+        const responce = await fetch('/api/memo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title.value, 
+                content: Content.value,
+                ownerTraqId: "test"})
+        }).catch((e) => {
+            $toast.error("something wrong", {
+                duration: 1200,
+                position:  'top-right'
+            });
+            return e;
+        })
+        if(responce && responce.ok){
+            const wikiAbstract = await responce.json();
+            wikiId.value = wikiAbstract.id;
+            if(CreateButtonDown){
+                router.push("/memo/" + wikiAbstract.id);
+            }else{
+                $toast.success("saved!!", {
+                duration: 1200,
+                position:  'top-right'
+            })
+            }
+        }
+    }
+    console.log(props.isSodan);
+}
+const Save = () =>{
+    if(wikiId.value >= 0){
+        Update();
+    }else{
+        Create(false);
+    }
+}
+
 </script>
 <template>
+    <div :class="$style.buttons">
+        <button type="button" @click="Save">save</button>
+        <button type="button" @click="Create(true)">create</button>
+    </div>
     <div :class="$style.editors">
         <div :class="[$style.editor, $style.content]">
             <div :class="$style.uppercontent">
@@ -451,9 +574,15 @@ watch(contentHistory,() =>{
     <!-- <buton type="button" @click="SubmitSodan"></buton> -->
 </template>
 <style module>
+.buttons{
+    text-align: right;
+    padding-right: 10%;
+}
+.buttons button{
+    margin-left: 5px;
+}
 .viewer th{
     border: 1px solid black;
-
     background-color: rgb(244, 244, 244);
 }
 .viewer td{
@@ -473,12 +602,6 @@ watch(contentHistory,() =>{
     table-layout: fixed;
     margin: 0 auto; 
 }
-.viewer h1{
-    text-align: left;
-}
-.viewer h2{
-    text-align: left;
-}
 input{
     border:1px solid lightgray;
     width: 90%;
@@ -488,9 +611,12 @@ textarea{
     line-height: 1.5em;
     padding-top: 5px;
     width: 90%;
-    height: 100px;
+    height: 200px;
     resize:none;
     border-color: lightgray;
+}
+textarea:focus{
+    border-color: gray;
 }
 .editors{
     display: flex;
@@ -502,7 +628,7 @@ textarea{
     border:1px solid lightgray;
     border-radius: 10px;
     overflow: scroll;
-    max-height: 200px;
+    height: 200px;
 }
 .content{
     width:45%;

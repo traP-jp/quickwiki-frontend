@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import router from '../router';
-
+import {useToast} from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
 
 type Wiki = {
     id: number,
@@ -14,6 +15,7 @@ type Wiki = {
     ownerTraqId: string,
     tags: string[]
 }
+const $toast = useToast();
 const ErrorMessage = ref<string>("");
 const getTags = ref<string[]>([]);
 const getKeywords = ref<string[]>([]);
@@ -29,7 +31,13 @@ async function Search(keywords :string[],tags :string[]) {
         body: JSON.stringify({
             query: keywords[0], 
             tags: tags})
-    }).catch((e) => console.log(e))
+    }).catch((e) => {
+        $toast.error("something wrong", {
+            duration: 1200,
+            position:  'top-right'
+        })
+        return e;   
+    })
     if(responce && responce.ok){
         wikis.value = await responce.json();
     }
