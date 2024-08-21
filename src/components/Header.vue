@@ -2,7 +2,7 @@
   <div :class="$style.header_header">QuickWiki</div>
   <headerItem :class="$style.header">
     <ul>
-      <router-link to="/mywiki">
+      <router-link to="/wiki/mywiki">
             <li>QuickWiki</li>
         </router-link>
         <router-link to="/createsodan">
