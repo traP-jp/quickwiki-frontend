@@ -336,56 +336,73 @@ const Check = (corsorPos: number) =>{
 // MarkDownに変換する。editorに変化を加える or 加えたいときに呼ばれる
 const toMarkDown = async() =>{    
     if(!lockFlg.value){
-        let corsorPos = document.querySelector('textarea')?.selectionStart
-        if(enterFlg.value && corsorPos){
-            lockFlg.value = true;
-            corsorPos = Check(corsorPos);
-            Content.value = afterContents.value.join('\n');
-        }
-        if(tabFlg.value && corsorPos){
-            lockFlg.value = true;
-            let tmpflg = false;
-            for(let i=0; i < checkTargets.value.length; i++){
-                if(checkTargets.value[i] == "1. "){
-                    const splits = Content.value.slice(0, corsorPos).split(/[0-9]+\. $/)
-                    if(splits.at(-1) == "" && Content.value.slice(0, corsorPos) != ""){
-                        const tmp = Content.value.slice(0, corsorPos).match(/[0-9]+\. $/);
-                        let tmptarget = "";
-                        
-                        if(tmp) tmptarget = tmp[tmp.length -1]
-                        Content.value = Content.value.slice(0,corsorPos - tmptarget.length) + "  " + Content.value.slice(corsorPos - tmptarget.length);
+        const editor = document.querySelector("textarea");
+        if(editor != null){
+            let corsorPos = editor.selectionStart
+            if(enterFlg.value && corsorPos){
+                lockFlg.value = true;
+                corsorPos = Check(corsorPos);
+                Content.value = afterContents.value.join('\n');
+            }
+            if(tabFlg.value && corsorPos){
+                lockFlg.value = true;
+                let tmpflg = false;
+                for(let i=0; i < checkTargets.value.length; i++){
+                    if(checkTargets.value[i] == "1. "){
+                        const splits = Content.value.slice(0, corsorPos).split(/[0-9]+\. $/)
+                        if(splits.at(-1) == "" && Content.value.slice(0, corsorPos) != ""){
+                            const tmp = Content.value.slice(0, corsorPos).match(/[0-9]+\. $/);
+                            let tmptarget = "";
+                            
+                            if(tmp) tmptarget = tmp[tmp.length -1]
+                            Content.value = Content.value.slice(0,corsorPos - tmptarget.length) + "  " + Content.value.slice(corsorPos - tmptarget.length);
+                            tmpflg = true;
+                        }
+                    }else if(Content.value.slice(corsorPos - checkTargets.value[i].length, corsorPos) == checkTargets.value[i]){
+                        Content.value = Content.value.slice(0,corsorPos - checkTargets.value[i].length) + "  " + Content.value.slice(corsorPos - checkTargets.value[i].length);
                         tmpflg = true;
                     }
-                }else if(Content.value.slice(corsorPos - checkTargets.value[i].length, corsorPos) == checkTargets.value[i]){
-                    Content.value = Content.value.slice(0,corsorPos - checkTargets.value[i].length) + "  " + Content.value.slice(corsorPos - checkTargets.value[i].length);
-                    tmpflg = true;
                 }
+                if(!tmpflg){
+                    Content.value = Content.value.slice(0,corsorPos) + "  " + Content.value.slice(corsorPos);
+                }
+                corsorPos += 2;
             }
-            if(!tmpflg){
-                Content.value = Content.value.slice(0,corsorPos) + "  " + Content.value.slice(corsorPos);
-            }
-            corsorPos += 2;
-        }
-        if(shiftTabFlg.value && corsorPos){
-            lockFlg.value = true;
-            const KaigyouPos = getPosBeforeKaigyou(corsorPos)
-            if(Content.value.slice(KaigyouPos,KaigyouPos + 2) == "  "){
-                Content.value = Content.value.slice(0,KaigyouPos)+ Content.value.slice(KaigyouPos + 2);
-                if(corsorPos - KaigyouPos > 2){
-                    corsorPos -= 2;
+            if(shiftTabFlg.value && corsorPos){
+                lockFlg.value = true;
+                const KaigyouPos = getPosBeforeKaigyou(corsorPos)
+                if(Content.value.slice(KaigyouPos,KaigyouPos + 2) == "  "){
+                    Content.value = Content.value.slice(0,KaigyouPos)+ Content.value.slice(KaigyouPos + 2);
+                    if(corsorPos - KaigyouPos > 2){
+                        corsorPos -= 2;
+                    }else{
+                        corsorPos = KaigyouPos;
+                    }
                 }else{
-                    corsorPos = KaigyouPos;
+                    lockFlg.value = false;
                 }
-            }else{
-                lockFlg.value = false;
             }
+            contentHistory.value.unshift(Content.value);
+            MarkedContent.value = await marked.parse(Content.value);
+            if(corsorPos) editor.setSelectionRange(corsorPos,corsorPos)
+            editor.style.height = "auto";
+            if(editor.scrollHeight + 10 >= 200){
+                editor.style.height = (editor.scrollHeight + 10).toString() + "px";
+            }else{
+                editor.style.height = "200px"
+            }
+            // const viewer = document.getElementById("viewer");
+            // if(viewer){
+            //     if(parseInt(viewer.style.height) >= parseInt(editor.style.height) + 80){
+            //         editor.style.height = (parseInt(viewer.style.height) - 80).toString() + "px";
+            //     }else{
+            //         viewer.style.height = (parseInt(editor.style.height) + 80).toString() + "px";
+            //     }
+            // }
+            enterFlg.value = false;
+            tabFlg.value = false;
+            shiftTabFlg.value = false;
         }
-        contentHistory.value.unshift(Content.value);
-        MarkedContent.value = await marked.parse(Content.value);
-        if(corsorPos) document.querySelector('textarea')?.setSelectionRange(corsorPos,corsorPos)
-        enterFlg.value = false;
-        tabFlg.value = false;
-        shiftTabFlg.value = false;
     }else{
         lockFlg.value = false;
     }
@@ -490,24 +507,25 @@ watch(contentHistory,() =>{
 );
 
 const Update = async() =>{
-    if(props.isSodan){
-        console.log("sodan");
-        // const responce = await fetch('/api/sodan', {
-        //     method: 'PATCH',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         title: title.value, 
-        //         content: Content.value,
-        //         ownerTraqId: "test"})
-        // }).catch((e) => console.log(e))
-        // if(responce && responce.ok){
-        //     const wikiAbstract = await responce.json();
-        //     router.push("/memo/" + wikiAbstract.id)
-        // }
-    }else{
-        const responce = await fetch('/api/memo', {
+    // if(props.isSodan){
+    //     console.log("sodan");
+    //     const response = await fetch('/api/sodan', {
+    //         method: 'PATCH',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify({
+    //             title: title.value, 
+    //             content: Content.value,
+    //             ownerTraqId: "test"})
+    //     }).catch((e) => console.log(e))
+    //     if(response && response.ok){
+    //         const wikiAbstract = await response.json();
+    //         router.push("/memo/" + wikiAbstract.id)
+    //     }
+    //     return response
+    // }else{
+        const response = await fetch('/api/memo', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -523,64 +541,67 @@ const Update = async() =>{
                 position:  'top-right'
             })
             return e})
-        if(responce.ok){
+        if(response.ok){
             $toast.success("saved!!", {
                 duration: 1200,
                 position:  'top-right'
             })
         }
-    }
-    console.log(props.isSodan);
+        return response;
+    // }
 }
 const Create = async(CreateButtonDown: boolean) =>{ 
-    if(props.isSodan){
-        console.log("sodan");
-        // const responce = await fetch('/api/sodan', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         title: title.value, 
-        //         content: Content.value,
-        //         ownerTraqId: "test"})
-        // }).catch((e) => console.log(e))
-        // if(responce && responce.ok){
-        //     const wikiAbstract = await responce.json();
-        //     wikiId.value = wikiAbstract.id;
-        //     if(CreateButtonDown)router.push("/sodan/" + wikiAbstract.id);
-        // }
-    }else{
-        const responce = await fetch('/api/memo', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: title.value, 
-                content: Content.value,
-                ownerTraqId: "test"})
-        }).catch((e) => {
-            $toast.error("something wrong", {
-                duration: 1200,
-                position:  'top-right'
-            });
-            return e;
+    if(title.value == "" || Content.value == ""){
+        $toast.info("please enter the title and content", {
+            duration: 1200,
+            position:  'top-right'
         })
-        if(responce && responce.ok){
-            const wikiAbstract = await responce.json();
-            wikiId.value = wikiAbstract.id;
-            if(CreateButtonDown){
-                router.push("/memo/" + wikiAbstract.id);
-            }else{
-                $toast.success("saved!!", {
-                duration: 1200,
-                position:  'top-right'
+    }else{
+        if(props.isSodan){
+            console.log("sodan");
+            // const response = await fetch('/api/sodan', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         title: title.value, 
+            //         content: Content.value,
+            //         ownerTraqId: "test"})
+            // }).catch((e) => console.log(e))
+            // if(response && response.ok){
+            //     const wikiAbstract = await response.json();
+            //     wikiId.value = wikiAbstract.id;
+            //     if(CreateButtonDown)router.push("/sodan/" + wikiAbstract.id);
+            // }
+        }else{
+            const response = await fetch('/api/memo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title.value, 
+                    content: Content.value,
+                    ownerTraqId: "test"})
+            }).catch((e) => {
+                $toast.error("something wrong", {
+                    duration: 1200,
+                    position:  'top-right'
+                });
+                return e;
             })
+            if(response && response.ok){
+                const wikiAbstract = await response.json();
+                wikiId.value = wikiAbstract.id;
+                $toast.success("saved!!", {
+                    duration: 1200,
+                    position:  'top-right'
+                });
+                if(CreateButtonDown)router.push("/memo/" + wikiAbstract.id);
             }
         }
     }
-    console.log(props.isSodan);
 }
 const Save = () =>{
     if(title.value == "" || Content.value == ""){
@@ -597,15 +618,23 @@ const Save = () =>{
     }
 }
 
+const Show = async() =>{
+    const response = await Update();
+    if(response && response.ok){
+        router.push("/memo/" + wikiId.value);
+    }
+}
+
 </script>
 <template>
-    <div :class="$style.buttons">
+    <div class="buttons">
         <button type="button" @click="Save">save</button>
-        <button type="button" @click="Create(true)">create</button>
+        <button type="button" @click="Create(true)" v-if="wikiId < 0">create</button>
+        <button type="button" @click="Show" v-if="wikiId >= 0">show</button>
     </div>
-    <div :class="$style.editors">
-        <div :class="[$style.editor, $style.content]">
-            <div :class="$style.uppercontent">
+    <div class="editors">
+        <div class="content">
+            <div class="uppercontent">
                 <h3>title</h3>
                 <input type="text" placeholder="title..." v-model="title">
                 <h3>contents</h3>
@@ -621,16 +650,16 @@ const Save = () =>{
                 <button type="button" @click="ToBolds('[', true)"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('![', true)"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
             </div>   
-            <textarea :class="$style.downcontent" placeholder="contents..." v-model="Content" v-on:keypress.enter="EnterDown" v-on:keydown.prevent.tab.exact="TabDown" v-on:keydown.prevent.shift.tab="ShiftTabDown" v-on:keydown.prevent.ctrl.z.exact="controlzDown" v-on:keydown.prevent.ctrl.shift.z="controlshiftzDown" v-on:keydown.prevent.meta.z.exact="controlzDown" v-on:keydown.prevent.meta.shift.z="controlshiftzDown"  v-on:keydown.prevent.ctrl.s="Save"  v-on:keydown.prevent.meta.s="Save"></textarea>
+            <textarea class="editor" placeholder="contents..." v-model="Content" v-on:keypress.enter="EnterDown" v-on:keydown.prevent.tab.exact="TabDown" v-on:keydown.prevent.shift.tab="ShiftTabDown" v-on:keydown.ctrl.prevent.z.exact="controlzDown" v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" v-on:keydown.meta.prevent.z.exact="controlzDown" v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  v-on:keydown.ctrl.prevent.s="Save"  v-on:keydown.meta.prevent.s="Save"></textarea>
         </div>
-        <div :class="$style.content">
-            <div :class="$style.uppercontent"></div>
-            <div :class="[$style.viewer, $style.downcontent]" v-html="MarkedTitle + MarkedContent"></div>
+        <div class="content">
+            <div class="uppercontent"></div>
+            <div class="viewer downcontent" v-html="MarkedTitle + MarkedContent"></div>
         </div>
     </div>
     <!-- <buton type="button" @click="SubmitSodan"></buton> -->
 </template>
-<style module>
+<style scoped>
 
 .buttons{
     text-align: right;
@@ -658,6 +687,7 @@ const Save = () =>{
     border-collapse: collapse;
     width: 90%;
     table-layout: fixed;
+    height: 300px;
     margin: 0 auto; 
 }
 .viewer li:has(input){
@@ -671,16 +701,18 @@ input{
     border:1px solid lightgray;
     width: 90%;
 }
-textarea{
+.editor{
     font-size: large;
     line-height: 1.5em;
     padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
     width: 90%;
     height: 200px;
     resize:none;
     border-color: lightgray;
 }
-textarea:focus{
+.editor:focus{
     border-color: gray;
 }
 .editors{
@@ -692,8 +724,8 @@ textarea:focus{
     padding-right: 20px;
     border:1px solid lightgray;
     border-radius: 10px;
-    overflow: scroll;
-    height: 200px;
+    margin-top: 80px;
+    height: 100%;
 }
 .content{
     width:45%;
@@ -702,12 +734,9 @@ textarea:focus{
 }
 .uppercontent{
     text-align: left;
-    flex-grow: 3;
 }
 .uppercontent button{
     color: rgb(90, 90, 90);
 }
-.downcontent{
-    flex-grow: 10;
-}
+
 </style>
