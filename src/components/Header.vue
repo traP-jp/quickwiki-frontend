@@ -1,6 +1,7 @@
 <template>
   <div :class="$style.header_header">QuickWiki</div>
-  <headerItem :class="$style.header">
+  <header :class="$style.header">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     <ul>
       <router-link to="/wiki/mywiki">
             <li>QuickWiki</li>
@@ -15,7 +16,7 @@
             <li>講習会資料</li>
         </router-link>
     </ul>
-  </headerItem>
+  </header>
 </template>
 
 <style module>

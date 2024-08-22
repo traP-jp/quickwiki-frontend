@@ -19,7 +19,7 @@ const SubmitSodan = async() =>{
 <template>
     <div :class="$style.contents">
         <h1>CreateSodan</h1>
-        <MarkDownEditor />
+        <MarkDownEditor :isSodan="true" />
     </div>
 </template>
 <style module>
