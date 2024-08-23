@@ -5,6 +5,7 @@ import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import router from '../router'
+import { useUserStore } from '../store/user'
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 
@@ -27,6 +28,7 @@ const shiftTabFlg = ref<boolean>(false);
 const wikiId = ref<number>(-1);
 const $toast = useToast();
 const checkTargets = ref<string[]>(["- [ ] ", "- ", "1. ", "> "])
+const userStore = useUserStore();
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
@@ -534,7 +536,7 @@ const Update = async() =>{
                 id: wikiId.value,
                 title: title.value, 
                 content: Content.value,
-                ownerTraqId: "test"})
+                ownerTraqId: userStore.traqId})
         }).catch((e) =>{
             $toast.error("something wrong", {
                 duration: 1200,
@@ -583,7 +585,7 @@ const Create = async(CreateButtonDown: boolean) =>{
                 body: JSON.stringify({
                     title: title.value, 
                     content: Content.value,
-                    ownerTraqId: "test"})
+                    ownerTraqId: userStore.traqId})
             }).catch((e) => {
                 $toast.error("something wrong", {
                     duration: 1200,
