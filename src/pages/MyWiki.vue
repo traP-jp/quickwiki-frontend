@@ -27,15 +27,9 @@ onMounted(async () => {
   padding: 0;
 }
 
-body {
-  height: 100vh;
-}
-
 .container {
   display: flex;
   margin-top: 95px;
-  height: 100vh;
-  overflow-y: scroll;
 }
 
 main {
