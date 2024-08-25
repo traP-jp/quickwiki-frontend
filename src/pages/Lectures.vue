@@ -32,7 +32,7 @@ onBeforeRouteUpdate(async (to, from) => {
   <div :class="$style.container">
     <div class="sidebar">
       <div class="sidebar_content">
-      <h2 class="sidebar_header">講習会</h2>
+        <h2 class="sidebar_header">講習会</h2>
         <ul>
           <router-link to="/lectures/sougou">
             <li>総合/融合</li>
@@ -98,15 +98,6 @@ onBeforeRouteUpdate(async (to, from) => {
 
 .container {
   display: flex;
-  align-items: flex-start;
-  margin-top: 95px;
-  height: 100vh;
-  overflow-y: scroll;
-}
-
-main {
-  flex: 1 1 auto;
-  background: #f2f2f2;
 }
 
 .card {
