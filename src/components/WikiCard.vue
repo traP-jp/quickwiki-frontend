@@ -24,9 +24,9 @@ const SelectWiki = (wiki: Wiki) => {
     router.push("/memo/" + wiki.id.toString());
   }
 };
-const TagClick = (tag: string) => {
-  router.push("/tag/" + tag);
-};
+const TagClick = (tag :string) => {
+    router.push('/tag/' + tag.replace(/ /g, "+"))
+}
 </script>
 
 <template>

@@ -69,10 +69,12 @@ onBeforeRouteUpdate((to, from) => {
 </script>
 
 <template>
-  <table 
-    v-for="wiki in wikis"
-    :key="wiki.id"
-  >
-    <WikiCard :wiki="wiki" />
+  <table class="cardTable">
+    <WikiCard :wiki="wiki" v-for="wiki in wikis" :key="wiki.id" />
   </table>
 </template>
+<style scoped>
+.cardTable{
+    margin: 10px 0px;
+}
+</style>

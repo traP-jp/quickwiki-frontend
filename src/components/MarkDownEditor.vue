@@ -5,7 +5,6 @@ import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import router from '../router'
-import { useUserStore } from '../store/user'
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 
@@ -28,7 +27,6 @@ const shiftTabFlg = ref<boolean>(false);
 const wikiId = ref<number>(-1);
 const $toast = useToast();
 const checkTargets = ref<string[]>(["- [ ] ", "- ", "1. ", "> "])
-const userStore = useUserStore();
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
@@ -535,8 +533,7 @@ const Update = async() =>{
             body: JSON.stringify({
                 id: wikiId.value,
                 title: title.value, 
-                content: Content.value,
-                ownerTraqId: userStore.traqId})
+                content: Content.value})
         }).catch((e) =>{
             $toast.error("something wrong", {
                 duration: 1200,
@@ -585,7 +582,7 @@ const Create = async(CreateButtonDown: boolean) =>{
                 body: JSON.stringify({
                     title: title.value, 
                     content: Content.value,
-                    ownerTraqId: userStore.traqId})
+                    tags:[""]})
             }).catch((e) => {
                 $toast.error("something wrong", {
                     duration: 1200,
@@ -638,7 +635,7 @@ const Show = async() =>{
         <div :class="$style.content">
             <div :class="$style.uppercontent">
                 <h3>title</h3>
-                <input type="text" placeholder="title..." v-model="title">
+                <input type="text" placeholder="title..." v-model="title" :class="$style.title">
                 <h3>contents</h3>
                 <button type="button" @click="ToBolds('**', false)"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('*', false)"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
@@ -698,7 +695,7 @@ const Show = async() =>{
     border-left: 3px solid lightgray;
     color: gray;
 }
-input{
+.title{
     border:1px solid lightgray;
     width: 90%;
 }
