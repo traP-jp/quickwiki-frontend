@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import MyWiki from './pages/MyWiki.vue'
 import NotFound from './pages/NotFound.vue'
 import CreateSodan from './pages/CreateSodan.vue'
 import IndividualSodan from './pages/IndividualSodan.vue'
@@ -27,7 +26,7 @@ const routes = [
           alias: '/'
         },
         {
-          path: 'like',
+          path: 'favoritewiki',
           component: LikeWiki
         },
         {
