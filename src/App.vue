@@ -3,16 +3,18 @@ import Header from "./components/Header.vue";
 </script>
 
 <template>
-  <div>
+  <div :class="$style.page">
     <Header />
-    <div :class="$style.contents">
-      <router-view />
-    </div>
+    <router-view :class="$style.contents" />
   </div>
 </template>
 <style module>
+.page {
+  height: 100%;
+  background: #f2f2f2;
+  overflow-x: hidden;
+}
 .contents {
-  margin-top: 93px;
-  height: 100vh;
+  height: fit-content;
 }
 </style>

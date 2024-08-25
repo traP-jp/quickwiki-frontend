@@ -30,38 +30,40 @@ onBeforeRouteUpdate(async (to, from) => {
 </script>
 <template>
   <div :class="$style.container">
-    <sidebar class="sidebar">
+    <div class="sidebar">
+      <div class="sidebar_content">
       <h2 class="sidebar_header">講習会</h2>
-      <ul>
-        <router-link to="/lectures/sougou">
-          <li>総合/融合</li>
-        </router-link>
-        <router-link to="/lectures/SysAd">
-          <li>SysAd</li>
-        </router-link>
-        <router-link to="/lectures/algorithm">
-          <li>アルゴリズム</li>
-        </router-link>
-        <router-link to="/lectures/CTF">
-          <li>CTF</li>
-        </router-link>
-        <router-link to="/lectures/Kaggle">
-          <li>Kaggle</li>
-        </router-link>
-        <router-link to="/lectures/Game">
-          <li>ゲーム</li>
-        </router-link>
-        <router-link to="/lectures/sound">
-          <li>サウンド</li>
-        </router-link>
-        <router-link to="/lectures/graphics">
-          <li>グラフィック/デザイン</li>
-        </router-link>
-        <router-link to="/lectures/others">
-          <li>その他講習会</li>
-        </router-link>
-      </ul>
-    </sidebar>
+        <ul>
+          <router-link to="/lectures/sougou">
+            <li>総合/融合</li>
+          </router-link>
+          <router-link to="/lectures/SysAd">
+            <li>SysAd</li>
+          </router-link>
+          <router-link to="/lectures/algorithm">
+            <li>アルゴリズム</li>
+          </router-link>
+          <router-link to="/lectures/CTF">
+            <li>CTF</li>
+          </router-link>
+          <router-link to="/lectures/Kaggle">
+            <li>Kaggle</li>
+          </router-link>
+          <router-link to="/lectures/Game">
+            <li>ゲーム</li>
+          </router-link>
+          <router-link to="/lectures/sound">
+            <li>サウンド</li>
+          </router-link>
+          <router-link to="/lectures/graphics">
+            <li>グラフィック/デザイン</li>
+          </router-link>
+          <router-link to="/lectures/others">
+            <li>その他講習会</li>
+          </router-link>
+        </ul>
+      </div>
+    </div>
     <main>
       <div :class="$style.teamHeader">
         <p v-if="isUrl('sougou')">総合/融合</p>
@@ -95,18 +97,10 @@ onBeforeRouteUpdate(async (to, from) => {
 
 .container {
   display: flex;
-  margin-top: 95px;
-  height: 100vh;
-  overflow-y: scroll;
-}
-
-main {
-  flex: 1 1 auto;
-  background: #f2f2f2;
 }
 
 .card {
-  width: 100%;
+  width: 95%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -129,5 +123,12 @@ main {
   list-style: none;
 }
 
+main {
+  flex-grow: 1;
+}
+
+table {
+  width: 100%;
+}
 
 </style>
