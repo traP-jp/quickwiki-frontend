@@ -1,39 +1,101 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import router from '../router';
+import { ref } from "vue";
+import router from "../router";
+import { useRoute } from "vue-router";
 
 const SearchWord = ref<string>("");
-const Words = ref<string[]>([])
+const Words = ref<string[]>([]);
 const ErrorMessage = ref<string>("");
 const tags = ref<string[]>([]);
 const keywords = ref<string[]>([]);
 const Submit = () => {
-    if(SearchWord.value == ''){
-        return false;
+  if (SearchWord.value == "") {
+    return false;
+  }
+  tags.value = [];
+  keywords.value = [];
+  const SearchWords = SearchWord.value.split(/\s+/);
+  // SearchWords.forEach((SearchWord) =>{
+  //     Words.value = Words.value.concat(SearchWord.split("　"));
+  // })
+  SearchWords.forEach((word) => {
+    if (word.substring(0, 1) == "#" || word.substring(0, 1) == "＃") {
+      if (word.substring(1) != "") {
+        tags.value.push(word.substring(1));
+      }
+    } else {
+      if (word != "") {
+        keywords.value.push(word);
+      }
     }
-    tags.value = [];
-    keywords.value = [];
-    const SearchWords = SearchWord.value.split(/\s+/);
-    // SearchWords.forEach((SearchWord) =>{
-    //     Words.value = Words.value.concat(SearchWord.split("　"));
-    // })
-    SearchWords.forEach((word) =>{
-        if(word.substring(0,1) == "#" || word.substring(0,1) == "＃"){
-            if(word.substring(1) != ""){
-                tags.value.push(word.substring(1));
-            }
-        }else{
-            if(word != ""){
-                keywords.value.push(word);
-            }
-        }
-    })
-    router.push('/wiki/search?tags=' + tags.value.join(',') + '&keywords=' + keywords.value.join(','));
-}
+  });
+  router.push(
+    "/wiki/search?tags=" +
+      tags.value.join(",") +
+      "&keywords=" +
+      keywords.value.join(",")
+  );
+};
+
 </script>
 
 <template>
-    <input v-model="SearchWord" type="search" @keypress.enter="Submit">
-    <input type="button" @click="Submit" value="検索">
-    <router-view />
+  <div :class="$style.container">
+    <sidebar class="sidebar">
+      <ul>
+        <router-link to="/wiki/mywiki">
+          <li>自分のWiki</li>
+        </router-link>
+        <router-link to="/wiki/favoritewiki">
+          <li>お気に入りのWiki</li>
+        </router-link>
+        <router-link to="/creatememo">
+          <li>Wikiを書く</li>
+        </router-link>
+      </ul>
+    </sidebar>
+    <main>
+      <input v-model="SearchWord" type="search" @keypress.enter="Submit" />
+      <input type="button" @click="Submit" value="検索" />
+      <router-view />
+    </main>
+  </div>
 </template>
+
+<style module>
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  margin-top: 95px;
+  height: 100vh;
+  overflow-y: scroll;
+}
+
+main {
+  flex: 1 1 auto;
+  background: coral;
+}
+
+.content {
+  background-color: #d63a3a;
+  font-size: 35px;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.mainHeader {
+  font-size: 35px;
+  user-select: none;
+  text-align: left;
+  padding:  20px ;
+}
+</style>

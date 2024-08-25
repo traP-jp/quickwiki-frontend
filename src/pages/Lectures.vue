@@ -65,7 +65,7 @@ onBeforeRouteUpdate(async (to, from) => {
       </div>
     </div>
     <main>
-      <div :class="$style.teamHeader">
+      <div :class="$style.mainHeader">
         <p v-if="isUrl('sougou')">総合/融合</p>
         <p v-if="isUrl('SysAd')">SysAd</p>
         <p v-if="isUrl('algorithm')">アルゴリズム</p>
@@ -88,7 +88,7 @@ onBeforeRouteUpdate(async (to, from) => {
   </div>
 </template>
 <style module>
-.teamHeader {
+.mainHeader {
   font-size: 35px;
   user-select: none;
   text-align: left;
