@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { onBeforeRouteUpdate, useRoute } from "vue-router";
 import "../styles/SideBar.css";
 const lectures = ref<string>("Now Preparing");
+const getTeams = ref<string>("");
 
 onMounted(async () => {
   const res = await fetch(
@@ -15,6 +16,17 @@ onMounted(async () => {
 const isUrl = (url: string) => {
   return url == useRoute().params.teams;
 };
+onBeforeRouteUpdate(async (to, from) => {
+  if (to.params.teams != null && typeof to.params.teams == "string") {
+    getTeams.value = to.params.teams;
+  }
+  const res = await fetch(
+    "/api/lecture/byFolder/path?folderpath=" + getTeams.value
+  );
+  if (res.ok) {
+    lectures.value = await res.json();
+  }
+});
 </script>
 <template>
   <div :class="$style.container">
@@ -51,7 +63,7 @@ const isUrl = (url: string) => {
       </ul>
     </sidebar>
     <main>
-      <div :class="$style.secHeader">
+      <div :class="$style.teamHeader">
         <p v-if="isUrl('sougou')">総合/融合</p>
         <p v-if="isUrl('SysAd')">SysAd</p>
         <p v-if="isUrl('algorithm')">アルゴリズム</p>
@@ -62,28 +74,23 @@ const isUrl = (url: string) => {
         <p v-if="isUrl('graphics')">グラフィック</p>
         <p v-if="isUrl('others')">その他講習会</p>
       </div>
-      <div
-        v-for="lecture in lectures"
-        :key="lecture.id"
-        :class="$style.content"
-      >
-      <ul>
-        <li :class="$style.title">
-          title: {{ lecture.title }}
-        </li>
-        <li :class="$style.content">
-          content: {{ lecture.content }}
-        </li>
-      </ul>
-      </div>
+      <table>
+        <tr v-for="lecture in lectures" :key="lecture.id" :class="$style.card">
+          <ul>
+            <li :class="$style.title">{{ lecture.title }}</li>
+            <li :class="$style.content">{{ lecture.content }}</li>
+          </ul>
+        </tr>
+      </table>
     </main>
   </div>
 </template>
 <style module>
-.secHeader {
+.teamHeader {
   font-size: 35px;
   user-select: none;
   text-align: left;
+  padding:  20px ;
 }
 
 .container {
@@ -95,14 +102,32 @@ const isUrl = (url: string) => {
 
 main {
   flex: 1 1 auto;
-  background: coral;
+  background: #f2f2f2;
 }
 
-.content {
-  background-color: #d63a3a;
-  font-size: 35px;
+.card {
   width: 100%;
   height: 100%;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  transition: box-shadow 0.3s ease;
 }
+
+.title {
+  font-size: 35px;
+  text-align: left;
+  margin-left: 80px;
+  list-style: none;
+}
+.content {
+  font-size: 25px;
+  list-style: none;
+}
+
+
 </style>

@@ -3,5 +3,5 @@
 </script>
 
 <template>
-    <h1>MyWiki</h1>
+    <h1>LikeWiki</h1>
 </template>

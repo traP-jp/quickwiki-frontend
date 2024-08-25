@@ -1,8 +1,9 @@
 <template>
   <div :class="$style.header_header">QuickWiki</div>
-  <headerItem :class="$style.header">
+  <header :class="$style.header">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     <ul>
-      <router-link to="/mywiki">
+      <router-link to="/wiki/mywiki">
             <li>QuickWiki</li>
         </router-link>
         <router-link to="/createsodan">
@@ -14,21 +15,8 @@
         <router-link to="/lectures/sougou">
             <li>講習会資料</li>
         </router-link>
-
-      <!-- <li>
-        <router-link to="/mywiki">QuickWiki</router-link>
-      </li>
-      <li>
-        <router-link to="/createsodan">匿名質問</router-link>
-      </li>
-      <li>
-      <router-link to="/creatememo">Wikiを書く</router-link>
-      </li>
-      <li>
-      <router-link to="/lectures/sougou">講習会資料</router-link>
-      </li> -->
     </ul>
-  </headerItem>
+  </header>
 </template>
 
 <style module>
@@ -47,7 +35,6 @@
 .header a {
   font-size: 25px;
   color: #1a1a1a;
-  margin:10px;
   user-select: none;
 }
 
@@ -93,5 +80,6 @@
 
 .header li {
   display: inline-block;
+  padding: 0px 10px;
 }
 </style>
