@@ -41,19 +41,21 @@ const Submit = () => {
 
 <template>
   <div :class="$style.container">
-    <sidebar class="sidebar">
-      <ul>
-        <router-link to="/wiki/mywiki">
-          <li>自分のWiki</li>
-        </router-link>
-        <router-link to="/wiki/favoritewiki">
-          <li>お気に入りのWiki</li>
-        </router-link>
-        <router-link to="/creatememo">
-          <li>Wikiを書く</li>
-        </router-link>
-      </ul>
-    </sidebar>
+    <div class="sidebar">
+      <div class="sidebar_content">
+        <ul>
+          <router-link to="/wiki/mywiki">
+            <li>自分のWiki</li>
+          </router-link>
+          <router-link to="/wiki/favoritewiki">
+            <li>お気に入りのWiki</li>
+          </router-link>
+          <router-link to="/creatememo">
+            <li>Wikiを書く</li>
+          </router-link>
+        </ul>
+      </div>
+    </div>
     <main>
       <input v-model="SearchWord" type="search" @keypress.enter="Submit" />
       <input type="button" @click="Submit" value="検索" />
@@ -68,21 +70,8 @@ const Submit = () => {
   padding: 0;
 }
 
-body {
-  height: 100vh;
-}
-
 .container {
   display: flex;
-  margin-top: 95px;
-  height: 100vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
-main {
-  flex: 1 1 auto;
-  background: coral;
 }
 
 .content {
