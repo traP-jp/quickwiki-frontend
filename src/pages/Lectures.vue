@@ -76,11 +76,11 @@ onBeforeRouteUpdate(async (to, from) => {
         <p v-if="isUrl('graphics')">グラフィック</p>
         <p v-if="isUrl('others')">その他講習会</p>
       </div>
-      <table>
+      <table width="80%">
         <tr v-for="lecture in lectures" :key="lecture.id" :class="$style.card">
           <ul>
             <li :class="$style.title">{{ lecture.title }}</li>
-            <li :class="$style.content">{{ lecture.content }}</li>
+            <li :class="$style.content">講義資料url:<a href="{{ lecture.content }}">{{ lecture.content }}</a></li>
           </ul>
         </tr>
       </table>
@@ -90,6 +90,7 @@ onBeforeRouteUpdate(async (to, from) => {
 <style module>
 .mainHeader {
   font-size: 35px;
+  font-weight: bold;
   user-select: none;
   text-align: left;
   padding:  20px ;
@@ -97,6 +98,15 @@ onBeforeRouteUpdate(async (to, from) => {
 
 .container {
   display: flex;
+  align-items: flex-start;
+  margin-top: 95px;
+  height: 100vh;
+  overflow-y: scroll;
+}
+
+main {
+  flex: 1 1 auto;
+  background: #f2f2f2;
 }
 
 .card {
@@ -122,13 +132,4 @@ onBeforeRouteUpdate(async (to, from) => {
   font-size: 25px;
   list-style: none;
 }
-
-main {
-  flex-grow: 1;
-}
-
-table {
-  width: 100%;
-}
-
 </style>
