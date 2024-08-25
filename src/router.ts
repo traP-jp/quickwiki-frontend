@@ -26,7 +26,7 @@ const routes = [
           alias: '/'
         },
         {
-          path: 'like',
+          path: 'favoritewiki',
           component: LikeWiki
         },
         {
