@@ -533,8 +533,7 @@ const Update = async() =>{
             body: JSON.stringify({
                 id: wikiId.value,
                 title: title.value, 
-                content: Content.value,
-                ownerTraqId: "test"})
+                content: Content.value})
         }).catch((e) =>{
             $toast.error("something wrong", {
                 duration: 1200,
@@ -583,7 +582,7 @@ const Create = async(CreateButtonDown: boolean) =>{
                 body: JSON.stringify({
                     title: title.value, 
                     content: Content.value,
-                    ownerTraqId: "test"})
+                    tags:[""]})
             }).catch((e) => {
                 $toast.error("something wrong", {
                     duration: 1200,
@@ -627,16 +626,16 @@ const Show = async() =>{
 
 </script>
 <template>
-    <div class="buttons">
+    <div :class="$style.buttons">
         <button type="button" @click="Save">save</button>
         <button type="button" @click="Create(true)" v-if="wikiId < 0">create</button>
         <button type="button" @click="Show" v-if="wikiId >= 0">show</button>
     </div>
-    <div class="editors">
-        <div class="content">
-            <div class="uppercontent">
+    <div :class="$style.editors">
+        <div :class="$style.content">
+            <div :class="$style.uppercontent">
                 <h3>title</h3>
-                <input type="text" placeholder="title..." v-model="title">
+                <input type="text" placeholder="title..." v-model="title" :class="$style.title">
                 <h3>contents</h3>
                 <button type="button" @click="ToBolds('**', false)"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('*', false)"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
@@ -650,16 +649,16 @@ const Show = async() =>{
                 <button type="button" @click="ToBolds('[', true)"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('![', true)"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
             </div>   
-            <textarea class="editor" placeholder="contents..." v-model="Content" v-on:keypress.enter="EnterDown" v-on:keydown.prevent.tab.exact="TabDown" v-on:keydown.prevent.shift.tab="ShiftTabDown" v-on:keydown.ctrl.prevent.z.exact="controlzDown" v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" v-on:keydown.meta.prevent.z.exact="controlzDown" v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  v-on:keydown.ctrl.prevent.s="Save"  v-on:keydown.meta.prevent.s="Save"></textarea>
+            <textarea :class="$style.editor" placeholder="contents..." v-model="Content" v-on:keypress.enter="EnterDown" v-on:keydown.prevent.tab.exact="TabDown" v-on:keydown.prevent.shift.tab="ShiftTabDown" v-on:keydown.ctrl.prevent.z.exact="controlzDown" v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" v-on:keydown.meta.prevent.z.exact="controlzDown" v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  v-on:keydown.ctrl.prevent.s="Save"  v-on:keydown.meta.prevent.s="Save"></textarea>
         </div>
-        <div class="content">
-            <div class="uppercontent"></div>
-            <div class="viewer downcontent" v-html="MarkedTitle + MarkedContent"></div>
+        <div :class="$style.content">
+            <div :class="$style.uppercontent"></div>
+            <div :class="$style.viewer" v-html="MarkedTitle + MarkedContent"></div>
         </div>
     </div>
     <!-- <buton type="button" @click="SubmitSodan"></buton> -->
 </template>
-<style scoped>
+<style module>
 
 .buttons{
     text-align: right;
@@ -680,14 +679,13 @@ const Show = async() =>{
     padding-right: 4px;
     padding-left: 4px;
     width: 30%;
-    height: 70px;
+    height: 40px;
 }
 .viewer table{
     border: 1px solid black;
     border-collapse: collapse;
     width: 90%;
     table-layout: fixed;
-    height: 300px;
     margin: 0 auto; 
 }
 .viewer li:has(input){
@@ -697,7 +695,7 @@ const Show = async() =>{
     border-left: 3px solid lightgray;
     color: gray;
 }
-input{
+.title{
     border:1px solid lightgray;
     width: 90%;
 }

@@ -95,6 +95,9 @@ onBeforeRouteUpdate(async (to, from) => {
 
 .container {
   display: flex;
+  position: fixed;
+  top: 50px;
+  width: 100%;
   margin-top: 95px;
   height: 100vh;
   overflow-y: scroll;
