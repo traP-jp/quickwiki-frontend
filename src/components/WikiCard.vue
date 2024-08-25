@@ -1,0 +1,126 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import router from '../router';
+type Wiki = {
+    id: number,
+    type: string,
+    title: string,
+    Abstract: string,
+    createdAt: string,
+    updatedAt: string,
+    ownerTraqId: string,
+    tags: string[]
+}
+const props = defineProps({
+  wiki: Object
+})
+const wiki = ref(props.wiki);
+
+const SelectWiki = (wiki: Wiki) => {
+  console.log(wiki);
+  if (wiki.type == "sodan") {
+    router.push("/sodan/" + wiki.id.toString());
+  } else if (wiki.type == "memo") {
+    router.push("/memo/" + wiki.id.toString());
+  }
+};
+const TagClick = (tag :string) => {
+    router.push('/tag/' + tag.replace(/ /g, "+"))
+}
+</script>
+
+<template>
+    <tr
+      class="card"
+      @click="SelectWiki(wiki)"
+    >
+        <li class="title">{{ wiki.title }}</li>
+        <li class="content">{{ wiki.Abstract }}</li>
+      <div class="tag-container">
+        <button
+          v-for="tag in wiki.tags"
+          :key="tag"
+          class="tag-content"
+          type="button"
+          @click.stop="TagClick(tag)"
+        >
+          {{ tag }}
+        </button>
+      </div>
+    </tr>
+</template>
+
+<style scoped>
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  margin-left: 80px;
+}
+
+.tag-content {
+  display: flex;
+  align-items: left;
+  margin: 5px;
+}
+
+.card tr:hover {
+  background-color: rgb(211, 211, 211);
+}
+.card tr:has(.tag:hover) {
+  background-color: rgb(244, 244, 244);
+}
+.card tr {
+  background-color: rgb(244, 244, 244);
+  padding-right: 4px;
+  width: 30%;
+  height: 70px;
+  transition: background-color 0.175s 0.075s ease-out;
+}
+.card {
+  border-spacing: 0 2px;
+  width: 90%;
+  table-layout: fixed;
+  margin: 0 auto;
+}
+.title {
+  font-size: 20px;
+  user-select: none;
+}
+
+.content {
+  font-size: 15px;
+  text-align: left;
+  margin-left: 80px;
+  list-style: none;
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  transition: box-shadow 0.3s ease;
+}
+
+.title {
+  font-size: 35px;
+  text-align: left;
+  margin-left: 80px;
+  list-style: none;
+}
+
+.content {
+  font-size: 25px;
+  list-style: none;
+}
+
+.title:hover{
+  text-decoration: underline solid #000000 0.15rem;
+}
+</style>

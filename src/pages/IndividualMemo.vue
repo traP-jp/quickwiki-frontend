@@ -50,7 +50,7 @@ onMounted(async () => {
   updatedAt.value = memo.value.updatedAt;
 })
 const TagClick = (tag :string) => {
-    router.push('/tag/' + tag)
+    router.push('/tag/' + tag.replace(/ /g, "+"))
 }
 // errorがユーザーに伝わるように
 // 
@@ -67,6 +67,7 @@ const TagClick = (tag :string) => {
 </template>
 
 <style scoped>
+
 .title{
     text-align: left;
     margin-top: 5px;
