@@ -12,7 +12,7 @@ import Header from "./components/Header.vue";
 </template>
 <style module>
 .contents {
-  margin-top: 100px;
+  margin-top: 93px;
   height: 100vh;
 }
 </style>
