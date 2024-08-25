@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import router from '../router';
-
+import {useToast} from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
 
 type Wiki = {
     id: number,
@@ -14,11 +15,12 @@ type Wiki = {
     ownerTraqId: string,
     tags: string[]
 }
+const $toast = useToast();
 const ErrorMessage = ref<string>("");
 const getTags = ref<string[]>([]);
 const getKeywords = ref<string[]>([]);
 const route = useRoute();
-const wikis = ref<Wiki[]>([])
+const wikis = ref<Wiki[]>([]);
 
 async function Search(keywords :string[],tags :string[]) {
     const responce = await fetch('/api/wiki/search', {
@@ -29,93 +31,155 @@ async function Search(keywords :string[],tags :string[]) {
         body: JSON.stringify({
             query: keywords[0], 
             tags: tags})
-    }).catch((e) => console.log(e))
+    }).catch((e) => {
+        $toast.error("something wrong", {
+            duration: 1200,
+            position:  'top-right'
+        })
+        return e;   
+    })
     if(responce && responce.ok){
         wikis.value = await responce.json();
     }
 }
-onMounted(() =>{
-    if(route.query.keywords != null && route.query.tags != null && typeof(route.query.keywords) == 'string' && typeof(route.query.tags) == 'string'){
-        getKeywords.value = route.query.keywords.split(',');
-        getTags.value = route.query.tags.split(',');
-    }
-    Search(getKeywords.value, getTags.value);
+onMounted(() => {
+  if (
+    route.query.keywords != null &&
+    route.query.tags != null &&
+    typeof route.query.keywords == "string" &&
+    typeof route.query.tags == "string"
+  ) {
+    getKeywords.value = route.query.keywords.split(",");
+    getTags.value = route.query.tags.split(",");
+  }
+  Search(getKeywords.value, getTags.value);
 });
 onBeforeRouteUpdate((to, from) => {
-    console.log('search')
-    if(to.query.keywords != null && to.query.tags != null && typeof(to.query.keywords) == 'string' && typeof(to.query.tags) == 'string'){
-        getKeywords.value = to.query.keywords.split(',');
-        getTags.value = to.query.tags.split(',');
-    }
-    Search(getKeywords.value,getTags.value);
+  console.log("search");
+  if (
+    to.query.keywords != null &&
+    to.query.tags != null &&
+    typeof to.query.keywords == "string" &&
+    typeof to.query.tags == "string"
+  ) {
+    getKeywords.value = to.query.keywords.split(",");
+    getTags.value = to.query.tags.split(",");
+  }
+  Search(getKeywords.value, getTags.value);
 });
-const SelectWiki = (wiki :Wiki) =>{
-    console.log(wiki)
-    if(wiki.type == 'sodan'){
-        router.push('/sodan/' + wiki.id.toString())
-    }else if(wiki.type == 'memo'){
-        router.push('/memo/' + wiki.id.toString())
-    }
-}
-const TagClick = (tag :string) => {
-    router.push('/tag/' + tag)
-}
+const SelectWiki = (wiki: Wiki) => {
+  console.log(wiki);
+  if (wiki.type == "sodan") {
+    router.push("/sodan/" + wiki.id.toString());
+  } else if (wiki.type == "memo") {
+    router.push("/memo/" + wiki.id.toString());
+  }
+};
+const TagClick = (tag: string) => {
+  router.push("/tag/" + tag);
+};
 // tagとwikiが同時に作動しないように
 // errorがユーザーに伝わるように
-// 
+//
 </script>
 
 <template>
-    <table class="searchCard">
-        <tr v-for="wiki in wikis" :key="wiki.id" @click="SelectWiki(wiki)">
-            <!-- <button type="button" @click="SelectWiki(wiki)"> -->
-                <th class="title">{{ wiki.title }}</th>
-                <th class="content">{{ wiki.Abstract }}</th>
-                <th class="tags">
-                    <div  v-for="tag in wiki.tags" :key="tag" class="tag">
-                        <button class="tagbutton" type="button" @click.stop="TagClick(tag)"> {{ tag }}</button>
-                    </div>
-                </th>
-            <!-- </button> -->
-        </tr>
-    </table>
+  <table>
+    <tr
+      v-for="wiki in wikis"
+      :key="wiki.id"
+      class="card"
+      @click="SelectWiki(wiki)"
+    >
+      <!-- <button type="button" @click="SelectWiki(wiki)"> -->
+        <li class="title">{{ wiki.title }}</li>
+        <li class="content">{{ wiki.Abstract }}</li>
+      <div class="tag-container">
+        <button
+          v-for="tag in wiki.tags"
+          :key="tag"
+          class="tag-content"
+          type="button"
+          @click.stop="TagClick(tag)"
+        >
+          {{ tag }}
+        </button>
+      </div>
+      <!-- </button> -->
+    </tr>
+  </table>
 </template>
 <style scoped>
-.tagbutton{
-    width: 100%;
-    height:100%;
-    border-radius: 0%;
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  margin-left: 80px;
 }
-.searchCard tr:hover{
-    background-color: rgb(211, 211, 211);
+
+.tag-content {
+  display: flex;
+  align-items: left;
+  margin: 5px;
 }
-.searchCard tr:has(.tag:hover){
-    background-color: rgb(244, 244, 244);
+
+.card tr:hover {
+  background-color: rgb(211, 211, 211);
 }
-.searchCard tr{
-    background-color: rgb(244, 244, 244);
-    padding-right: 4px;
-    width: 30%;
-    height: 70px;
-    transition: background-color 0.175s 0.075s ease-out;
+.card tr:has(.tag:hover) {
+  background-color: rgb(244, 244, 244);
 }
-.searchCard{
-    border-spacing: 0 2px;
-    width: 90%;
-    table-layout: fixed;
-    margin: 0 auto; 
+.card tr {
+  background-color: rgb(244, 244, 244);
+  padding-right: 4px;
+  width: 30%;
+  height: 70px;
+  transition: background-color 0.175s 0.075s ease-out;
 }
-.title{
-    font-size: 20px;
+.card {
+  border-spacing: 0 2px;
+  width: 90%;
+  table-layout: fixed;
+  margin: 0 auto;
 }
-.content{
-    font-size: 15px;
+.title {
+  font-size: 20px;
+  user-select: none;
 }
-.tag{
-    background-color: rgb(200, 200, 200);
-    border-radius: 2px;
-    margin: 3px;
-    margin-right: 7px;
-    font-size: 10px;
+
+.content {
+  font-size: 15px;
+  text-align: left;
+  margin-left: 80px;
+  list-style: none;
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  transition: box-shadow 0.3s ease;
+}
+
+.title {
+  font-size: 35px;
+  text-align: left;
+  margin-left: 80px;
+  list-style: none;
+}
+
+.content {
+  font-size: 25px;
+  list-style: none;
+}
+
+.title:hover{
+  text-decoration: underline solid #000000 0.15rem;
 }
 </style>

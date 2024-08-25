@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import NotFound from './pages/NotFound.vue'
 import CreateSodan from './pages/CreateSodan.vue'
 import IndividualSodan from './pages/IndividualSodan.vue'
+import IndividualMemo from './pages/IndividualMemo.vue'
 import Lectures from './pages/Lectures.vue'
 import Wiki from './pages/Wiki.vue'
 import MyWiki from './pages/MyWiki.vue'
@@ -15,6 +16,7 @@ import ApiTest from './pages/ApiTest.vue'
 const routes = [
   { path: '/createsodan', name: 'createsodan', component: CreateSodan },
   { path: '/sodan/:id', name: 'individualsodan', component: IndividualSodan },
+  { path: '/memo/:id', name: 'individualmemo', component: IndividualMemo },
   { path: '/search', name: 'search', component: Search },
   { path: '/lectures/:teams', name: 'teamlectures', component: Lectures},
   { path: '/wiki', name: 'wiki', component: Wiki, children: [

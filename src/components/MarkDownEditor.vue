@@ -4,6 +4,13 @@ import { Marked } from 'marked'
 import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
+import router from '../router'
+import {useToast} from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+
+const props = defineProps({
+    isSodan: Boolean
+})
 
 const title = ref<string>('');
 const Content = ref<string>("");
@@ -17,6 +24,9 @@ const enterFlg = ref<boolean>(false);
 const lockFlg = ref<boolean>(false);
 const tabFlg = ref<boolean>(false);
 const shiftTabFlg = ref<boolean>(false);
+const wikiId = ref<number>(-1);
+const $toast = useToast();
+const checkTargets = ref<string[]>(["- [ ] ", "- ", "1. ", "> "])
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
@@ -66,7 +76,7 @@ const guessCorsorPosisCorsorPos = (kaigyouIndex: number, corsorpos: number) =>{
     return guessCorsorPos == corsorpos
 }
 // listを書いているときの補完を行う
-const CheckList = (kaigyouIndex: number, corsorpos: number) => {
+const CheckLists = (kaigyouIndex: number, corsorpos: number, target: string, targetLength: number) => {
     let countTab = 0;
     while(countTab + 2 <= afterContents.value[kaigyouIndex-1].length){
         if(afterContents.value[kaigyouIndex-1].startsWith("  ",countTab*2)){
@@ -75,11 +85,28 @@ const CheckList = (kaigyouIndex: number, corsorpos: number) => {
             break;
         }
     }
-    
-    if(afterContents.value[kaigyouIndex-1].startsWith("- ",countTab*2)){
-        if(afterContents.value[kaigyouIndex-1].slice(countTab*2) == "- "){
-            afterContents.value = afterContents.value.slice(0,kaigyouIndex-1).concat(afterContents.value.slice(count));
-            return corsorpos-3-countTab*2
+    if(target == "1. "){
+        const splits = afterContents.value[kaigyouIndex-1].slice(countTab*2).split(/^[0-9]+\. /)        
+        if(splits[0] == "" && afterContents.value[kaigyouIndex-1].slice(countTab*2) != ""){
+            const tmp = afterContents.value[kaigyouIndex-1].slice(countTab*2).match(/^[0-9]+\. /);
+            let tmptarget = "";
+            if(tmp) tmptarget = tmp[0]
+            if(splits[1] == ""){
+                afterContents.value = afterContents.value.slice(0,kaigyouIndex-1).concat(afterContents.value.slice(kaigyouIndex));
+                return corsorpos-tmptarget.length - 1 - countTab*2
+            }else{
+            let tmp= "";
+            for(let i=0;i < countTab;i++){
+                tmp += "  ";
+            }
+            afterContents.value[kaigyouIndex] = tmp + (parseInt(tmptarget)+1).toString() + ". " + afterContents.value[kaigyouIndex];
+            return corsorpos + ((parseInt(tmptarget)+1).toString() + ". ").length + countTab*2      
+            }
+        }
+    }else if(afterContents.value[kaigyouIndex-1].startsWith(target,countTab*2)){
+        if(afterContents.value[kaigyouIndex-1].slice(countTab*2) == target){
+            afterContents.value = afterContents.value.slice(0,kaigyouIndex-1).concat(afterContents.value.slice(kaigyouIndex));
+            return corsorpos-targetLength - 1 - countTab*2
             // afterContents.value[kaigyouIndex-1] = "";
             
         }else{
@@ -87,9 +114,8 @@ const CheckList = (kaigyouIndex: number, corsorpos: number) => {
             for(let i=0;i < countTab;i++){
                 tmp += "  ";
             }
-            afterContents.value[kaigyouIndex] = tmp + "- " + afterContents.value[kaigyouIndex];
-            return corsorpos+2+countTab*2
-            
+            afterContents.value[kaigyouIndex] = tmp + target + afterContents.value[kaigyouIndex];
+            return corsorpos + targetLength + countTab*2      
         }
     }
     return corsorpos;
@@ -221,7 +247,8 @@ const ChangeCorsorPos = (kaigyouIndex: number, corsorPos: number,maxRowIndex: nu
     }else{
         corsorColnum = getColnum(Content.value.slice(getPosBeforeKaigyou(beforeCorsorPos),beforeCorsorPos) + "|") -1;
     } 
-
+    console.log(corsorColnum);
+    
     let beforekaigyouPos = 0;
     for(let i=0; i < kaigyouIndex -1; i++){
         beforekaigyouPos += afterContents.value[i].length + 1;
@@ -231,12 +258,15 @@ const ChangeCorsorPos = (kaigyouIndex: number, corsorPos: number,maxRowIndex: nu
     let i = 0
     let targetRowContents = [""]
     if(moveTwoLine){
+        console.log("two");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex+1])
         setCorsorPos = nextkaigyouPos + afterContents.value[kaigyouIndex].length + 1;
     }else if(maxRowIndex < kaigyouIndex){
+        console.log("max < kaigy");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex-1])
         setCorsorPos = beforekaigyouPos;
     }else{
+        console.log("other:row");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex])
         setCorsorPos = nextkaigyouPos;
     }
@@ -267,15 +297,19 @@ const CheckTable = (kaigyouIndex: number, corsorPos: number) =>{
     }
     afterContents.value.splice(tables.maxRow + 1,1)
     if(addRowFlg && kaigyouIndex - 1 != tables.minRow ){
+        console.log("k-1=min");
         afterContents.value.splice(kaigyouIndex, 0, CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 1, false);
     }else if(addRowFlg && tables.maxRow == tables.minRow){
+        console.log("max=min");
         afterContents.value.splice(kaigyouIndex, 0, CreateRow(colnum, maxlength, true), CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 2, true);
     }else if(addRowFlg && tables.maxRow - tables.minRow == 1){
+        console.log("max-1=min");
         afterContents.value.splice(kaigyouIndex + 1, 0, CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 1, true);
     }else{
+        console.log("other");
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow, kaigyouIndex - 1 == tables.minRow);
     }
     addRowFlg = true;
@@ -290,7 +324,9 @@ const Check = (corsorPos: number) =>{
             if(beforeContents.value[kaigyouIndex-1].startsWith("|") && beforeContents.value[kaigyouIndex-1].endsWith("|")){
                 result = CheckTable(kaigyouIndex, corsorPos);
             }else{
-               result =  CheckList(kaigyouIndex, corsorPos);
+                for(let i=0; result == corsorPos && i < checkTargets.value.length; i++){
+                    result =  CheckLists(kaigyouIndex, corsorPos, checkTargets.value[i], checkTargets.value[i].length);
+                }
             }
             return result;
         }
@@ -300,41 +336,73 @@ const Check = (corsorPos: number) =>{
 // MarkDownに変換する。editorに変化を加える or 加えたいときに呼ばれる
 const toMarkDown = async() =>{    
     if(!lockFlg.value){
-        let corsorPos = document.querySelector('textarea')?.selectionStart
-        if(enterFlg.value && corsorPos){
-            lockFlg.value = true;
-            corsorPos = Check(corsorPos);
-            Content.value = afterContents.value.join('\n');
-        }
-        if(tabFlg.value && corsorPos){
-            lockFlg.value = true;
-            if(Content.value.slice(corsorPos-2,corsorPos) == '- '){
-                Content.value = Content.value.slice(0,corsorPos-2) + "  " + Content.value.slice(corsorPos-2);
-            }else{
-                Content.value = Content.value.slice(0,corsorPos) + "  " + Content.value.slice(corsorPos);
+        const editor = document.querySelector("textarea");
+        if(editor != null){
+            let corsorPos = editor.selectionStart
+            if(enterFlg.value && corsorPos){
+                lockFlg.value = true;
+                corsorPos = Check(corsorPos);
+                Content.value = afterContents.value.join('\n');
             }
-            corsorPos += 2;
-        }
-        if(shiftTabFlg.value && corsorPos){
-            lockFlg.value = true;
-            const KaigyouPos = getPosBeforeKaigyou(corsorPos)
-            if(Content.value.slice(KaigyouPos,KaigyouPos + 2) == "  "){
-                Content.value = Content.value.slice(0,KaigyouPos)+ Content.value.slice(KaigyouPos + 2);
-                if(corsorPos - KaigyouPos > 2){
-                    corsorPos -= 2;
-                }else{
-                    corsorPos = KaigyouPos;
+            if(tabFlg.value && corsorPos){
+                lockFlg.value = true;
+                let tmpflg = false;
+                for(let i=0; i < checkTargets.value.length; i++){
+                    if(checkTargets.value[i] == "1. "){
+                        const splits = Content.value.slice(0, corsorPos).split(/[0-9]+\. $/)
+                        if(splits.at(-1) == "" && Content.value.slice(0, corsorPos) != ""){
+                            const tmp = Content.value.slice(0, corsorPos).match(/[0-9]+\. $/);
+                            let tmptarget = "";
+                            
+                            if(tmp) tmptarget = tmp[tmp.length -1]
+                            Content.value = Content.value.slice(0,corsorPos - tmptarget.length) + "  " + Content.value.slice(corsorPos - tmptarget.length);
+                            tmpflg = true;
+                        }
+                    }else if(Content.value.slice(corsorPos - checkTargets.value[i].length, corsorPos) == checkTargets.value[i]){
+                        Content.value = Content.value.slice(0,corsorPos - checkTargets.value[i].length) + "  " + Content.value.slice(corsorPos - checkTargets.value[i].length);
+                        tmpflg = true;
+                    }
                 }
-            }else{
-                lockFlg.value = false;
+                if(!tmpflg){
+                    Content.value = Content.value.slice(0,corsorPos) + "  " + Content.value.slice(corsorPos);
+                }
+                corsorPos += 2;
             }
+            if(shiftTabFlg.value && corsorPos){
+                lockFlg.value = true;
+                const KaigyouPos = getPosBeforeKaigyou(corsorPos)
+                if(Content.value.slice(KaigyouPos,KaigyouPos + 2) == "  "){
+                    Content.value = Content.value.slice(0,KaigyouPos)+ Content.value.slice(KaigyouPos + 2);
+                    if(corsorPos - KaigyouPos > 2){
+                        corsorPos -= 2;
+                    }else{
+                        corsorPos = KaigyouPos;
+                    }
+                }else{
+                    lockFlg.value = false;
+                }
+            }
+            contentHistory.value.unshift(Content.value);
+            MarkedContent.value = await marked.parse(Content.value);
+            if(corsorPos) editor.setSelectionRange(corsorPos,corsorPos)
+            editor.style.height = "auto";
+            if(editor.scrollHeight + 10 >= 200){
+                editor.style.height = (editor.scrollHeight + 10).toString() + "px";
+            }else{
+                editor.style.height = "200px"
+            }
+            // const viewer = document.getElementById("viewer");
+            // if(viewer){
+            //     if(parseInt(viewer.style.height) >= parseInt(editor.style.height) + 80){
+            //         editor.style.height = (parseInt(viewer.style.height) - 80).toString() + "px";
+            //     }else{
+            //         viewer.style.height = (parseInt(editor.style.height) + 80).toString() + "px";
+            //     }
+            // }
+            enterFlg.value = false;
+            tabFlg.value = false;
+            shiftTabFlg.value = false;
         }
-        contentHistory.value.unshift(Content.value);
-        MarkedContent.value = await marked.parse(Content.value);
-        if(corsorPos) document.querySelector('textarea')?.setSelectionRange(corsorPos,corsorPos)
-        enterFlg.value = false;
-        tabFlg.value = false;
-        shiftTabFlg.value = false;
     }else{
         lockFlg.value = false;
     }
@@ -367,27 +435,43 @@ const CreateTable = () =>{
         document.querySelector('textarea')?.focus();
         document.querySelector('textarea')?.setSelectionRange(corsorPos+12,corsorPos+12);
     }else{
-        Content.value += "| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text     | Text     |"
+        Content.value += "| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text     | Text     |\n\n"
         document.querySelector('textarea')?.focus();
         document.querySelector('textarea')?.setSelectionRange(3,3);
     }
 }
-// listボタン
-const CreateList = () =>{
+// listとかのボタン
+const CreateLists = (target: string) =>{
     let corsorPos = document.querySelector('textarea')?.selectionStart;
     if(corsorPos){
-        Content.value = Content.value.slice(0,corsorPos) + "\n- \n" + Content.value.slice(corsorPos);
+        Content.value = Content.value.slice(0,corsorPos) + "\n" + target + "\n" + Content.value.slice(corsorPos);
         document.querySelector('textarea')?.focus();
-        document.querySelector('textarea')?.setSelectionRange(corsorPos+3,corsorPos+3);
+        document.querySelector('textarea')?.setSelectionRange(corsorPos+target.length+1,corsorPos+target.length+1);
     }else{
-        Content.value += "- ";
+        Content.value += target;
         document.querySelector('textarea')?.focus();
-        document.querySelector('textarea')?.setSelectionRange(3,3);
+        document.querySelector('textarea')?.setSelectionRange(Content.value.length,Content.value.length);
     }
 }
 // deleteボタン
 const DeleteContent = () =>{
     Content.value = "";
+}
+const ToBolds = (target: string, isLinkorImage: boolean) =>{
+    const startPos = document.querySelector('textarea')?.selectionStart;
+    const endPos = document.querySelector('textarea')?.selectionEnd;
+    console.log(startPos, endPos)
+    let endContent;
+    if(isLinkorImage){
+        endContent = "](https://)";
+    }else{
+        endContent = target;
+    }
+    if(startPos && endPos && startPos != 0){
+        Content.value = Content.value.slice(0,startPos) + target + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
+    }else{
+        Content.value = target + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
+    }
 }
 // ctrl + z, command + z
 const controlzDown = async() =>{
@@ -421,39 +505,171 @@ watch(contentHistory,() =>{
     }
     },{ deep: true }
 );
+
+const Update = async() =>{
+    // if(props.isSodan){
+    //     console.log("sodan");
+    //     const response = await fetch('/api/sodan', {
+    //         method: 'PATCH',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify({
+    //             title: title.value, 
+    //             content: Content.value,
+    //             ownerTraqId: "test"})
+    //     }).catch((e) => console.log(e))
+    //     if(response && response.ok){
+    //         const wikiAbstract = await response.json();
+    //         router.push("/memo/" + wikiAbstract.id)
+    //     }
+    //     return response
+    // }else{
+        const response = await fetch('/api/memo', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: wikiId.value,
+                title: title.value, 
+                content: Content.value,
+                ownerTraqId: "test"})
+        }).catch((e) =>{
+            $toast.error("something wrong", {
+                duration: 1200,
+                position:  'top-right'
+            })
+            return e})
+        if(response.ok){
+            $toast.success("saved!!", {
+                duration: 1200,
+                position:  'top-right'
+            })
+        }
+        return response;
+    // }
+}
+const Create = async(CreateButtonDown: boolean) =>{ 
+    if(title.value == "" || Content.value == ""){
+        $toast.info("please enter the title and content", {
+            duration: 1200,
+            position:  'top-right'
+        })
+    }else{
+        if(props.isSodan){
+            console.log("sodan");
+            // const response = await fetch('/api/sodan', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         title: title.value, 
+            //         content: Content.value,
+            //         ownerTraqId: "test"})
+            // }).catch((e) => console.log(e))
+            // if(response && response.ok){
+            //     const wikiAbstract = await response.json();
+            //     wikiId.value = wikiAbstract.id;
+            //     if(CreateButtonDown)router.push("/sodan/" + wikiAbstract.id);
+            // }
+        }else{
+            const response = await fetch('/api/memo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title.value, 
+                    content: Content.value,
+                    ownerTraqId: "test"})
+            }).catch((e) => {
+                $toast.error("something wrong", {
+                    duration: 1200,
+                    position:  'top-right'
+                });
+                return e;
+            })
+            if(response && response.ok){
+                const wikiAbstract = await response.json();
+                wikiId.value = wikiAbstract.id;
+                $toast.success("saved!!", {
+                    duration: 1200,
+                    position:  'top-right'
+                });
+                if(CreateButtonDown)router.push("/memo/" + wikiAbstract.id);
+            }
+        }
+    }
+}
+const Save = () =>{
+    if(title.value == "" || Content.value == ""){
+        $toast.info("please enter the title and content", {
+            duration: 1200,
+            position:  'top-right'
+        })
+    }else{
+        if(wikiId.value >= 0){
+            Update();
+        }else{
+            Create(false);
+        }
+    }
+}
+
+const Show = async() =>{
+    const response = await Update();
+    if(response && response.ok){
+        router.push("/memo/" + wikiId.value);
+    }
+}
+
 </script>
 <template>
-    <div :class="$style.editors">
-        <div :class="[$style.editor, $style.content]">
-            <div :class="$style.uppercontent">
+    <div class="buttons">
+        <button type="button" @click="Save">save</button>
+        <button type="button" @click="Create(true)" v-if="wikiId < 0">create</button>
+        <button type="button" @click="Show" v-if="wikiId >= 0">show</button>
+    </div>
+    <div class="editors">
+        <div class="content">
+            <div class="uppercontent">
                 <h3>title</h3>
                 <input type="text" placeholder="title..." v-model="title">
                 <h3>contents</h3>
-                <button type="button" @click="CreateTable"><svg class="svg-icon" style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M859.1 161H165.9c-19.8 0-35.9 16.9-35.9 37.7v627.7c0 20.8 16.1 37.7 35.9 37.7h693.3c19.8 0 35.9-16.9 35.9-37.7V198.7c-0.1-20.8-16.2-37.7-36-37.7z m0 150.6v147.2H652V311.6h207.1zM408.9 642.9V496.5h207.2V643H408.9z m207.2 37.7v145.7H408.9V680.6h207.2zM373 642.9H165.9V496.5H373v146.4z m243.1-331.3v147.2H408.9V311.6h207.2zM652 496.5h207.2V643H652V496.5zM416.9 198.7c19.8 0 35.9 16.9 35.9 37.7 0 20.8-16.1 37.7-35.9 37.7-19.8 0-35.9-16.9-35.9-37.7 0-20.9 16.1-37.7 35.9-37.7z m-107.6 0c19.8 0 35.9 16.9 35.9 37.7 0 20.8-16.1 37.7-35.9 37.7-19.8 0-35.9-16.9-35.9-37.7 0-20.9 16.1-37.7 35.9-37.7z m-107.6 0c19.8 0 35.9 16.9 35.9 37.7 0 20.8-16.1 37.7-35.9 37.7-19.8 0-35.9-16.9-35.9-37.7 0.1-20.9 16.1-37.7 35.9-37.7z m0 112.9H373v147.2H165.9V311.6h35.8z m-35.8 369H373v145.7H165.9V680.6zM652 826.3V680.6h207.2v145.7H652z m0 0"  /></svg></button>
-                <button type="button" @click="CreateList"><svg class="svg-icon" style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M170.666667 298.666667m-42.666667 0a42.666667 42.666667 0 1 0 85.333333 0 42.666667 42.666667 0 1 0-85.333333 0Z"  /><path d="M170.666667 512m-42.666667 0a42.666667 42.666667 0 1 0 85.333333 0 42.666667 42.666667 0 1 0-85.333333 0Z"  /><path d="M170.666667 725.333333m-42.666667 0a42.666667 42.666667 0 1 0 85.333333 0 42.666667 42.666667 0 1 0-85.333333 0Z"  /><path d="M298.666667 469.333333m40.106666 0l517.12 0q40.106667 0 40.106667 40.106667l0 5.12q0 40.106667-40.106667 40.106667l-517.12 0q-40.106667 0-40.106666-40.106667l0-5.12q0-40.106667 40.106666-40.106667Z"  /><path d="M298.666667 682.666667m40.106666 0l517.12 0q40.106667 0 40.106667 40.106666l0 5.12q0 40.106667-40.106667 40.106667l-517.12 0q-40.106667 0-40.106666-40.106667l0-5.12q0-40.106667 40.106666-40.106666Z"  /><path d="M298.666667 256m40.106666 0l517.12 0q40.106667 0 40.106667 40.106667l0 5.12q0 40.106667-40.106667 40.106666l-517.12 0q-40.106667 0-40.106666-40.106666l0-5.12q0-40.106667 40.106666-40.106667Z"  /></svg></button>
-                <button type="button" @click="DeleteContent">
-                    <svg fill="#000000" height="1em" width="1em" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 315 315" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 315 315">
-                    <g>
-                        <path d="m256.774,23.942h-64.836v-6.465c0-9.636-7.744-17.477-17.263-17.477h-34.348c-9.521,0-17.266,7.841-17.266,17.478v6.465h-64.835c-9.619,0-17.445,7.76-17.445,17.297v11.429c0,7.168 4.42,13.33 10.698,15.951 1.989,39.623 13.5,231.193 14.018,239.801 0.222,3.696 3.284,6.58 6.987,6.58h170.033c3.703,0 6.766-2.884 6.987-6.58 0.518-8.607 12.028-200.178 14.018-239.801 6.278-2.621 10.698-8.783 10.698-15.951v-11.43c5.68434e-14-9.537-7.826-17.297-17.446-17.297zm-119.713-6.464c0-1.918 1.465-3.478 3.266-3.478h34.348c1.8,0 3.264,1.56 3.264,3.478v6.465h-40.877v-6.465zm-82.282,23.761c0-1.818 1.546-3.297 3.445-3.297h198.549c1.899,0 3.445,1.478 3.445,3.297v11.429c0,1.819-1.546,3.299-3.445,3.299h-198.548c-1.899,0-3.445-1.479-3.445-3.299v-11.429zm181.143,259.761h-156.848c-2.055-34.247-11.479-191.674-13.51-231.033h183.867c-2.031,39.359-11.454,196.786-13.509,231.033z"/>
-                        <path d="m157.5,95.125c-3.866,0-7,3.134-7,7v176.109c0,3.866 3.134,7 7,7 3.866,0 7-3.134 7-7v-176.109c0-3.866-3.134-7-7-7z"/>
-                        <path d="m110.2,102.04c-0.202-3.86-3.507-6.837-7.355-6.625-3.86,0.201-6.827,3.494-6.625,7.355l9.182,175.829c0.195,3.736 3.285,6.635 6.984,6.635 0.123,0 0.247-0.003 0.371-0.01 3.86-0.201 6.827-3.494 6.625-7.355l-9.182-175.829z"/>
-                        <path d="m212.155,95.415c-3.899-0.223-7.153,2.764-7.355,6.625l-9.184,175.829c-0.202,3.861 2.765,7.154 6.625,7.355 0.125,0.007 0.248,0.01 0.371,0.01 3.698,0 6.789-2.898 6.984-6.635l9.184-175.829c0.202-3.861-2.764-7.154-6.625-7.355z"/>
-                    </g>
-                    </svg></button>
+                <button type="button" @click="ToBolds('**', false)"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('*', false)"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('~~', false)"><font-awesome-icon :icon="['fas', 'strikethrough']" transform="shrink-3" /></button>
+                <button type="button" @click="CreateLists('> ')"><font-awesome-icon :icon="['fas', 'quote-right']" transform="shrink-3" /></button>
+                <button type="button" @click="CreateLists('- ')"><font-awesome-icon :icon="['fas', 'list-ul']" transform="shrink-3" /></button>
+                <button type="button" @click="CreateLists('1. ')"><font-awesome-icon :icon="['fas', 'list-ol']" transform="shrink-3" /></button>
+                <button type="button" @click="CreateTable"><font-awesome-icon :icon="['fas', 'table']" transform="shrink-1" /></button>
+                <button type="button" @click="CreateLists('- [ ] ')"><font-awesome-icon :icon="['fas', 'square-check']" transform="shrink-3" /></button>
+                <button type="button" @click="DeleteContent"><font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" /></button>
+                <button type="button" @click="ToBolds('[', true)"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('![', true)"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
             </div>   
-            <textarea :class="$style.downcontent" placeholder="contents..." v-model="Content" v-on:keypress.enter="EnterDown" v-on:keydown.prevent.tab.exact="TabDown" v-on:keydown.prevent.shift.tab="ShiftTabDown" v-on:keydown.prevent.ctrl.z.exact="controlzDown" v-on:keydown.prevent.ctrl.shift.z="controlshiftzDown" v-on:keydown.prevent.meta.z.exact="controlzDown" v-on:keydown.prevent.meta.shift.z="controlshiftzDown"></textarea>
+            <textarea class="editor" placeholder="contents..." v-model="Content" v-on:keypress.enter="EnterDown" v-on:keydown.prevent.tab.exact="TabDown" v-on:keydown.prevent.shift.tab="ShiftTabDown" v-on:keydown.ctrl.prevent.z.exact="controlzDown" v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" v-on:keydown.meta.prevent.z.exact="controlzDown" v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  v-on:keydown.ctrl.prevent.s="Save"  v-on:keydown.meta.prevent.s="Save"></textarea>
         </div>
-        <div :class="$style.content">
-            <div :class="$style.uppercontent"></div>
-            <div :class="[$style.viewer, $style.downcontent]" v-html="MarkedTitle + MarkedContent"></div>
+        <div class="content">
+            <div class="uppercontent"></div>
+            <div class="viewer downcontent" v-html="MarkedTitle + MarkedContent"></div>
         </div>
     </div>
     <!-- <buton type="button" @click="SubmitSodan"></buton> -->
 </template>
-<style module>
+<style scoped>
+
+.buttons{
+    text-align: right;
+    padding-right: 10%;
+}
+.buttons button{
+    margin-left: 5px;
+}
 .viewer th{
     border: 1px solid black;
-
     background-color: rgb(244, 244, 244);
 }
 .viewer td{
@@ -471,26 +687,33 @@ watch(contentHistory,() =>{
     border-collapse: collapse;
     width: 90%;
     table-layout: fixed;
+    height: 300px;
     margin: 0 auto; 
 }
-.viewer h1{
-    text-align: left;
+.viewer li:has(input){
+    list-style:none;
 }
-.viewer h2{
-    text-align: left;
+.viewer blockquote{
+    border-left: 3px solid lightgray;
+    color: gray;
 }
 input{
     border:1px solid lightgray;
     width: 90%;
 }
-textarea{
+.editor{
     font-size: large;
     line-height: 1.5em;
     padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
     width: 90%;
-    height: 100px;
+    height: 200px;
     resize:none;
     border-color: lightgray;
+}
+.editor:focus{
+    border-color: gray;
 }
 .editors{
     display: flex;
@@ -501,8 +724,8 @@ textarea{
     padding-right: 20px;
     border:1px solid lightgray;
     border-radius: 10px;
-    overflow: scroll;
-    max-height: 200px;
+    margin-top: 80px;
+    height: 100%;
 }
 .content{
     width:45%;
@@ -511,9 +734,9 @@ textarea{
 }
 .uppercontent{
     text-align: left;
-    flex-grow: 3;
 }
-.downcontent{
-    flex-grow: 10;
+.uppercontent button{
+    color: rgb(90, 90, 90);
 }
+
 </style>
