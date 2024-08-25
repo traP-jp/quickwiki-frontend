@@ -31,7 +31,6 @@ async function Search(tags: string[]) {
         apipath += tag;
     });
     console.log(apipath)
-    console.log(apipath)
     const responce = await fetch(apipath)
     if(responce && responce.ok){
         wikis.value = await responce.json();
@@ -47,7 +46,7 @@ onMounted(() => {
     route.params.name != null &&
     typeof route.params.name == "string"
   ){
-    getTags.value = route.params.name.replace(/\+/g, " ").split(",");
+    getTags.value = route.params.name.split(",");
   }
   Search(getTags.value);
 });
@@ -56,7 +55,7 @@ onBeforeRouteUpdate((to, from) => {
     to.params.name != null &&
     typeof to.params.name == "string"
   ) {
-    getTags.value = to.params.name.replace(/\+/g, " ").split(",");
+    getTags.value = to.params.name.split(",");
   }
   Search(getTags.value);
 });
