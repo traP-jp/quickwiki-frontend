@@ -87,6 +87,21 @@ const sodan = ref<Sodan>({
 
 onMounted(async () => {
 
+const responce = await fetch('/api/sodan?wikiId=' + route.params.id)
+if(responce.ok){
+    sodan.value = await responce.json();
+}
+title.value = await marked.parse(sodan.value.title);
+question.value = await marked.parse(sodan.value.questionMessage.content);
+for(let i=0; i < sodan.value.answerMessages.length; i++){
+  answers.value[i] = await marked.parse(sodan.value.answerMessages[i].content);
+  sodan.value.answerMessages[i].content = answers.value[i]
+
+}
+});
+
+onMounted(async () => {
+
   const responce = await fetch('/api/sodan?wikiId=' + route.params.id)
   if(responce.ok){
       sodan.value = await responce.json();

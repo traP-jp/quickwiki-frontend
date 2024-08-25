@@ -40,7 +40,7 @@ body {
 
 main {
   flex: 1 1 auto;
-  background: coral;
+  background: #f2f2f2;
 }
 
 .content {

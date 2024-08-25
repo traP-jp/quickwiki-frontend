@@ -77,6 +77,7 @@ body {
   margin-top: 95px;
   height: 100vh;
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 main {
