@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import router from '../router';
+import { ref } from "vue";
+import router from "../router";
 type Wiki = {
-    id: number,
-    type: string,
-    title: string,
-    Abstract: string,
-    createdAt: string,
-    updatedAt: string,
-    ownerTraqId: string,
-    tags: string[]
-}
+  id: number;
+  type: string;
+  title: string;
+  Abstract: string;
+  createdAt: string;
+  updatedAt: string;
+  ownerTraqId: string;
+  tags: string[];
+};
 const props = defineProps({
-  wiki: Object
-})
+  wiki: Object,
+});
 const wiki = ref(props.wiki);
 
 const SelectWiki = (wiki: Wiki) => {
@@ -24,30 +24,39 @@ const SelectWiki = (wiki: Wiki) => {
     router.push("/memo/" + wiki.id.toString());
   }
 };
-const TagClick = (tag :string) => {
-    router.push('/tag/' + tag.replace(/ /g, "+"))
-}
+const TagClick = (tag: string) => {
+  router.push("/tag/" + tag.replace(/ /g, "+"));
+};
+
+const isLiking = ref<boolean>(false);
+const StartLiking = (wiki: Wiki) => {
+  isLiking.value = true;
+  router.push("/wiki/user/favorite/" + wiki.id.toString());
+};
 </script>
 
 <template>
-    <tr
-      class="card"
-      @click="SelectWiki(wiki)"
-    >
-        <li class="title">{{ wiki.title }}</li>
-        <li class="content">{{ wiki.Abstract }}</li>
-      <div class="tag-container">
-        <button
-          v-for="tag in wiki.tags"
-          :key="tag"
-          class="tag-content"
-          type="button"
-          @click.stop="TagClick(tag)"
-        >
-          {{ tag }}
-        </button>
-      </div>
-    </tr>
+  <tr class="card" @click="SelectWiki(wiki)">
+    <li class="title">{{ wiki.title }}</li>
+    <li class="content">{{ wiki.Abstract }}</li>
+    <div class="tag-container">
+      <button
+        v-for="tag in wiki.tags"
+        :key="tag"
+        class="tag-content"
+        type="button"
+        @click.stop="TagClick(tag)"
+      >
+        {{ tag }}
+      </button>
+    </div>
+    <button v-if="isLiking" class="iine" @click="StartLiking">
+      <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
+    </button>
+    <button v-else class="iine" @click="StartLiking">
+      <font-awesome-icon :icon="['far', 'heart']" /> いいね！
+    </button>
+  </tr>
 </template>
 
 <style scoped>
@@ -85,7 +94,6 @@ const TagClick = (tag :string) => {
 }
 .title {
   font-size: 20px;
-  user-select: none;
 }
 
 .content {
@@ -120,7 +128,14 @@ const TagClick = (tag :string) => {
   list-style: none;
 }
 
-.title:hover{
+.title:hover {
   text-decoration: underline solid #000000 0.15rem;
+}
+
+.iine {
+  padding: 8px;
+  font-size: 18px;
+  width: 120px;
+  margin-left: 80px;
 }
 </style>

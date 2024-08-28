@@ -1,6 +1,46 @@
+<script setup lang="ts">
+import { ref } from "vue";
+import router from "../router";
+import { useRoute } from "vue-router";
+
+const SearchWord = ref<string>("");
+const Words = ref<string[]>([]);
+const ErrorMessage = ref<string>("");
+const tags = ref<string[]>([]);
+const keywords = ref<string[]>([]);
+const Submit = () => {
+  if (SearchWord.value == "") {
+    return false;
+  }
+  tags.value = [];
+  keywords.value = [];
+  const SearchWords = SearchWord.value.split(/\s+/);
+  // SearchWords.forEach((SearchWord) =>{
+  //     Words.value = Words.value.concat(SearchWord.split("　"));
+  // })
+  SearchWords.forEach((word) => {
+    if (word.substring(0, 1) == "#" || word.substring(0, 1) == "＃") {
+      if (word.substring(1) != "") {
+        tags.value.push(word.substring(1));
+      }
+    } else {
+      if (word != "") {
+        keywords.value.push(word);
+      }
+    }
+  });
+  router.push(
+    "/wiki/search?tags=" +
+      tags.value.join(",") +
+      "&keywords=" +
+      keywords.value.join(",")
+  );
+};</script>
 <template>
   <div :class="$style.header">
     <div :class="$style.header_header">QuickWiki</div>
+    <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box"/>
+    <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
     <header :class="$style.header_list">
       <ul>
         <router-link to="/wiki/mywiki">
@@ -76,6 +116,10 @@
   display: inline-block;
   padding: 0px 10px;
 }
+
+.text_box {
+  width: 30%;
+  height: 30px;
+  border-radius: 8px;
+}
 </style>
-<script setup>
-</script>

@@ -5,9 +5,7 @@ import "../styles/SideBar.css";
 const wikis = ref<string>("Now Preparing");
 
 onMounted(async () => {
-  const resMyWiki = await fetch(
-    "/api/wiki/user"
-  );
+  const resMyWiki = await fetch("/api/wiki/user");
   if (resMyWiki.ok) {
     wikis.value = await resMyWiki.json();
   }
@@ -41,13 +39,5 @@ body {
 main {
   flex: 1 1 auto;
   background: #f2f2f2;
-}
-
-.content {
-  background-color: #d63a3a;
-  font-size: 35px;
-  width: 100%;
-  height: 100%;
-  text-align: center;
 }
 </style>
