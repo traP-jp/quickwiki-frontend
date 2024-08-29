@@ -528,24 +528,8 @@ watch(contentHistory,() =>{
 );
 
 const Update = async() =>{
-    // if(type.value == 2){
-    //     console.log("sodan");
-    //     const response = await fetch('/api/sodan', {
-    //         method: 'PATCH',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify({
-    //             title: title.value, 
-    //             content: Content.value,
-    //             ownerTraqId: "test"})
-    //     }).catch((e) => console.log(e))
-    //     if(response && response.ok){
-    //         const wikiAbstract = await response.json();
-    //         router.push("/memo/" + wikiAbstract.id)
-    //     }
-    //     return response
-    // }else if(type == 1){
+    if(type.value == 1){
+    // 自分のメモであるかを確認！！！！！！！！！！！！！！！！！
         const response = await fetch('/api/memo', {
             method: 'PATCH',
             headers: {
@@ -569,7 +553,7 @@ const Update = async() =>{
             })
         }
         return response;
-    // }
+    }
 }
 const Create = async(CreateButtonDown: boolean) =>{ 
     if(title.value == "" || Content.value == ""){
@@ -577,26 +561,8 @@ const Create = async(CreateButtonDown: boolean) =>{
             duration: 1200,
             position:  'top-right'
         })
-    // 自分のメモであるかを確認！！！！！！！！！！！！！！！！！
     }else{
-        if(type.value == 2){
-            console.log("sodan");
-            // const response = await fetch('/api/sodan', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify({
-            //         title: title.value, 
-            //         content: Content.value,
-            //         ownerTraqId: "test"})
-            // }).catch((e) => console.log(e))
-            // if(response && response.ok){
-            //     const wikiAbstract = await response.json();
-            //     wikiId.value = wikiAbstract.id;
-            //     if(CreateButtonDown)router.push("/sodan/" + wikiAbstract.id);
-            // }
-        }else if(type.value == 1){
+        if(type.value == 1){
             const response = await fetch('/api/memo', {
                 method: 'POST',
                 headers: {
@@ -646,11 +612,37 @@ const SendReply = () =>{
             duration: 1200,
             position:  'top-right'
         })
+        Content.value = "";
+        sendToRoom.value = undefined;
     }else{
         $toast.info("please enter the room number and content", {
             duration: 1200,
             position:  'top-right'
         })
+    }
+
+}
+const SendSodan = () =>{
+    if(Content.value != ""){
+        // contentsをsodanに送る
+        $toast.success("send!!", {
+            duration: 1200,
+            position:  'top-right'
+        })
+        Content.value = "";
+        selectTags.value = []
+    }else{
+        $toast.info("please enter the content", {
+            duration: 1200,
+            position:  'top-right'
+        })
+    }
+}
+const Send = () =>{
+    if(type.value == 3){
+        SendReply();
+    }else if(type.value == 2){
+        SendSodan();
     }
 }
 
@@ -702,13 +694,13 @@ onMounted(async() =>{
 })
 </script>
 <template>
-    <div :class="$style.buttons" v-if="type == 1 || type == 2">
+    <div :class="$style.buttons" v-if="type == 1">
         <button type="button" @click="Save">save</button>
         <button type="button" @click="Create(true)" v-if="wikiId < 0">create</button>
         <button type="button" @click="Show" v-if="wikiId >= 0">show</button>
     </div>
-    <div :class="$style.buttons" v-if="type == 3">
-        <button type="button" @click="SendReply">send</button>
+    <div :class="$style.buttons" v-if="type == 2 || type == 3">
+        <button type="button" @click="Send">send</button>
     </div>
     <div :class="$style.editors">
         <div :class="$style.content">
@@ -734,11 +726,28 @@ onMounted(async() =>{
                     :items="[1, 2, 3, 4, 5, 6]"
                     v-model="sendToRoom"
                     variant="underlined"
-                    v-on:keydown.ctrl.prevent.s="SendReply"  
-                    v-on:keydown.meta.prevent.s="SendReply"
+                    v-on:keydown.ctrl.prevent.s="Send"  
+                    v-on:keydown.meta.prevent.s="Send"
                     ></v-select>
                 </div>
-                <div v-if="type == 1 || type == 2">
+                <div v-if="type == 2">
+                    <h3>tags</h3>
+                    <v-combobox
+                    chips
+                    clearable
+                    deletable-chips
+                    multiple
+                    small-chips
+                    :items="tags"
+                    v-model="selectTags"
+                    label="tags"
+                    :loading="isLoading"
+                    variant="underlined"
+                    v-on:keydown.ctrl.prevent.s="Send"  
+                    v-on:keydown.meta.prevent.s="Send"
+                    ></v-combobox>
+                </div>
+                <div v-if="type == 1">
                     <h3>tags</h3>
                     <v-combobox
                     chips
@@ -768,7 +777,7 @@ onMounted(async() =>{
                 <button type="button" @click="ToBolds('[', true)"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('![', true)"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
             </div>   
-            <v-textarea v-if="type == 1 || type == 2"
+            <v-textarea v-if="type == 1"
             name="input-7-1"
             filled
             label="Contents"
@@ -784,7 +793,7 @@ onMounted(async() =>{
              v-on:keydown.ctrl.prevent.s="Save"  
              v-on:keydown.meta.prevent.s="Save"
             ></v-textarea>
-            <v-textarea v-else-if="type == 3"
+            <v-textarea v-else-if="type == 2 || type == 3"
             name="input-7-1"
             filled
             label="Contents"
@@ -797,8 +806,8 @@ onMounted(async() =>{
              v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" 
              v-on:keydown.meta.prevent.z.exact="controlzDown" 
              v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  
-             v-on:keydown.ctrl.prevent.s="SendReply"  
-             v-on:keydown.meta.prevent.s="SendReply"
+             v-on:keydown.ctrl.prevent.s="Send"  
+             v-on:keydown.meta.prevent.s="Send"
             ></v-textarea>
         </div>
         <div :class="$style.content">
