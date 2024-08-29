@@ -276,7 +276,7 @@ paths:
             schema:
               type: object
               properties:
-                memoId:
+                wikiId:
                   type: string
                   example: 123
       responses:
@@ -321,7 +321,7 @@ paths:
             schema:
               type: object
               properties:
-                memoId:
+                wikiId:
                   type: string
                   example: 123
       responses:
@@ -342,7 +342,7 @@ paths:
             schema:
               type: object
               properties:
-                memoId:
+                wikiId:
                   type: string
                   example: 123
       responses:
@@ -509,6 +509,12 @@ components:
           items:
             type: string
           example: [ComputerScience, Python]
+        resultCount:
+          type: integer
+          example: 10
+        from:
+          type: integer
+          example: 0
     lectureWithoutId:
       type: object
       properties:
