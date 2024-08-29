@@ -8,14 +8,33 @@ import router from '../router'
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 
+type Memo = {
+    id: number,
+    title: string,
+    ownerTraqId: string,
+    content: string,
+    createdAt: string,
+    updatedAt: string,
+    tags: string[]
+}
+
 const props = defineProps({
-    isSodan: Boolean
+    editorType: Number,
+    defaultId: {
+        type: Number,
+        default: -1
+    }
 })
+const type = ref(props.editorType)
+const wikiId = ref(props.defaultId);
+// type:  1:memo作成 2:sodan作成 3:sodanに返信
 
 const title = ref<string>('');
+const selectTags = ref<string[]>([])
 const Content = ref<string>("");
 const MarkedTitle = ref<string>("");
 const MarkedContent = ref<string>("");
+
 const beforeContents = ref<string[]>([]);
 const afterContents = ref<string[]>([]);
 const contentHistory = ref<string[]>([""]);
@@ -24,11 +43,10 @@ const enterFlg = ref<boolean>(false);
 const lockFlg = ref<boolean>(false);
 const tabFlg = ref<boolean>(false);
 const shiftTabFlg = ref<boolean>(false);
-const wikiId = ref<number>(-1);
 const $toast = useToast();
 const checkTargets = ref<string[]>(["- [ ] ", "- ", "1. ", "> "])
 const tags = ref([])
-const selectTags = ref<string[]>([])
+const sendToRoom = ref<number>();
 const isLoading = ref(false)
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
@@ -510,7 +528,7 @@ watch(contentHistory,() =>{
 );
 
 const Update = async() =>{
-    // if(props.isSodan){
+    // if(type.value == 2){
     //     console.log("sodan");
     //     const response = await fetch('/api/sodan', {
     //         method: 'PATCH',
@@ -527,7 +545,7 @@ const Update = async() =>{
     //         router.push("/memo/" + wikiAbstract.id)
     //     }
     //     return response
-    // }else{
+    // }else if(type == 1){
         const response = await fetch('/api/memo', {
             method: 'PATCH',
             headers: {
@@ -559,8 +577,9 @@ const Create = async(CreateButtonDown: boolean) =>{
             duration: 1200,
             position:  'top-right'
         })
+    // 自分のメモであるかを確認！！！！！！！！！！！！！！！！！
     }else{
-        if(props.isSodan){
+        if(type.value == 2){
             console.log("sodan");
             // const response = await fetch('/api/sodan', {
             //     method: 'POST',
@@ -577,7 +596,7 @@ const Create = async(CreateButtonDown: boolean) =>{
             //     wikiId.value = wikiAbstract.id;
             //     if(CreateButtonDown)router.push("/sodan/" + wikiAbstract.id);
             // }
-        }else{
+        }else if(type.value == 1){
             const response = await fetch('/api/memo', {
                 method: 'POST',
                 headers: {
@@ -620,6 +639,20 @@ const Save = () =>{
         }
     }
 }
+const SendReply = () =>{
+    if(sendToRoom.value != null && Content.value != ""){
+        // contentsをsendToRoomの部屋に送る
+        $toast.success("send!!", {
+            duration: 1200,
+            position:  'top-right'
+        })
+    }else{
+        $toast.info("please enter the room number and content", {
+            duration: 1200,
+            position:  'top-right'
+        })
+    }
+}
 
 const Show = async() =>{
     const response = await Update();
@@ -643,38 +676,85 @@ const tagSearch = async() =>{
 }
 
 const rules = [value => !!value || 'Required.'];
-onMounted(() =>{
+onMounted(async() =>{
+    if(wikiId.value >= 0){
+        const res = await fetch('/api/memo?wikiId=' + wikiId.value)
+        const initMemo = ref<Memo>()
+        if(res && res.ok){
+            initMemo.value = await res.json();
+            if(initMemo.value != null){
+                title.value = initMemo.value.title
+                selectTags.value = initMemo.value.tags
+                Content.value = initMemo.value.content
+                MarkedTitle.value = await marked.parse(title.value);
+                MarkedContent.value = await marked.parse(Content.value);
+            }
+        }else{
+            $toast.error("can't get Contents", {
+            duration: 1200,
+            position:  'top-right'
+            })
+        }
+    }
+    console.log(wikiId.value);
+    
     tagSearch();
 })
 </script>
 <template>
-    <div :class="$style.buttons">
+    <div :class="$style.buttons" v-if="type == 1 || type == 2">
         <button type="button" @click="Save">save</button>
         <button type="button" @click="Create(true)" v-if="wikiId < 0">create</button>
         <button type="button" @click="Show" v-if="wikiId >= 0">show</button>
     </div>
+    <div :class="$style.buttons" v-if="type == 3">
+        <button type="button" @click="SendReply">send</button>
+    </div>
     <div :class="$style.editors">
         <div :class="$style.content">
             <div :class="$style.uppercontent">
-                <h3>title</h3>
-                <v-text-field
-                :rules="rules"
-                v-model="title"
-                hide-details="auto"
-                label="title"
-                ></v-text-field>
-                <h3>tags</h3>
-                <v-combobox
-                chips
-                clearable
-                deletable-chips
-                multiple
-                small-chips
-                :items="tags"
-                v-model="selectTags"
-                label="tags"
-                :loading="isLoading"
-                ></v-combobox>
+                <div v-if="type == 1">
+                    <h3>title</h3>
+                    <v-text-field
+                    :rules="rules"
+                    v-model="title"
+                    hide-details="auto"
+                    label="title"
+                    variant="underlined"
+                    v-on:keydown.ctrl.prevent.s="Save"  
+                    v-on:keydown.meta.prevent.s="Save"
+                    ></v-text-field>
+                </div>
+                <div v-else-if="type == 3">
+                    <h3>送信先</h3>
+                    <v-select
+                    clearable
+                    chips
+                    label="SendTo..."
+                    :items="[1, 2, 3, 4, 5, 6]"
+                    v-model="sendToRoom"
+                    variant="underlined"
+                    v-on:keydown.ctrl.prevent.s="SendReply"  
+                    v-on:keydown.meta.prevent.s="SendReply"
+                    ></v-select>
+                </div>
+                <div v-if="type == 1 || type == 2">
+                    <h3>tags</h3>
+                    <v-combobox
+                    chips
+                    clearable
+                    deletable-chips
+                    multiple
+                    small-chips
+                    :items="tags"
+                    v-model="selectTags"
+                    label="tags"
+                    :loading="isLoading"
+                    variant="underlined"
+                    v-on:keydown.ctrl.prevent.s="Save"  
+                    v-on:keydown.meta.prevent.s="Save"
+                    ></v-combobox>
+                </div>
                 <h3>contents</h3>
                 <button type="button" @click="ToBolds('**', false)"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('*', false)"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
@@ -688,7 +768,7 @@ onMounted(() =>{
                 <button type="button" @click="ToBolds('[', true)"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('![', true)"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
             </div>   
-            <v-textarea
+            <v-textarea v-if="type == 1 || type == 2"
             name="input-7-1"
             filled
             label="Contents"
@@ -703,6 +783,22 @@ onMounted(() =>{
              v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  
              v-on:keydown.ctrl.prevent.s="Save"  
              v-on:keydown.meta.prevent.s="Save"
+            ></v-textarea>
+            <v-textarea v-else-if="type == 3"
+            name="input-7-1"
+            filled
+            label="Contents"
+            auto-grow
+             v-model="Content" 
+             v-on:keypress.enter="EnterDown" 
+             v-on:keydown.prevent.tab.exact="TabDown" 
+             v-on:keydown.prevent.shift.tab="ShiftTabDown" 
+             v-on:keydown.ctrl.prevent.z.exact="controlzDown" 
+             v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" 
+             v-on:keydown.meta.prevent.z.exact="controlzDown" 
+             v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  
+             v-on:keydown.ctrl.prevent.s="SendReply"  
+             v-on:keydown.meta.prevent.s="SendReply"
             ></v-textarea>
         </div>
         <div :class="$style.content">

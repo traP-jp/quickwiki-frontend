@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import router from '../router'
+import MarkDownEditor from '../components/MarkDownEditor.vue'
 import { Marked } from 'marked'
 import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
@@ -41,6 +42,7 @@ type Sodan = {
 const title = ref<string>("");
 const question = ref<string>("");
 const answers = ref<string[]>([]);
+const myid = ref<string>("");
 const route = useRoute();
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
@@ -96,8 +98,8 @@ onMounted(async () => {
   for(let i=0; i < sodan.value.answerMessages.length; i++){
     answers.value[i] = await marked.parse(sodan.value.answerMessages[i].content);
     sodan.value.answerMessages[i].content = answers.value[i]
-
   }
+  myid.value = sodan.value.questionMessage.userTraqId
 })
 const TagClick = (tag :string) => {
     router.push('/tag/' + tag)
@@ -122,6 +124,9 @@ const TagClick = (tag :string) => {
     <div>
       <div v-html="msg.content" class="msg" :class="{ isOthers: msg.userTraqId != sodan.questionMessage.userTraqId }"></div>
     </div>
+  </div>
+  <div class="mdeditor">
+    <MarkDownEditor :editorType=3 v-if="sodan.questionMessage.userTraqId == myid"/>
   </div>
 </template>
 
@@ -168,5 +173,8 @@ h2{
 }
 .rightContent{
     text-align: right;
+}
+.mdeditor{
+  margin: 20px;
 }
 </style>

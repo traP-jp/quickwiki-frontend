@@ -10,6 +10,7 @@ import LikeWiki from './pages/LikeWiki.vue'
 import MySodan from './pages/MySodan.vue'
 import Search from './pages/Search.vue'
 import CreateMemo from './pages/CreateMemo.vue'
+import EditMemo from './pages/EditMemo.vue'
 import TagPage from './pages/TagPage.vue'
 import ApiTest from './pages/ApiTest.vue'
 
@@ -36,6 +37,7 @@ const routes = [
       ] },
   { path: '/mysodan', name: 'mysodan', component: MySodan },
   { path: '/creatememo', name: 'creatememo', component: CreateMemo },
+  { path: '/editmemo/:memoid', name: 'editmemo', component: EditMemo },
   { path: '/tag/:name', name: 'tagpage', component: TagPage },
   { path: '/apitest', name: 'apitest', component: ApiTest },
   { path: '/:path(.*)*', component: NotFound }

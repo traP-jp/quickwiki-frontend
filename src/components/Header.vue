@@ -15,6 +15,14 @@
         <router-link to="/lectures/sougou">
             <li>講習会資料</li>
         </router-link>
+        <!-- 後で消す！！！ -->
+        <router-link to="/sodan/1">
+            <li>sodan1</li>
+        </router-link>
+        <router-link to="/memo/1">
+            <li>memo1</li>
+        </router-link>
+        <!-- ここまで -->
     </ul>
   </header>
 </template>
