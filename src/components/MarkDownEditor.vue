@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { Marked } from 'marked'
 import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
@@ -27,6 +27,9 @@ const shiftTabFlg = ref<boolean>(false);
 const wikiId = ref<number>(-1);
 const $toast = useToast();
 const checkTargets = ref<string[]>(["- [ ] ", "- ", "1. ", "> "])
+const tags = ref([])
+const selectTags = ref<string[]>([])
+const isLoading = ref(false)
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
@@ -384,13 +387,13 @@ const toMarkDown = async() =>{
             }
             contentHistory.value.unshift(Content.value);
             MarkedContent.value = await marked.parse(Content.value);
-            if(corsorPos) editor.setSelectionRange(corsorPos,corsorPos)
-            editor.style.height = "auto";
-            if(editor.scrollHeight + 10 >= 200){
-                editor.style.height = (editor.scrollHeight + 10).toString() + "px";
-            }else{
-                editor.style.height = "200px"
-            }
+            // if(corsorPos) editor.setSelectionRange(corsorPos,corsorPos)
+            // editor.style.height = "auto";
+            // if(editor.scrollHeight + 10 >= 200){
+            //     editor.style.height = (editor.scrollHeight + 10).toString() + "px";
+            // }else{
+            //     editor.style.height = "200px"
+            // }
             // const viewer = document.getElementById("viewer");
             // if(viewer){
             //     if(parseInt(viewer.style.height) >= parseInt(editor.style.height) + 80){
@@ -534,7 +537,7 @@ const Update = async() =>{
                 id: wikiId.value,
                 title: title.value, 
                 content: Content.value,
-                ownerTraqId: "test"})
+                tags: selectTags.value})
         }).catch((e) =>{
             $toast.error("something wrong", {
                 duration: 1200,
@@ -583,7 +586,7 @@ const Create = async(CreateButtonDown: boolean) =>{
                 body: JSON.stringify({
                     title: title.value, 
                     content: Content.value,
-                    ownerTraqId: "test"})
+                    tags: selectTags.value})
             }).catch((e) => {
                 $toast.error("something wrong", {
                     duration: 1200,
@@ -625,6 +628,24 @@ const Show = async() =>{
     }
 }
 
+const tagSearch = async() =>{
+    isLoading.value = true;
+    const response = await fetch("/api/tag")
+    if(response && response.ok){
+        tags.value = await response.json(); 
+    }else{
+        $toast.error("something wrong", {
+            duration: 1200,
+            position:  'top-right'
+        })
+    }
+    isLoading.value = false;
+}
+
+const rules = [value => !!value || 'Required.'];
+onMounted(() =>{
+    tagSearch();
+})
 </script>
 <template>
     <div :class="$style.buttons">
@@ -636,7 +657,24 @@ const Show = async() =>{
         <div :class="$style.content">
             <div :class="$style.uppercontent">
                 <h3>title</h3>
-                <input type="text" placeholder="title..." v-model="title">
+                <v-text-field
+                :rules="rules"
+                v-model="title"
+                hide-details="auto"
+                label="title"
+                ></v-text-field>
+                <h3>tags</h3>
+                <v-combobox
+                chips
+                clearable
+                deletable-chips
+                multiple
+                small-chips
+                :items="tags"
+                v-model="selectTags"
+                label="tags"
+                :loading="isLoading"
+                ></v-combobox>
                 <h3>contents</h3>
                 <button type="button" @click="ToBolds('**', false)"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('*', false)"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
@@ -650,7 +688,22 @@ const Show = async() =>{
                 <button type="button" @click="ToBolds('[', true)"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('![', true)"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
             </div>   
-            <textarea :class="$style.editor" placeholder="contents..." v-model="Content" v-on:keypress.enter="EnterDown" v-on:keydown.prevent.tab.exact="TabDown" v-on:keydown.prevent.shift.tab="ShiftTabDown" v-on:keydown.ctrl.prevent.z.exact="controlzDown" v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" v-on:keydown.meta.prevent.z.exact="controlzDown" v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  v-on:keydown.ctrl.prevent.s="Save"  v-on:keydown.meta.prevent.s="Save"></textarea>
+            <v-textarea
+            name="input-7-1"
+            filled
+            label="Contents"
+            auto-grow
+             v-model="Content" 
+             v-on:keypress.enter="EnterDown" 
+             v-on:keydown.prevent.tab.exact="TabDown" 
+             v-on:keydown.prevent.shift.tab="ShiftTabDown" 
+             v-on:keydown.ctrl.prevent.z.exact="controlzDown" 
+             v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" 
+             v-on:keydown.meta.prevent.z.exact="controlzDown" 
+             v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  
+             v-on:keydown.ctrl.prevent.s="Save"  
+             v-on:keydown.meta.prevent.s="Save"
+            ></v-textarea>
         </div>
         <div :class="$style.content">
             <div :class="$style.uppercontent"></div>
@@ -660,13 +713,23 @@ const Show = async() =>{
     <!-- <buton type="button" @click="SubmitSodan"></buton> -->
 </template>
 <style module>
-
+.editors button{
+    background-color: rgb(245, 245, 245);
+    margin-bottom: 1px;
+}
+.editors button:hover{
+    background-color: rgb(230, 230, 230);
+}
 .buttons{
     text-align: right;
     padding-right: 10%;
 }
 .buttons button{
+    background-color: rgb(245, 245, 245);
     margin-left: 5px;
+}
+.buttons button:hover{
+    background-color: rgb(230, 230, 230);
 }
 .viewer th{
     border: 1px solid black;
@@ -689,8 +752,13 @@ const Show = async() =>{
     table-layout: fixed;
     margin: 0 auto; 
 }
+.viewer ul{
+    padding-left: 20px;
+    text-align: left;
+}
 .viewer li:has(input){
     list-style:none;
+    text-align: left;
 }
 .viewer blockquote{
     border-left: 3px solid lightgray;
@@ -721,6 +789,7 @@ input{
     padding-top: 10px;
     padding-left: 20px;
     padding-right: 20px;
+    background-color: white;
     border:1px solid lightgray;
     border-radius: 10px;
     margin-top: 80px;
