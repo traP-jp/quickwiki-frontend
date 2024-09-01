@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import router from "../router";
 type Wiki = {
   id: number;
@@ -15,6 +15,7 @@ const props = defineProps({
   wiki: Object,
 });
 const wiki = ref(props.wiki);
+const favorites = ref<Wiki[]>([])
 
 const SelectWiki = (wiki: Wiki) => {
   console.log(wiki);
@@ -29,6 +30,18 @@ const TagClick = (tag: string) => {
 };
 
 const isLiking = ref<boolean>(false);
+onMounted(async() =>{
+  const res = await fetch("/api/wiki/user/favorite");
+
+  if(res != null && res.ok){
+    favorites.value = await res.json();
+  }
+  favorites.value.forEach(favorite => {
+    if(wiki.value != null && favorite.id == wiki.value.id){
+      isLiking.value = true;
+    }
+  });
+})
 const StartLiking = async (wiki: Wiki) => {
   if (isLiking.value) {
     isLiking.value = false;
