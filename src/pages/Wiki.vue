@@ -4,13 +4,13 @@
       <div class="sidebar_content">
         <ul>
           <router-link to="/wiki/mywiki">
-            <li>自分のWiki</li>
+            <li class="sidebar_link_content">自分のWiki</li>
           </router-link>
           <router-link to="/wiki/favoritewiki">
-            <li>お気に入りのWiki</li>
+            <li class="sidebar_link_content">お気に入りのWiki</li>
           </router-link>
           <router-link to="/creatememo">
-            <li>Wikiを書く</li>
+            <li class="sidebar_link_content">Wikiを書く</li>
           </router-link>
         </ul>
       </div>
@@ -36,6 +36,7 @@
 
 main {
   flex: 1 1 auto;
+  height: 100vh;
 }
 
 .sidebar_content {

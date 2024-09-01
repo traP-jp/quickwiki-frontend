@@ -6,6 +6,7 @@
   user-select: none;
   border-right: 2px solid #aaaaaa;
   box-shadow: #aaaaaa 2px 2px 2px;
+  margin-top: -10px;
 }
 
 .sidebar_header {
@@ -36,7 +37,16 @@
   color: #1a1a1a;
 }
 
-.sidebar  li:hover {
-  background-color: #dedede;
-  border-radius: 10px;
+.sidebar_link_content {
+  border-right: 5px solid #ffffff;
+}
+
+.sidebar_link_content:hover {
+  background-color: #f0f0f0;
+  border-right: 5px solid #fd7a00;
+}
+
+.router-link-active .sidebar_link_content {
+  background-color: #f0f0f0;
+  border-right: 5px solid #fd7a00;
 }

@@ -44,31 +44,31 @@ onBeforeRouteUpdate(async (to, from) => {
         <h2 class="sidebar_header">講習会</h2>
         <ul>
           <router-link to="/lectures/sougou">
-            <li>総合/融合</li>
+            <li class="sidebar_link_content">総合/融合</li>
           </router-link>
           <router-link to="/lectures/SysAd">
-            <li>SysAd</li>
+            <li class="sidebar_link_content">SysAd</li>
           </router-link>
           <router-link to="/lectures/algorithm">
-            <li>アルゴリズム</li>
+            <li class="sidebar_link_content">アルゴリズム</li>
           </router-link>
           <router-link to="/lectures/CTF">
-            <li>CTF</li>
+            <li class="sidebar_link_content">CTF</li>
           </router-link>
           <router-link to="/lectures/Kaggle">
-            <li>Kaggle</li>
+            <li class="sidebar_link_content">Kaggle</li>
           </router-link>
           <router-link to="/lectures/Game">
-            <li>ゲーム</li>
+            <li class="sidebar_link_content">ゲーム</li>
           </router-link>
           <router-link to="/lectures/sound">
-            <li>サウンド</li>
+            <li class="sidebar_link_content">サウンド</li>
           </router-link>
           <router-link to="/lectures/graphics">
-            <li>グラフィック/デザイン</li>
+            <li class="sidebar_link_content">グラフィック/デザイン</li>
           </router-link>
           <router-link to="/lectures/others">
-            <li>その他講習会</li>
+            <li class="sidebar_link_content">その他講習会</li>
           </router-link>
         </ul>
       </div>

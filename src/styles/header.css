@@ -1,0 +1,7 @@
+.router-link-active .header_link_content {
+    border-bottom: 3px solid #fd7a00;
+}
+
+.header_link_content {
+    border-bottom: 3px solid #ffffff;
+}

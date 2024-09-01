@@ -115,8 +115,8 @@ const StartLiking = async (wiki: Wiki) => {
 }
 
 .card:hover {
-  border: 2px solid #fd7a00;
-  box-shadow: #fd7a00 0 0 5px;
+  border: 2px solid rgba(253, 122, 0, 0.6);
+  box-shadow: 0 0 5px rgba(253, 122, 0, 0.6);
   cursor: pointer;
 }
 .card {
