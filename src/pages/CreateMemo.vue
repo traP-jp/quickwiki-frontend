@@ -4,7 +4,7 @@ import MarkDownEditor from '../components/MarkDownEditor.vue';
 <template>
     <div :class="$style.contents">
         <h1>CreateMemo</h1>
-        <MarkDownEditor :isSodan="false" />
+        <MarkDownEditor :editorType=1 />
     </div>
 </template>
 <style module>

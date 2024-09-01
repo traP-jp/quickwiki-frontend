@@ -2,6 +2,10 @@
 import { onMounted, ref } from "vue";
 import { onBeforeRouteUpdate, useRoute } from "vue-router";
 import "../styles/SideBar.css";
+import {useToast} from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+
+const $toast = useToast();
 const lectures = ref<string>("Now Preparing");
 const getTeams = ref<string>("");
 
@@ -25,6 +29,11 @@ onBeforeRouteUpdate(async (to, from) => {
   );
   if (res.ok) {
     lectures.value = await res.json();
+  }else{
+    $toast.error("something wrong", {
+        duration: 1200,
+        position:  'top-right'
+    })
   }
 });
 </script>

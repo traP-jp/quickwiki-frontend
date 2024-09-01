@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import "../styles/SideBar.css";
+import {useToast} from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
 import WikiCard from '../components/WikiCard.vue';
+
+const $toast = useToast();
 
 type Wiki = {
     id: number,
@@ -22,6 +26,11 @@ onMounted(async () => {
   );
   if (resMyWiki.ok) {
     wikis.value = await resMyWiki.json();
+  }else{
+    $toast.error("something wrong", {
+        duration: 1200,
+        position:  'top-right'
+    })
   }
 });
 </script>
