@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { Marked } from 'marked'
 import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
@@ -8,14 +8,38 @@ import router from '../router'
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 
+type Memo = {
+    id: number,
+    title: string,
+    ownerTraqId: string,
+    content: string,
+    createdAt: string,
+    updatedAt: string,
+    tags: string[]
+}
+
 const props = defineProps({
-    isSodan: Boolean
+    editorType: Number,
+    defaultId: {
+        type: Number,
+        default: -1
+    },
+    editSodanId: {
+        type: Number,
+        default: -1
+    }
 })
+const type = ref(props.editorType)
+const wikiId = ref(props.defaultId);
+const editSodanId = ref(props.editSodanId);
+// type:  1:memo作成 2:sodan作成 3:sodanに返信
 
 const title = ref<string>('');
+const selectTags = ref<string[]>([])
 const Content = ref<string>("");
 const MarkedTitle = ref<string>("");
 const MarkedContent = ref<string>("");
+
 const beforeContents = ref<string[]>([]);
 const afterContents = ref<string[]>([]);
 const contentHistory = ref<string[]>([""]);
@@ -24,9 +48,11 @@ const enterFlg = ref<boolean>(false);
 const lockFlg = ref<boolean>(false);
 const tabFlg = ref<boolean>(false);
 const shiftTabFlg = ref<boolean>(false);
-const wikiId = ref<number>(-1);
 const $toast = useToast();
 const checkTargets = ref<string[]>(["- [ ] ", "- ", "1. ", "> "])
+const tags = ref([])
+const sendToRoom = ref<number>();
+const isLoading = ref(false)
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
@@ -384,13 +410,13 @@ const toMarkDown = async() =>{
             }
             contentHistory.value.unshift(Content.value);
             MarkedContent.value = await marked.parse(Content.value);
-            if(corsorPos) editor.setSelectionRange(corsorPos,corsorPos)
-            editor.style.height = "auto";
-            if(editor.scrollHeight + 10 >= 200){
-                editor.style.height = (editor.scrollHeight + 10).toString() + "px";
-            }else{
-                editor.style.height = "200px"
-            }
+            // if(corsorPos) editor.setSelectionRange(corsorPos,corsorPos)
+            // editor.style.height = "auto";
+            // if(editor.scrollHeight + 10 >= 200){
+            //     editor.style.height = (editor.scrollHeight + 10).toString() + "px";
+            // }else{
+            //     editor.style.height = "200px"
+            // }
             // const viewer = document.getElementById("viewer");
             // if(viewer){
             //     if(parseInt(viewer.style.height) >= parseInt(editor.style.height) + 80){
@@ -507,24 +533,8 @@ watch(contentHistory,() =>{
 );
 
 const Update = async() =>{
-    // if(props.isSodan){
-    //     console.log("sodan");
-    //     const response = await fetch('/api/sodan', {
-    //         method: 'PATCH',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify({
-    //             title: title.value, 
-    //             content: Content.value,
-    //             ownerTraqId: "test"})
-    //     }).catch((e) => console.log(e))
-    //     if(response && response.ok){
-    //         const wikiAbstract = await response.json();
-    //         router.push("/memo/" + wikiAbstract.id)
-    //     }
-    //     return response
-    // }else{
+    if(type.value == 1){
+    // 自分のメモであるかを確認！！！！！！！！！！！！！！！！！
         const response = await fetch('/api/memo', {
             method: 'PATCH',
             headers: {
@@ -533,7 +543,8 @@ const Update = async() =>{
             body: JSON.stringify({
                 id: wikiId.value,
                 title: title.value, 
-                content: Content.value})
+                content: Content.value,
+                tags: selectTags.value})
         }).catch((e) =>{
             $toast.error("something wrong", {
                 duration: 1200,
@@ -547,7 +558,7 @@ const Update = async() =>{
             })
         }
         return response;
-    // }
+    }
 }
 const Create = async(CreateButtonDown: boolean) =>{ 
     if(title.value == "" || Content.value == ""){
@@ -556,24 +567,7 @@ const Create = async(CreateButtonDown: boolean) =>{
             position:  'top-right'
         })
     }else{
-        if(props.isSodan){
-            console.log("sodan");
-            // const response = await fetch('/api/sodan', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify({
-            //         title: title.value, 
-            //         content: Content.value,
-            //         ownerTraqId: "test"})
-            // }).catch((e) => console.log(e))
-            // if(response && response.ok){
-            //     const wikiAbstract = await response.json();
-            //     wikiId.value = wikiAbstract.id;
-            //     if(CreateButtonDown)router.push("/sodan/" + wikiAbstract.id);
-            // }
-        }else{
+        if(type.value == 1){
             const response = await fetch('/api/memo', {
                 method: 'POST',
                 headers: {
@@ -582,7 +576,7 @@ const Create = async(CreateButtonDown: boolean) =>{
                 body: JSON.stringify({
                     title: title.value, 
                     content: Content.value,
-                    tags:[""]})
+                    tags: selectTags.value})
             }).catch((e) => {
                 $toast.error("something wrong", {
                     duration: 1200,
@@ -616,6 +610,81 @@ const Save = () =>{
         }
     }
 }
+const SendReply = async() =>{
+    if(sendToRoom.value != null && Content.value != ""){
+        // sendRoomNumは？？？？？？？？？
+        const res = await fetch('/api/anon-sodan/replies?wikiId=' + editSodanId.value.toString(), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                content: Content.value})
+        }).catch((e) => {
+            $toast.error("something wrong", {
+                duration: 1200,
+                position:  'top-right'
+            });
+        });
+        if(res != null && res.ok){
+            $toast.success("send!!", {
+                duration: 1200,
+                position:  'top-right'
+            })
+            Content.value = "";
+            sendToRoom.value = undefined;
+            const cont = await res.json()
+            console.log(cont)
+        }
+    }else{
+        $toast.info("please enter the room number and content", {
+            duration: 1200,
+            position:  'top-right'
+        })
+    }
+
+}
+const SendSodan = async() =>{
+    if(Content.value != ""){
+        // tagをsodanに送る????????
+        const res = await fetch("/api/anon-sodan",{
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                content: Content.value
+            })
+        }).catch((e) => {
+            $toast.error("something wrong", {
+                duration: 1200,
+                position:  'top-right'
+            });
+        });
+        if(res != null && res.ok){
+            $toast.success("send!!", {
+                duration: 1200,
+                position:  'top-right'
+            })
+            Content.value = "";
+            selectTags.value = []
+        }
+    }else{
+        $toast.info("please enter the content", {
+            duration: 1200,
+            position:  'top-right'
+        })
+    }
+}
+const Send = () =>{
+    console.log(editSodanId.value);
+    
+    if(type.value == 3){
+        SendReply();
+    }else if(type.value == 2){
+        SendSodan();
+    }
+}
 
 const Show = async() =>{
     const response = await Update();
@@ -624,18 +693,116 @@ const Show = async() =>{
     }
 }
 
+const tagSearch = async() =>{
+    isLoading.value = true;
+    const response = await fetch("/api/tag")
+    if(response && response.ok){
+        tags.value = await response.json(); 
+    }else{
+        $toast.error("something wrong", {
+            duration: 1200,
+            position:  'top-right'
+        })
+    }
+    isLoading.value = false;
+}
+
+const rules = [value => !!value || 'Required.'];
+onMounted(async() =>{
+    if(wikiId.value >= 0){
+        const res = await fetch('/api/memo?wikiId=' + wikiId.value)
+        const initMemo = ref<Memo>()
+        if(res && res.ok){
+            initMemo.value = await res.json();
+            if(initMemo.value != null){
+                title.value = initMemo.value.title
+                selectTags.value = initMemo.value.tags
+                Content.value = initMemo.value.content
+                MarkedTitle.value = await marked.parse(title.value);
+                MarkedContent.value = await marked.parse(Content.value);
+            }
+        }else{
+            $toast.error("can't get Contents", {
+            duration: 1200,
+            position:  'top-right'
+            })
+        }
+    }
+    
+    if(type.value == 2 || type.value == 1)tagSearch();
+})
 </script>
 <template>
-    <div :class="$style.buttons">
+    <div :class="$style.buttons" v-if="type == 1">
         <button type="button" @click="Save">save</button>
         <button type="button" @click="Create(true)" v-if="wikiId < 0">create</button>
         <button type="button" @click="Show" v-if="wikiId >= 0">show</button>
     </div>
+    <div :class="$style.buttons" v-if="type == 2 || type == 3">
+        <button type="button" @click="Send">send</button>
+    </div>
     <div :class="$style.editors">
         <div :class="$style.content">
             <div :class="$style.uppercontent">
-                <h3>title</h3>
-                <input type="text" placeholder="title..." v-model="title" :class="$style.title">
+                <div v-if="type == 1">
+                    <h3>title</h3>
+                    <v-text-field
+                    :rules="rules"
+                    v-model="title"
+                    hide-details="auto"
+                    label="title"
+                    variant="underlined"
+                    v-on:keydown.ctrl.prevent.s="Save"  
+                    v-on:keydown.meta.prevent.s="Save"
+                    ></v-text-field>
+                </div>
+                <div v-else-if="type == 3">
+                    <h3>送信先</h3>
+                    <v-select
+                    clearable
+                    chips
+                    label="SendTo..."
+                    :items="[1, 2, 3, 4, 5, 6]"
+                    v-model="sendToRoom"
+                    variant="underlined"
+                    v-on:keydown.ctrl.prevent.s="Send"  
+                    v-on:keydown.meta.prevent.s="Send"
+                    ></v-select>
+                </div>
+                <div v-if="type == 2">
+                    <h3>tags</h3>
+                    <v-combobox
+                    chips
+                    clearable
+                    deletable-chips
+                    multiple
+                    small-chips
+                    :items="tags"
+                    v-model="selectTags"
+                    label="tags"
+                    :loading="isLoading"
+                    variant="underlined"
+                    v-on:keydown.ctrl.prevent.s="Send"  
+                    v-on:keydown.meta.prevent.s="Send"
+                    ></v-combobox>
+                </div>
+                <div v-if="type == 1">
+                    <h3>tags</h3>
+                    <v-combobox
+                    chips
+                    clearable
+                    deletable-chips
+                    multiple
+                    small-chips
+                    :items="tags"
+                    v-model="selectTags"
+                    label="tags"
+                    :loading="isLoading"
+                    variant="underlined"
+                    v-on:keydown.ctrl.prevent.s="Save"  
+                    v-on:keydown.meta.prevent.s="Save"
+                    ></v-combobox>
+                </div>
                 <h3>contents</h3>
                 <button type="button" @click="ToBolds('**', false)"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('*', false)"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
@@ -649,7 +816,38 @@ const Show = async() =>{
                 <button type="button" @click="ToBolds('[', true)"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('![', true)"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
             </div>   
-            <textarea :class="$style.editor" placeholder="contents..." v-model="Content" v-on:keypress.enter="EnterDown" v-on:keydown.prevent.tab.exact="TabDown" v-on:keydown.prevent.shift.tab="ShiftTabDown" v-on:keydown.ctrl.prevent.z.exact="controlzDown" v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" v-on:keydown.meta.prevent.z.exact="controlzDown" v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  v-on:keydown.ctrl.prevent.s="Save"  v-on:keydown.meta.prevent.s="Save"></textarea>
+            <v-textarea v-if="type == 1"
+            name="input-7-1"
+            filled
+            label="Contents"
+            auto-grow
+             v-model="Content" 
+             v-on:keypress.enter="EnterDown" 
+             v-on:keydown.prevent.tab.exact="TabDown" 
+             v-on:keydown.prevent.shift.tab="ShiftTabDown" 
+             v-on:keydown.ctrl.prevent.z.exact="controlzDown" 
+             v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" 
+             v-on:keydown.meta.prevent.z.exact="controlzDown" 
+             v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  
+             v-on:keydown.ctrl.prevent.s="Save"  
+             v-on:keydown.meta.prevent.s="Save"
+            ></v-textarea>
+            <v-textarea v-else-if="type == 2 || type == 3"
+            name="input-7-1"
+            filled
+            label="Contents"
+            auto-grow
+             v-model="Content" 
+             v-on:keypress.enter="EnterDown" 
+             v-on:keydown.prevent.tab.exact="TabDown" 
+             v-on:keydown.prevent.shift.tab="ShiftTabDown" 
+             v-on:keydown.ctrl.prevent.z.exact="controlzDown" 
+             v-on:keydown.ctrl.shift.prevent.z="controlshiftzDown" 
+             v-on:keydown.meta.prevent.z.exact="controlzDown" 
+             v-on:keydown.meta.shift.prevent.z="controlshiftzDown"  
+             v-on:keydown.ctrl.prevent.s="Send"  
+             v-on:keydown.meta.prevent.s="Send"
+            ></v-textarea>
         </div>
         <div :class="$style.content">
             <div :class="$style.uppercontent"></div>
@@ -659,13 +857,23 @@ const Show = async() =>{
     <!-- <buton type="button" @click="SubmitSodan"></buton> -->
 </template>
 <style module>
-
+.editors button{
+    background-color: rgb(245, 245, 245);
+    margin-bottom: 1px;
+}
+.editors button:hover{
+    background-color: rgb(230, 230, 230);
+}
 .buttons{
     text-align: right;
     padding-right: 10%;
 }
 .buttons button{
+    background-color: rgb(245, 245, 245);
     margin-left: 5px;
+}
+.buttons button:hover{
+    background-color: rgb(230, 230, 230);
 }
 .viewer th{
     border: 1px solid black;
@@ -688,8 +896,13 @@ const Show = async() =>{
     table-layout: fixed;
     margin: 0 auto; 
 }
+.viewer ul{
+    padding-left: 20px;
+    text-align: left;
+}
 .viewer li:has(input){
     list-style:none;
+    text-align: left;
 }
 .viewer blockquote{
     border-left: 3px solid lightgray;
@@ -720,6 +933,7 @@ const Show = async() =>{
     padding-top: 10px;
     padding-left: 20px;
     padding-right: 20px;
+    background-color: white;
     border:1px solid lightgray;
     border-radius: 10px;
     margin-top: 80px;

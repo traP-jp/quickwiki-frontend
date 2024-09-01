@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import "../styles/SideBar.css";
+import {useToast} from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
 
 const wikis = ref<string>("Now Preparing");
+const $toast = useToast();
 
 onMounted(async () => {
   const resMyWiki = await fetch(
@@ -10,6 +13,11 @@ onMounted(async () => {
   );
   if (resMyWiki.ok) {
     wikis.value = await resMyWiki.json();
+  }else{
+    $toast.error("something wrong", {
+        duration: 1200,
+        position:  'top-right'
+    })
   }
 });
 </script>
