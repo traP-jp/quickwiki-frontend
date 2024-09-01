@@ -94,6 +94,11 @@ const StartLiking = async (wiki: Wiki) => {
 
 .tag-content {
   margin: 5px;
+  background-color: rgb(244, 244, 244);
+}
+
+.tag-content:hover {
+  background-color: rgb(211, 211, 211);
 }
 
 .card tr:hover {
