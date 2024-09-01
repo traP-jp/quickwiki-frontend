@@ -39,8 +39,10 @@ const Submit = () => {
 <template>
   <div :class="$style.header">
     <div :class="$style.header_header">QuickWiki</div>
-    <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box"/>
-    <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
+    <div :class="$style.search">
+      <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50"/>
+      <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
+    </div>
     <header :class="$style.header_list">
       <ul>
         <router-link to="/wiki/mywiki">
@@ -66,7 +68,7 @@ const Submit = () => {
   top: 0;
   z-index: 10;
   background-color: #ffffff;
-  box-shadow: 0px 2px 1px 0px #5e5e5e;
+  box-shadow: 0 2px 1px 0 #5e5e5e;
 }
 
 .header_list a {
@@ -118,8 +120,13 @@ const Submit = () => {
 }
 
 .text_box {
-  width: 30%;
   height: 30px;
   border-radius: 8px;
+}
+
+.search {
+  position: absolute;
+  top: 30px;
+  right: 50px;
 }
 </style>

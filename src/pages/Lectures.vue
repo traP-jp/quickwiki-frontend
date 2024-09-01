@@ -98,15 +98,6 @@ onBeforeRouteUpdate(async (to, from) => {
 
 .container {
   display: flex;
-  align-items: flex-start;
-  margin-top: 95px;
-  height: 100vh;
-  overflow-y: scroll;
-}
-
-main {
-  flex: 1 1 auto;
-  background: #f2f2f2;
 }
 
 .card {
