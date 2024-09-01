@@ -115,8 +115,8 @@ const StartLiking = async (wiki: Wiki) => {
 }
 
 .card:hover {
-  border: 2px solid rgba(253, 122, 0, 0.6);
-  box-shadow: 0 0 5px rgba(253, 122, 0, 0.6);
+  border: 2px solid rgba(253, 122, 0, 0.4);
+  box-shadow: 0 0 5px rgba(253, 122, 0, 0.4);
   cursor: pointer;
 }
 .card {
@@ -147,7 +147,7 @@ const StartLiking = async (wiki: Wiki) => {
   border-radius: 6px;
   margin-bottom: 16px;
   transition-property: box-shadow, border;
-  transition-duration: 0.3s;
+  transition-duration: 0.2s;
 }
 
 .title {

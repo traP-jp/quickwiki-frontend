@@ -36,7 +36,7 @@ onMounted(async () => {
   <div :class="$style.container">
     <main>
       <h1>MyWiki</h1>
-      <table class="cardTable">
+      <table :class="$style.cardTable">
         <WikiCard :wiki="wiki" v-for="wiki in wikis" :key="wiki.id" />
       </table>
     </main>
@@ -54,5 +54,8 @@ onMounted(async () => {
 
 main {
   flex: 1 1 auto;
+}
+.cardTable {
+  width: 95%;
 }
 </style>
