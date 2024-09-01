@@ -4,6 +4,8 @@
   width: 15%;
   min-width: 180px;
   user-select: none;
+  border-right: 2px solid #aaaaaa;
+  box-shadow: #aaaaaa 2px 2px 2px;
 }
 
 .sidebar_header {

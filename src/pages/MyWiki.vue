@@ -55,6 +55,5 @@ onMounted(async () => {
 
 main {
   flex: 1 1 auto;
-  background: #f2f2f2;
 }
 </style>

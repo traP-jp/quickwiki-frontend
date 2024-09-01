@@ -29,12 +29,13 @@
 
 .container {
   display: flex;
-  height: 100vh;
+  margin-top: -10px;
+  padding-top: 10px;
+  gap: 10px;
 }
 
 main {
   flex: 1 1 auto;
-  background: coral;
 }
 
 .sidebar_content {
