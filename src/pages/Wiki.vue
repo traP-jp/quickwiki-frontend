@@ -1,45 +1,3 @@
-<script setup lang="ts">
-import { ref } from "vue";
-import router from "../router";
-import { useRoute } from "vue-router";
-
-const SearchWord = ref<string>("");
-const Words = ref<string[]>([]);
-const ErrorMessage = ref<string>("");
-const tags = ref<string[]>([]);
-const keywords = ref<string[]>([]);
-const Submit = () => {
-  if (SearchWord.value == "") {
-    return false;
-  }
-  tags.value = [];
-  keywords.value = [];
-  const SearchWords = SearchWord.value.split(/\s+/);
-  // SearchWords.forEach((SearchWord) =>{
-  //     Words.value = Words.value.concat(SearchWord.split("　"));
-  // })
-  SearchWords.forEach((word) => {
-    if (word.substring(0, 1) == "#" || word.substring(0, 1) == "＃") {
-      if (word.substring(1) != "") {
-        tags.value.push(word.substring(1));
-      }
-    } else {
-      if (word != "") {
-        keywords.value.push(word);
-      }
-    }
-  });
-  router.push(
-    "/wiki/search?tags=" +
-      tags.value.join(",") +
-      "&keywords=" +
-      keywords.value.join(",") + 
-      "&page=0"
-  );
-};
-
-</script>
-
 <template>
   <div :class="$style.container">
     <div class="sidebar">
@@ -58,8 +16,6 @@ const Submit = () => {
       </div>
     </div>
     <main>
-      <input v-model="SearchWord" type="search" @keypress.enter="Submit" />
-      <input type="button" @click="Submit" value="検索" />
       <router-view />
     </main>
   </div>
@@ -73,20 +29,15 @@ const Submit = () => {
 
 .container {
   display: flex;
+  height: 100vh;
 }
 
-.content {
-  background-color: #d63a3a;
-  font-size: 35px;
-  width: 100%;
-  height: 100%;
-  text-align: center;
+main {
+  flex: 1 1 auto;
+  background: coral;
 }
 
-.mainHeader {
-  font-size: 35px;
-  user-select: none;
-  text-align: left;
-  padding:  20px ;
+.sidebar_content {
+  top: 0;
 }
 </style>

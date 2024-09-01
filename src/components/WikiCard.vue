@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import router from '../router';
+import { ref } from "vue";
+import router from "../router";
 type Wiki = {
-    id: number,
-    type: string,
-    title: string,
-    Abstract: string,
-    createdAt: string,
-    updatedAt: string,
-    ownerTraqId: string,
-    tags: string[]
-}
+  id: number;
+  type: string;
+  title: string;
+  Abstract: string;
+  createdAt: string;
+  updatedAt: string;
+  ownerTraqId: string;
+  tags: string[];
+};
 const props = defineProps({
-  wiki: Object
-})
+  wiki: Object,
+});
 const wiki = ref(props.wiki);
 
 const SelectWiki = (wiki: Wiki) => {
@@ -24,34 +24,64 @@ const SelectWiki = (wiki: Wiki) => {
     router.push("/memo/" + wiki.id.toString());
   }
 };
-const TagClick = (tag :string) => {
-    router.push('/tag/' + tag.replace(/ /g, "+"))
+const TagClick = (tag: string) => {
+  router.push("/tag/" + tag.replace(/ /g, "+"));
+};
+
+const isLiking = ref<boolean>(false);
+const StartLiking = async (wiki: Wiki) => {
+  if (isLiking.value) {
+    isLiking.value = false;
+    await fetch("/api/wiki/user/favorite", {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        wikiId: wiki.id.toString()
+      })
+    });
+  }else {
+    isLiking.value = true;
+    await fetch("/api/wiki/user/favorite", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        wikiId: wiki.id.toString()
+      })
+    });
+  }
 }
 </script>
 
 <template>
-    <tr
-      v-if="wiki != null"
-      class="card"
-      @click="SelectWiki(wiki)"
+  <tr v-if="wiki != null" class="card" @click="SelectWiki(wiki)">
+    <li class="title">{{ wiki.title }}</li>
+    <li class="content">{{ wiki.Abstract }}</li>
+    <div class="tag-container">
+    <div
+      v-for="tag in wiki.tags"
+      :key="tag"
     >
-        <li class="title">{{ wiki.title }}</li>
-        <li class="content">{{ wiki.Abstract }}</li>
-      <div class="tag-container">
-        <div
-          v-for="tag in wiki.tags"
-          :key="tag">
-        <button
-          class="tag-content"
-          type="button"
-          @click.stop="TagClick(tag)"
-          v-if="tag != ''"
-        >
-          {{ tag }}
-        </button>
-        </div>
+      <button
+        class="tag-content"
+        type="button"
+        @click.stop="TagClick(tag)"
+        v-if="tag != ''"
+      >
+        {{ tag }}
+      </button>
       </div>
-    </tr>
+    </div>
+    <button v-if="isLiking" class="iine" @click="StartLiking(wiki)">
+      <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
+    </button>
+    <button v-else class="iine" @click="StartLiking(wiki)">
+      <font-awesome-icon :icon="['far', 'heart']" /> いいね！
+    </button>
+  </tr>
 </template>
 
 <style scoped>
@@ -63,8 +93,6 @@ const TagClick = (tag :string) => {
 }
 
 .tag-content {
-  display: flex;
-  align-items: left;
   margin: 5px;
 }
 
@@ -89,7 +117,6 @@ const TagClick = (tag :string) => {
 }
 .title {
   font-size: 20px;
-  user-select: none;
 }
 
 .content {
@@ -124,7 +151,14 @@ const TagClick = (tag :string) => {
   list-style: none;
 }
 
-.title:hover{
+.title:hover {
   text-decoration: underline solid #000000 0.15rem;
+}
+
+.iine {
+  padding: 8px;
+  font-size: 18px;
+  width: 120px;
+  margin-left: 80px;
 }
 </style>

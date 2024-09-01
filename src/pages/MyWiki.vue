@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import "../styles/SideBar.css";
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import WikiCard from '../components/WikiCard.vue';
@@ -21,9 +20,7 @@ type Wiki = {
 const wikis = ref<Wiki[]>([]);
 
 onMounted(async () => {
-  const resMyWiki = await fetch(
-    "/api/wiki/user"
-  );
+  const resMyWiki = await fetch("/api/wiki/user");
   if (resMyWiki.ok) {
     wikis.value = await resMyWiki.json();
   }else{
@@ -53,19 +50,11 @@ onMounted(async () => {
 
 .container {
   display: flex;
-  margin-top: 95px;
+  height: 100vh;
 }
 
 main {
   flex: 1 1 auto;
   background: #f2f2f2;
-}
-
-.content {
-  background-color: #d63a3a;
-  font-size: 35px;
-  width: 100%;
-  height: 100%;
-  text-align: center;
 }
 </style>
