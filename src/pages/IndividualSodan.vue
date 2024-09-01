@@ -126,7 +126,7 @@ const TagClick = (tag :string) => {
     </div>
   </div>
   <div class="mdeditor">
-    <MarkDownEditor :editorType=3 v-if="sodan.questionMessage.userTraqId == myid"/>
+    <MarkDownEditor :editorType=3 :editSodanId="sodan.id" v-if="sodan.questionMessage.userTraqId == myid"/>
   </div>
 </template>
 

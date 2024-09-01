@@ -23,10 +23,15 @@ const props = defineProps({
     defaultId: {
         type: Number,
         default: -1
+    },
+    editSodanId: {
+        type: Number,
+        default: -1
     }
 })
 const type = ref(props.editorType)
 const wikiId = ref(props.defaultId);
+const editSodanId = ref(props.editSodanId);
 // type:  1:memo作成 2:sodan作成 3:sodanに返信
 
 const title = ref<string>('');
@@ -605,15 +610,32 @@ const Save = () =>{
         }
     }
 }
-const SendReply = () =>{
+const SendReply = async() =>{
     if(sendToRoom.value != null && Content.value != ""){
-        // contentsをsendToRoomの部屋に送る
-        $toast.success("send!!", {
-            duration: 1200,
-            position:  'top-right'
-        })
-        Content.value = "";
-        sendToRoom.value = undefined;
+        // sendRoomNumは？？？？？？？？？
+        const res = await fetch('/api/anon-sodan/replies?wikiId=' + editSodanId.value.toString(), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                content: Content.value})
+        }).catch((e) => {
+            $toast.error("something wrong", {
+                duration: 1200,
+                position:  'top-right'
+            });
+        });
+        if(res != null && res.ok){
+            $toast.success("send!!", {
+                duration: 1200,
+                position:  'top-right'
+            })
+            Content.value = "";
+            sendToRoom.value = undefined;
+            const cont = await res.json()
+            console.log(cont)
+        }
     }else{
         $toast.info("please enter the room number and content", {
             duration: 1200,
@@ -622,15 +644,31 @@ const SendReply = () =>{
     }
 
 }
-const SendSodan = () =>{
+const SendSodan = async() =>{
     if(Content.value != ""){
-        // contentsをsodanに送る
-        $toast.success("send!!", {
-            duration: 1200,
-            position:  'top-right'
-        })
-        Content.value = "";
-        selectTags.value = []
+        // tagをsodanに送る????????
+        const res = await fetch("/api/anon-sodan",{
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                content: Content.value
+            })
+        }).catch((e) => {
+            $toast.error("something wrong", {
+                duration: 1200,
+                position:  'top-right'
+            });
+        });
+        if(res != null && res.ok){
+            $toast.success("send!!", {
+                duration: 1200,
+                position:  'top-right'
+            })
+            Content.value = "";
+            selectTags.value = []
+        }
     }else{
         $toast.info("please enter the content", {
             duration: 1200,
@@ -639,6 +677,8 @@ const SendSodan = () =>{
     }
 }
 const Send = () =>{
+    console.log(editSodanId.value);
+    
     if(type.value == 3){
         SendReply();
     }else if(type.value == 2){
@@ -688,9 +728,8 @@ onMounted(async() =>{
             })
         }
     }
-    console.log(wikiId.value);
     
-    tagSearch();
+    if(type.value == 2 || type.value == 1)tagSearch();
 })
 </script>
 <template>
