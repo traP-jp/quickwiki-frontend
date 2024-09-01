@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import router from "../router";
-import { useRoute } from "vue-router";
 </script>
 
 <template>
   <div :class="$style.container">
-    <sidebar class="sidebar">
-      <ul>
-        <router-link to="/wiki/mywiki">
-          <li>自分のWiki</li>
-        </router-link>
-        <router-link to="/wiki/favoritewiki">
-          <li>お気に入りのWiki</li>
-        </router-link>
-        <router-link to="/creatememo">
-          <li>Wikiを書く</li>
-        </router-link>
-      </ul>
-    </sidebar>
-    <main>
+    <div class="sidebar">
+      <div class="sidebar_content">
+        <ul>
+          <router-link to="/wiki/mywiki">
+            <li>自分のWiki</li>
+          </router-link>
+          <router-link to="/wiki/favoritewiki">
+            <li>お気に入りのWiki</li>
+          </router-link>
+          <router-link to="/creatememo">
+            <li>Wikiを書く</li>
+          </router-link>
+        </ul>
+      </div>
+    </div>
+    <main :class="$style.mainHeader">
       <router-view />
     </main>
   </div>
@@ -37,10 +36,7 @@ body {
 
 .container {
   display: flex;
-  margin-top: 95px;
   height: 100vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
 }
 
 main {
@@ -48,18 +44,7 @@ main {
   background: coral;
 }
 
-.content {
-  background-color: #d63a3a;
-  font-size: 35px;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-}
-
-.mainHeader {
-  font-size: 35px;
-  user-select: none;
-  text-align: left;
-  padding:  20px ;
+.sidebar_content {
+  top: 0;
 }
 </style>

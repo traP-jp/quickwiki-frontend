@@ -29,17 +29,31 @@ const TagClick = (tag: string) => {
 };
 
 const isLiking = ref<boolean>(false);
-const StartLiking = (wiki: Wiki) => {
-  isLiking.value = true;
-  await fetch ("/api/wiki/user/favorite",
-    method: 'POST',
-    headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    memoId: wiki.id.toString()
-  })
-};
+const StartLiking = async (wiki: Wiki) => {
+  if (isLiking.value) {
+    isLiking.value = false;
+    await fetch("/api/wiki/user/favorite", {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        wikiId: wiki.id.toString()
+      })
+    });
+  }else {
+    isLiking.value = true;
+    await fetch("/api/wiki/user/favorite", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        wikiId: wiki.id.toString()
+      })
+    });
+  }
+}
 </script>
 
 <template>

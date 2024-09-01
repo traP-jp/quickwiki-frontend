@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import "../styles/SideBar.css";
 
 const wikis = ref<string>("Now Preparing");
 
@@ -31,9 +30,7 @@ body {
 
 .container {
   display: flex;
-  margin-top: 95px;
   height: 100vh;
-  overflow-y: scroll;
 }
 
 main {
