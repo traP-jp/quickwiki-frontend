@@ -6,6 +6,7 @@ import { Marked } from 'marked'
 import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
+import { useUserStore } from '../store/user'
 
 type Memo = {
     id: number,
@@ -21,6 +22,7 @@ const title = ref<string>("");
 const content = ref<string>("");
 const updatedAt = ref<string>("");
 const route = useRoute();
+const userStore = useUserStore();
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
@@ -50,12 +52,13 @@ onMounted(async () => {
   content.value = await marked.parse(memo.value.content);
   updatedAt.value = memo.value.updatedAt;
   myid.value = memo.value.ownerTraqId
+  console.log("user判定", memo.value.ownerTraqId, userStore.traqId, memo.value.ownerTraqId == userStore.traqId);
 })
 const TagClick = (tag :string) => {
-    router.push('/tag/' + tag.replace(/ /g, "+"))
+    router.push('/wiki/tag/' + tag.replace(/ /g, "+"))
 }
 const Edit = () =>{
-  router.push("/editmemo/" + memo.value.id);
+  router.push("/wiki/editmemo/" + memo.value.id);
 }
 </script>
 
