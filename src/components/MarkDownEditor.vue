@@ -533,8 +533,7 @@ const Update = async() =>{
             body: JSON.stringify({
                 id: wikiId.value,
                 title: title.value, 
-                content: Content.value,
-                ownerTraqId: "test"})
+                content: Content.value})
         }).catch((e) =>{
             $toast.error("something wrong", {
                 duration: 1200,
@@ -583,7 +582,7 @@ const Create = async(CreateButtonDown: boolean) =>{
                 body: JSON.stringify({
                     title: title.value, 
                     content: Content.value,
-                    ownerTraqId: "test"})
+                    tags:[""]})
             }).catch((e) => {
                 $toast.error("something wrong", {
                     duration: 1200,
@@ -636,7 +635,7 @@ const Show = async() =>{
         <div :class="$style.content">
             <div :class="$style.uppercontent">
                 <h3>title</h3>
-                <input type="text" placeholder="title..." v-model="title">
+                <input type="text" placeholder="title..." v-model="title" :class="$style.title">
                 <h3>contents</h3>
                 <button type="button" @click="ToBolds('**', false)"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
                 <button type="button" @click="ToBolds('*', false)"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
@@ -696,7 +695,7 @@ const Show = async() =>{
     border-left: 3px solid lightgray;
     color: gray;
 }
-input{
+.title{
     border:1px solid lightgray;
     width: 90%;
 }
