@@ -40,7 +40,7 @@ const Submit = () => {
   <div :class="$style.header">
     <div :class="$style.header_header">QuickWiki</div>
     <div :class="$style.search">
-      <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50"/>
+      <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50" placeholder="すべてのsodanとmemoを検索"/>
       <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
     </div>
     <header :class="$style.header_list">
@@ -122,6 +122,7 @@ const Submit = () => {
 .text_box {
   height: 30px;
   border-radius: 8px;
+  border: 1px solid #aaa;
 }
 
 .search {
