@@ -1,3 +1,26 @@
+<script setup>
+
+</script>
+
+<template>
+  <div class="sidebar">
+    <div class="sidebar_content">
+      <ul>
+        <router-link to="/wiki/mywiki">
+          <li class="sidebar_link_content">自分のWiki</li>
+        </router-link>
+        <router-link to="/wiki/favoritewiki">
+          <li class="sidebar_link_content">お気に入りのWiki</li>
+        </router-link>
+        <router-link to="/creatememo">
+          <li class="sidebar_link_content">Wikiを書く</li>
+        </router-link>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<style scoped>
 .sidebar {
   z-index: 9;
   font-size: 35px;
@@ -7,12 +30,6 @@
   border-right: 2px solid #aaaaaa;
   box-shadow: #aaaaaa 2px 2px 2px;
   margin-top: -10px;
-}
-
-.sidebar_header {
-  font-size: 35px;
-  user-select: none;
-  text-align:center;
 }
 .sidebar_content {
   position: sticky;
@@ -50,3 +67,4 @@
   background-color: #f0f0f0;
   border-right: 5px solid #fd7a00;
 }
+</style>
