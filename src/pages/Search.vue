@@ -24,14 +24,20 @@ const wikis = ref<Wiki[]>([]);
 const pageNum = ref<number>(0);
 
 async function Search(keywords :string[], tags :string[], startNum: number) {
-    const responce = await fetch('/api/wiki/search', {
+  const filterTags = tags.filter(function(value){
+    return value != "";
+  })
+  const filterKeyWord = keywords.filter(function(value){
+    return value != "";
+  })
+  const responce = await fetch('/api/wiki/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          query: keywords[0], 
-          tags: tags,
+          query: filterKeyWord[0], 
+          tags: filterTags,
           resultCount: 20,
           from: startNum})
     }).catch((e) => {
