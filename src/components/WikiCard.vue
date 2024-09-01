@@ -75,10 +75,10 @@ const StartLiking = async (wiki: Wiki) => {
       </button>
       </div>
     </div>
-    <button v-if="isLiking" class="iine" @click="StartLiking(wiki)">
+    <button v-if="isLiking" class="iine" @click.stop="StartLiking(wiki)">
       <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
     </button>
-    <button v-else class="iine" @click="StartLiking(wiki)">
+    <button v-else class="iine" @click.stop="StartLiking(wiki)">
       <font-awesome-icon :icon="['far', 'heart']" /> いいね！
     </button>
   </tr>
@@ -101,18 +101,21 @@ const StartLiking = async (wiki: Wiki) => {
   background-color: rgb(211, 211, 211);
 }
 
-.card tr:hover {
+.card:hover {
   background-color: rgb(211, 211, 211);
 }
-.card tr:has(.tag:hover) {
+.card:has(.tag-container:hover) {
   background-color: rgb(244, 244, 244);
 }
-.card tr {
+.card:has(.iine:hover) {
+  background-color: rgb(244, 244, 244);
+}
+.card{
   background-color: rgb(244, 244, 244);
   padding-right: 4px;
   width: 30%;
   height: 70px;
-  transition: background-color 0.175s 0.075s ease-out;
+  transition: background-color 0.25s ease-in-out;
 }
 .card {
   border-spacing: 0 2px;
