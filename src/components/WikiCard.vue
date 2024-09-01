@@ -31,7 +31,14 @@ const TagClick = (tag: string) => {
 const isLiking = ref<boolean>(false);
 const StartLiking = (wiki: Wiki) => {
   isLiking.value = true;
-  router.push("/wiki/user/favorite/" + wiki.id.toString());
+  await fetch ("/api/wiki/user/favorite",
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    memoId: wiki.id.toString()
+  })
 };
 </script>
 
@@ -50,10 +57,10 @@ const StartLiking = (wiki: Wiki) => {
         {{ tag }}
       </button>
     </div>
-    <button v-if="isLiking" class="iine" @click="StartLiking">
+    <button v-if="isLiking" class="iine" @click="StartLiking(wiki)">
       <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
     </button>
-    <button v-else class="iine" @click="StartLiking">
+    <button v-else class="iine" @click="StartLiking(wiki)">
       <font-awesome-icon :icon="['far', 'heart']" /> いいね！
     </button>
   </tr>
