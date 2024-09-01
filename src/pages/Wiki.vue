@@ -18,7 +18,7 @@
         </ul>
       </div>
     </div>
-    <main :class="$style.mainHeader">
+    <main>
       <router-view />
     </main>
   </div>

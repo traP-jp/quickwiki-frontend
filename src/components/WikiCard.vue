@@ -89,8 +89,6 @@ const StartLiking = async (wiki: Wiki) => {
 }
 
 .tag-content {
-  display: flex;
-  align-items: left;
   margin: 5px;
 }
 
