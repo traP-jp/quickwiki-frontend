@@ -94,7 +94,7 @@ const nextPage = () =>{
     )
 }
 const backPage = () =>{
-  pageNum.value--;
+  if(pageNum.value > 0)pageNum.value--;
   router.push("/wiki/search?tags=" +
     getTags.value.join(",") +
     "&keywords=" +
@@ -109,7 +109,7 @@ const backPage = () =>{
   <table class="cardTable">
     <WikiCard :wiki="wiki" v-for="wiki in wikis" :key="wiki.id" />
   </table>
-  <button type="button" @click="backPage">back</button>
+  <button type="button" @click="backPage" v-if="pageNum > 0">back</button>
   <button type="button" @click="nextPage">next</button>
 </template>
 <style scoped>
