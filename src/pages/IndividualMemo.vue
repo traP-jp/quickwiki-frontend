@@ -52,7 +52,7 @@ onMounted(async () => {
   myid.value = memo.value.ownerTraqId
 })
 const TagClick = (tag :string) => {
-    router.push('/tag/' + tag)
+    router.push('/tag/' + tag.replace(/ /g, "+"))
 }
 const Edit = () =>{
   router.push("/editmemo/" + memo.value.id);
@@ -71,6 +71,7 @@ const Edit = () =>{
 </template>
 
 <style scoped>
+
 .title{
     text-align: left;
     margin-top: 5px;

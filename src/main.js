@@ -4,6 +4,7 @@ import App from './App.vue'
 import Router from './router'
 import vuetify from "./vuetify";
 import ToastPlugin from 'vue-toast-notification';
+import { createPinia } from 'pinia';
 import 'vue-toast-notification/dist/theme-bootstrap.css';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -12,4 +13,5 @@ import { faBold, faItalic, faStrikethrough, faQuoteRight, faListUl, faListOl, fa
 import { far } from "@fortawesome/free-regular-svg-icons";
 library.add( faBold, faItalic, faStrikethrough, faQuoteRight, faListOl, faListUl, faTable, faSquareCheck, faTrashCan, faImage, faLink, faHeart, far )
 
-createApp(App).use(Router).use(ToastPlugin).use(vuetify).component('font-awesome-icon', FontAwesomeIcon).mount('#app')
+createApp(App).use(Router).use(ToastPlugin).use(pinia).use(vuetify).component('font-awesome-icon', FontAwesomeIcon).mount('#app')
+const pinia = createPinia();

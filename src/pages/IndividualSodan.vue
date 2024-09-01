@@ -102,7 +102,7 @@ onMounted(async () => {
   myid.value = sodan.value.questionMessage.userTraqId
 })
 const TagClick = (tag :string) => {
-    router.push('/tag/' + tag)
+    router.push('/tag/' + tag.replace(/ /g, "+"))
 }
 // errorがユーザーに伝わるように
 // 

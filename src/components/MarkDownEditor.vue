@@ -908,7 +908,7 @@ onMounted(async() =>{
     border-left: 3px solid lightgray;
     color: gray;
 }
-input{
+.title{
     border:1px solid lightgray;
     width: 90%;
 }
