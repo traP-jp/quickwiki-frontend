@@ -7,7 +7,7 @@ import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 
-type Sodan = {
+type Memo = {
     id: number,
     title: string,
     ownerTraqId: string,
@@ -16,6 +16,7 @@ type Sodan = {
     updatedAt: string,
     tags: string[]
 }
+const myid = ref<string>("")
 const title = ref<string>("");
 const content = ref<string>("");
 const updatedAt = ref<string>("");
@@ -29,7 +30,7 @@ const marked = new Marked(markedHighlight({
     })
 );
 marked.setOptions({ breaks: true });
-const memo = ref<Sodan>({
+const memo = ref<Memo>({
     id: -1,
     title: "",
     ownerTraqId: "",
@@ -48,16 +49,19 @@ onMounted(async () => {
   title.value = await marked.parse(memo.value.title);
   content.value = await marked.parse(memo.value.content);
   updatedAt.value = memo.value.updatedAt;
+  myid.value = memo.value.ownerTraqId
 })
 const TagClick = (tag :string) => {
     router.push('/tag/' + tag.replace(/ /g, "+"))
 }
-// errorがユーザーに伝わるように
-// 
+const Edit = () =>{
+  router.push("/editmemo/" + memo.value.id);
+}
 </script>
 
 <template>
   <div class="title" v-html="title"></div>
+  <button type="button" @click="Edit" class="editButton" v-if="myid == memo.ownerTraqId">edit</button>
   <div class="tagcontainer">
     <button type="button" @click="TagClick(tag)" v-for="tag in memo.tags" :key="tag" class="tag">{{ tag }}</button>
   </div>
@@ -80,6 +84,15 @@ const TagClick = (tag :string) => {
 .tagcontainer{
   margin-top: 10px;
   margin-left: 20px;
+}
+.editButton{
+  background-color: rgb(245, 245, 245);
+  font-weight: bold;
+  margin-right: 30px;
+  float: right;
+}
+.editButton:hover{
+    background-color: rgb(230, 230, 230);
 }
 .tag{
     background-color: rgb(244, 244, 244);

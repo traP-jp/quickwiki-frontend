@@ -57,19 +57,23 @@ const StartLiking = async (wiki: Wiki) => {
 </script>
 
 <template>
-  <tr class="card" @click="SelectWiki(wiki)">
+  <tr v-if="wiki != null" class="card" @click="SelectWiki(wiki)">
     <li class="title">{{ wiki.title }}</li>
     <li class="content">{{ wiki.Abstract }}</li>
     <div class="tag-container">
+    <div
+      v-for="tag in wiki.tags"
+      :key="tag"
+    >
       <button
-        v-for="tag in wiki.tags"
-        :key="tag"
         class="tag-content"
         type="button"
         @click.stop="TagClick(tag)"
+        v-if="tag != ''"
       >
         {{ tag }}
       </button>
+      </div>
     </div>
     <button v-if="isLiking" class="iine" @click="StartLiking(wiki)">
       <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
