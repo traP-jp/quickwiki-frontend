@@ -1,6 +1,19 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-const wikis = ref<string>("Now Preparing");
+import WikiCard from '../components/WikiCard.vue';
+
+type Wiki = {
+    id: number,
+    type: string,
+    title: string,
+    Abstract: string,
+    createdAt: string,
+    updatedAt: string,
+    ownerTraqId: string,
+    tags: string[]
+}
+
+const wikis = ref<Wiki[]>([]);
 
 onMounted(async () => {
   const resFavoriteWiki = await fetch("/api/wiki/user/favorite");
@@ -12,4 +25,7 @@ onMounted(async () => {
 
 <template>
     <h1>LikeWiki</h1>
+    <table class="cardTable">
+      <WikiCard :wiki="wiki" v-for="wiki in wikis" :key="wiki.id" />
+    </table>
 </template>

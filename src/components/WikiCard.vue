@@ -31,21 +31,25 @@ const TagClick = (tag :string) => {
 
 <template>
     <tr
+      v-if="wiki != null"
       class="card"
       @click="SelectWiki(wiki)"
     >
         <li class="title">{{ wiki.title }}</li>
         <li class="content">{{ wiki.Abstract }}</li>
       <div class="tag-container">
-        <button
+        <div
           v-for="tag in wiki.tags"
-          :key="tag"
+          :key="tag">
+        <button
           class="tag-content"
           type="button"
           @click.stop="TagClick(tag)"
+          v-if="tag != ''"
         >
           {{ tag }}
         </button>
+        </div>
       </div>
     </tr>
 </template>
