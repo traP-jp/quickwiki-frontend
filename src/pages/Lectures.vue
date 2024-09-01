@@ -89,7 +89,7 @@ onBeforeRouteUpdate(async (to, from) => {
         <tr v-for="lecture in lectures" :key="lecture.id" :class="$style.card">
           <ul>
             <li :class="$style.title">{{ lecture.title }}</li>
-            <li :class="$style.content">講義資料url:<a href="{{ lecture.content }}">{{ lecture.content }}</a></li>
+            <li :class="$style.content">講義資料url:<a href="{{ lecture.content }}" :class="$style.link">{{ lecture.content }}</a></li>
           </ul>
         </tr>
       </table>
@@ -107,6 +107,7 @@ onBeforeRouteUpdate(async (to, from) => {
 
 .container {
   display: flex;
+  gap: 10px;
 }
 
 .card {
@@ -120,6 +121,8 @@ onBeforeRouteUpdate(async (to, from) => {
   border-radius: 6px;
   margin-bottom: 16px;
   transition: box-shadow 0.3s ease;
+  transition-property: box-shadow, border;
+  transition-duration: 0.2s;
 }
 
 .title {
@@ -131,5 +134,8 @@ onBeforeRouteUpdate(async (to, from) => {
 .content {
   font-size: 25px;
   list-style: none;
+}
+.link:hover {
+  text-decoration: underline;
 }
 </style>
