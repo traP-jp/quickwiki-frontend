@@ -13,5 +13,5 @@ import { faBold, faItalic, faStrikethrough, faQuoteRight, faListUl, faListOl, fa
 import { far } from "@fortawesome/free-regular-svg-icons";
 library.add( faBold, faItalic, faStrikethrough, faQuoteRight, faListOl, faListUl, faTable, faSquareCheck, faTrashCan, faImage, faLink, faHeart, far )
 
-createApp(App).use(Router).use(ToastPlugin).use(pinia).use(vuetify).component('font-awesome-icon', FontAwesomeIcon).mount('#app')
 const pinia = createPinia();
+createApp(App).use(Router).use(ToastPlugin).use(pinia).use(vuetify).component('font-awesome-icon', FontAwesomeIcon).mount('#app')
