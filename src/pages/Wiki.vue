@@ -33,7 +33,8 @@ const Submit = () => {
     "/wiki/search?tags=" +
       tags.value.join(",") +
       "&keywords=" +
-      keywords.value.join(",")
+      keywords.value.join(",") + 
+      "&page=0"
   );
 };
 

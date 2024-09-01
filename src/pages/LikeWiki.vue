@@ -2,9 +2,22 @@
 import { onMounted, ref } from "vue";
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import WikiCard from '../components/WikiCard.vue';
 
-const wikis = ref<string>("Now Preparing");
 const $toast = useToast();
+
+type Wiki = {
+    id: number,
+    type: string,
+    title: string,
+    Abstract: string,
+    createdAt: string,
+    updatedAt: string,
+    ownerTraqId: string,
+    tags: string[]
+}
+
+const wikis = ref<Wiki[]>([]);
 
 onMounted(async () => {
   const resFavoriteWiki = await fetch("/api/wiki/user/favorite");
@@ -21,4 +34,7 @@ onMounted(async () => {
 
 <template>
     <h1>LikeWiki</h1>
+    <table class="cardTable">
+      <WikiCard :wiki="wiki" v-for="wiki in wikis" :key="wiki.id" />
+    </table>
 </template>
