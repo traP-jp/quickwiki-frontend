@@ -25,6 +25,14 @@ type Sodan = {
         stampId: string,
         count: number
       }
+    ],
+    citations: [
+      {
+        userTraqId: string,
+        content: string,
+        createdAt: string,
+        updatedAt: string
+      }
     ]
   },
   answerMessages: [
@@ -37,6 +45,14 @@ type Sodan = {
         {
           stampId: string,
           count: number
+        }
+      ],
+      citations: [
+        {
+          userTraqId: string,
+          content: string,
+          createdAt: string,
+          updatedAt: string
         }
       ]
     }
@@ -73,6 +89,14 @@ const sodan = ref<Sodan>({
         stampId: "",
         count: 0
       }
+    ],
+    citations: [
+      {
+        userTraqId: "",
+        content: "",
+        createdAt: "",
+        updatedAt: ""
+      }
     ]
   },
   answerMessages: [
@@ -85,6 +109,14 @@ const sodan = ref<Sodan>({
         {
           stampId: "",
           count: 0
+        }
+      ],
+      citations: [
+        {
+          userTraqId: "",
+          content: "",
+          createdAt: "",
+          updatedAt: ""
         }
       ]
     }

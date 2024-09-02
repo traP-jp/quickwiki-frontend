@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import router from "../router";
+import { useUserStore } from '../store/user.js';
+import { useToast } from "vue-toast-notification";
+
 type Wiki = {
   id: number;
   type: string;
@@ -13,9 +16,16 @@ type Wiki = {
 };
 const props = defineProps({
   wiki: Object,
+  isMyPage: Boolean
 });
 const wiki = ref(props.wiki);
+const isMyPage = ref(props.isMyPage)
+const canDelete = ref<boolean>(false)
 const favorites = ref<Wiki[]>([])
+const hide = ref<boolean>(false)
+const userStore = useUserStore();
+const $toast = useToast();
+
 
 const SelectWiki = (wiki: Wiki) => {
   console.log(wiki);
@@ -41,6 +51,7 @@ onMounted(async() =>{
       isLiking.value = true;
     }
   });
+  canDelete.value = wiki.value.type == "memo" && isMyPage.value
 })
 const StartLiking = async (wiki: Wiki) => {
   if (isLiking.value) {
@@ -67,13 +78,36 @@ const StartLiking = async (wiki: Wiki) => {
     });
   }
 }
+const DeleteMemo = async(wiki: Wiki) =>{
+  console.log("user判定", wiki.ownerTraqId == userStore.traqId)
+  if(wiki.type == "memo"){
+    const response = await fetch("/api/memo",{
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        wikiId: wiki.id.toString()
+      })
+    }).catch((e) => {
+        $toast.error("something wrong", {
+            duration: 1200,
+            position:  'top-right'
+        })
+        return e;   
+    })
+    if(response && response.ok){
+        hide.value = true;
+    }
+  }
+}
 </script>
 
 <template>
-  <tr v-if="wiki != null" class="card" @click="SelectWiki(wiki)">
+  <tr v-if="!hide" class="card" @click="SelectWiki(wiki)">
     <li class="title">{{ wiki.title }}</li>
     <li class="content">{{ wiki.Abstract }}</li>
-    <div class="tag-container">
+    <div class="button-container">
     <div
       v-for="tag in wiki.tags"
       :key="tag"
@@ -88,17 +122,22 @@ const StartLiking = async (wiki: Wiki) => {
       </button>
       </div>
     </div>
-    <button v-if="isLiking" class="iine" @click.stop="StartLiking(wiki)">
-      <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
-    </button>
-    <button v-else class="iine" @click.stop="StartLiking(wiki)">
-      <font-awesome-icon :icon="['far', 'heart']" /> いいね！
-    </button>
+    <div class="button-container">
+      <button v-if="isLiking" class="iine" @click.stop="StartLiking(wiki)">
+        <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
+      </button>
+      <button v-else class="iine" @click.stop="StartLiking(wiki)">
+        <font-awesome-icon :icon="['far', 'heart']" /> いいね！
+      </button>
+      <button v-if="canDelete" class="iine" @click.stop="DeleteMemo(wiki)">
+        <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
+      </button>
+    </div>
   </tr>
 </template>
 
 <style scoped>
-.tag-container {
+.button-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: left;
@@ -117,7 +156,7 @@ const StartLiking = async (wiki: Wiki) => {
 .card:hover {
   background-color: rgb(211, 211, 211);
 }
-.card:has(.tag-container:hover) {
+.card:has(.button-container:hover) {
   background-color: rgb(244, 244, 244);
 }
 .card:has(.iine:hover) {
@@ -180,6 +219,5 @@ const StartLiking = async (wiki: Wiki) => {
   padding: 8px;
   font-size: 18px;
   width: 120px;
-  margin-left: 80px;
 }
 </style>
