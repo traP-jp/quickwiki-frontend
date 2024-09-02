@@ -7,6 +7,9 @@ import { Marked } from 'marked'
 import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
+import { useUserStore } from '../store/user.js';
+
+const userStore = useUserStore();
 
 type Sodan = {
   id: number,
@@ -43,6 +46,7 @@ const title = ref<string>("");
 const question = ref<string>("");
 const answers = ref<string[]>([]);
 const myid = ref<string>("");
+const isClose = ref<boolean>(false);
 const route = useRoute();
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
@@ -87,6 +91,17 @@ const sodan = ref<Sodan>({
   ]
 });
 
+const Close = () =>{
+  const updateDate = sodan.value.questionMessage.updatedAt.split(" ")
+  console.log(updateDate[0])
+  const updateDates = updateDate[0].split("-")
+  const now = new Date();
+  const updateAt = new Date(Number(updateDates[0]), Number(updateDates[1]) - 1, Number(updateDates[2]), 0, 0, 0)
+  updateAt.setDate(updateAt.getDate() + 7);
+  console.log(now, updateAt)
+  return now > updateAt;
+}
+
 onMounted(async () => {
 
   const responce = await fetch('/api/sodan?wikiId=' + route.params.id)
@@ -100,9 +115,12 @@ onMounted(async () => {
     sodan.value.answerMessages[i].content = answers.value[i]
   }
   myid.value = sodan.value.questionMessage.userTraqId
+  console.log("user判定", sodan.value.questionMessage.userTraqId, userStore, sodan.value.questionMessage.userTraqId == userStore.traqId)
+  isClose.value = Close() && sodan.value.questionMessage.userTraqId == userStore.traqId;
+  console.log("時間＆user判定", isClose.value)
 })
 const TagClick = (tag :string) => {
-    router.push('/tag/' + tag.replace(/ /g, "+"))
+    router.push('/wiki/tag/' + tag.replace(/ /g, "+"))
 }
 // errorがユーザーに伝わるように
 // 

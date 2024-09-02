@@ -7,6 +7,8 @@ import 'highlight.js/styles/github-dark.css'
 import router from '../router'
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import { useUserStore } from '../store/user'
+import { log } from 'console'
 
 type Memo = {
     id: number,
@@ -15,6 +17,17 @@ type Memo = {
     content: string,
     createdAt: string,
     updatedAt: string,
+    tags: string[]
+}
+
+type Wiki = {
+    id: number,
+    type: string,
+    title: string,
+    Abstract: string,
+    createdAt: string,
+    updatedAt: string,
+    ownerTraqId: string,
     tags: string[]
 }
 
@@ -33,13 +46,13 @@ const type = ref(props.editorType)
 const wikiId = ref(props.defaultId);
 const editSodanId = ref(props.editSodanId);
 // type:  1:memo作成 2:sodan作成 3:sodanに返信
-
+const userStore = useUserStore();
 const title = ref<string>('');
 const selectTags = ref<string[]>([])
 const Content = ref<string>("");
 const MarkedTitle = ref<string>("");
 const MarkedContent = ref<string>("");
-
+const myWikis = ref<Wiki[]>([]);
 const beforeContents = ref<string[]>([]);
 const afterContents = ref<string[]>([]);
 const contentHistory = ref<string[]>([""]);
@@ -534,30 +547,44 @@ watch(contentHistory,() =>{
 
 const Update = async() =>{
     if(type.value == 1){
-    // 自分のメモであるかを確認！！！！！！！！！！！！！！！！！
-        const response = await fetch('/api/memo', {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: wikiId.value,
-                title: title.value, 
-                content: Content.value,
-                tags: selectTags.value})
-        }).catch((e) =>{
-            $toast.error("something wrong", {
-                duration: 1200,
-                position:  'top-right'
-            })
-            return e})
-        if(response.ok){
-            $toast.success("saved!!", {
-                duration: 1200,
-                position:  'top-right'
-            })
+        let thisWikiIndex = -1;
+        for(let i=0; i < myWikis.value.length; i++){
+            if(myWikis.value[i].id == wikiId.value){
+                thisWikiIndex = i
+            }
         }
-        return response;
+        console.log("user判定",myWikis.value, wikiId.value,thisWikiIndex)
+        // if(thisWikiIndex >= 0){
+            const response = await fetch('/api/memo', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: wikiId.value,
+                    title: title.value, 
+                    content: Content.value,
+                    tags: selectTags.value})
+            }).catch((e) =>{
+                $toast.error("something wrong", {
+                    duration: 1200,
+                    position:  'top-right'
+                })
+                return e})
+            if(response != null && response.ok){
+                $toast.success("saved!!", {
+                    duration: 1200,
+                    position:  'top-right'
+                })
+                myWikis.value[thisWikiIndex] = await response.json();
+            }
+            return response;
+        // }else{
+        //     $toast.error("this memo isn't yours", {
+        //         duration: 1200,
+        //         position:  'top-right'
+        //     })
+        // }
     }
 }
 const Create = async(CreateButtonDown: boolean) =>{ 
@@ -591,7 +618,11 @@ const Create = async(CreateButtonDown: boolean) =>{
                     duration: 1200,
                     position:  'top-right'
                 });
-                if(CreateButtonDown)router.push("/memo/" + wikiAbstract.id);
+                console.log(myWikis.value.length)
+                myWikis.value.push(wikiAbstract)
+                console.log(myWikis.value.length)
+
+                if(CreateButtonDown)router.push("/wiki/memo/" + wikiAbstract.id);
             }
         }
     }
@@ -689,7 +720,7 @@ const Send = () =>{
 const Show = async() =>{
     const response = await Update();
     if(response && response.ok){
-        router.push("/memo/" + wikiId.value);
+        router.push("/wiki/memo/" + wikiId.value);
     }
 }
 
@@ -726,6 +757,10 @@ onMounted(async() =>{
             duration: 1200,
             position:  'top-right'
             })
+        }
+        const response = await fetch("/api/wiki/user")
+        if(res != null && response.ok){
+            myWikis.value = await res.json();
         }
     }
     

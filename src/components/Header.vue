@@ -49,10 +49,10 @@ const Submit = () => {
         <router-link to="/wiki/mywiki">
           <li>QuickWiki</li>
         </router-link>
-        <router-link to="/createsodan">
+        <router-link to="/wiki/createsodan">
           <li>匿名質問</li>
         </router-link>
-        <router-link to="/creatememo">
+        <router-link to="/wiki/creatememo">
           <li>Wikiを書く</li>
         </router-link>
         <router-link to="/lectures/sougou">
