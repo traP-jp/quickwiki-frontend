@@ -23,8 +23,19 @@ onMounted(async () => {
 </script>
 
 <template>
-    <h1>LikeWiki</h1>
+  <div>
+    <h1 :class="$style.head_text">お気に入りのWiki</h1>
     <table class="cardTable">
       <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" />
     </table>
+  </div>
 </template>
+
+<style module>
+.head_text {
+  font-size: 50px;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+</style>
