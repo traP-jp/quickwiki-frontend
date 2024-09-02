@@ -33,6 +33,7 @@ onMounted(async() =>{
 .page {
   height: 100%;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 .contents {
   height: fit-content;

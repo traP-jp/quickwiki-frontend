@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import WikiCard from '../components/WikiCard.vue';
+import router from "../router";
 
 const $toast = useToast();
 
@@ -20,6 +21,43 @@ type Wiki = {
 const wikis = ref<Wiki[]>([]);
 const memos = ref<Wiki[]>([]);
 const sodans = ref<Wiki[]>([]);
+
+// search box
+const SearchWord = ref<string>("");
+const Words = ref<string[]>([]);
+const ErrorMessage = ref<string>("");
+const tags = ref<string[]>([]);
+const keywords = ref<string[]>([]);
+const Submit = () => {
+  if (SearchWord.value == "") {
+    return false;
+  }
+  tags.value = [];
+  keywords.value = [];
+  const SearchWords = SearchWord.value.split(/\s+/);
+  // SearchWords.forEach((SearchWord) =>{
+  //     Words.value = Words.value.concat(SearchWord.split("　"));
+  // })
+  SearchWords.forEach((word) => {
+    if (word.substring(0, 1) == "#" || word.substring(0, 1) == "＃") {
+      if (word.substring(1) != "") {
+        tags.value.push(word.substring(1));
+      }
+    } else {
+      if (word != "") {
+        keywords.value.push(word);
+      }
+    }
+  });
+  router.push(
+      "/wiki/search?tags=" +
+      tags.value.join(",") +
+      "&keywords=" +
+      keywords.value.join(",") +
+      "&page=0"
+  );
+};
+// search box end
 
 onMounted(async () => {
   const resMyWiki = await fetch("/api/wiki/user");
@@ -43,12 +81,16 @@ onMounted(async () => {
 <template>
   <div :class="$style.container">
     <main>
-      <h1>MyWiki</h1>
-      <h2 :class="$style.anker" id="memo">備忘録一覧</h2>
+      <h1 :class="$style.head_text">QuickWiki</h1>
+      <div>
+        <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50" placeholder="すべてのsodanとmemoを検索"/>
+        <button @click="Submit" :class="$style.search_button"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
+      </div>
+      <h2 :class="$style.anker" id="memo">自分の備忘録一覧</h2>
       <table :class="$style.cardTable">
         <WikiCard :wiki="memo" :isMyPage="true" v-for="memo in memos" :key="memo.id" />
       </table>
-      <h2 :class="$style.anker" id="sodan">相談一覧</h2>
+      <h2 :class="$style.anker" id="sodan">自分の相談一覧</h2>
       <table :class="$style.cardTable">
         <WikiCard :wiki="sodan" :isMyPage="true" v-for="sodan in sodans" :key="sodan.id" />
       </table>
@@ -78,5 +120,26 @@ main {
 }
 .cardTable {
   width: 95%;
+}
+
+.head_text {
+  font-family: "Alfa Slab One", serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 100px;
+  padding: 10px;
+}
+
+.text_box {
+  height: 30px;
+  border-radius: 20px;
+  border: 1px solid #000000;
+  padding: 25px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.search_button {
+  font-size: 20px;
 }
 </style>
