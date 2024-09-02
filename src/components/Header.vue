@@ -44,7 +44,7 @@ const Submit = () => {
 
 onMounted(() => {
   iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + props.userTraqId;
-  iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
+  // iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
 });
 
 </script>
@@ -53,12 +53,16 @@ onMounted(() => {
     <div :class="$style.header_header">
       <router-link to="/" :class="$style.header_header_text">QuickWiki</router-link>
     </div>
-    <div :class="$style.search">
-      <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50" placeholder="すべてのsodanとmemoを検索"/>
-      <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
-    </div>
-    <div>
-      <img :src="iconUrl" :class="$style.icon">
+    <div :class="$style.header_right">
+      <div>
+        <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50" placeholder="すべてのsodanとmemoを検索"/>
+        <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
+      </div>
+      <div>
+        <router-link to="/wiki/mywiki">
+          <img :src="iconUrl" :class="$style.icon">
+        </router-link>
+      </div>
     </div>
     <div :class="$style.header_list">
       <ul>
@@ -142,19 +146,20 @@ onMounted(() => {
   height: 30px;
   border-radius: 8px;
   border: 1px solid #aaa;
-}
-
-.search {
-  position: absolute;
-  top: 30px;
-  right: 50px;
+  padding: 5px;
 }
 
 .icon {
+  width: 40px;
+  border-radius: 50%;
+}
+
+.header_right {
   position: absolute;
   top: 30px;
   right: 10px;
-  width: 40px;
-  border-radius: 50%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 </style>
