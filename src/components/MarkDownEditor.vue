@@ -12,16 +12,7 @@ import 'vue-toast-notification/dist/theme-sugar.css';
 import { useUserStore } from '../store/user'
 import { log } from 'console'
 import Wiki from "../types/wiki";
-
-type Memo = {
-    id: number,
-    title: string,
-    ownerTraqId: string,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
-    tags: string[]
-}
+import Memo from "../types/memo";
 
 const props = defineProps({
     editorType: Number,
