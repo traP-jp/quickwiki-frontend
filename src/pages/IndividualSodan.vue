@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import { useRoute } from 'vue-router'
 import router from '../router'
 import MarkDownEditor from '../components/MarkDownEditor.vue'
@@ -8,6 +8,8 @@ import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import { useUserStore } from '../store/user.js';
+import TraqMessage from "../types/message";
+import Message from "../components/Message.vue";
 
 const userStore = useUserStore();
 
@@ -15,32 +17,8 @@ type Sodan = {
   id: number,
   title: string,
   tags: string[],
-  questionMessage: {
-    userTraqId: string,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
-    stamps: [
-      {
-        stampId: string,
-        count: number
-      }
-    ]
-  },
-  answerMessages: [
-    {
-      userTraqId: string,
-      content: string,
-      createdAt: string,
-      updatedAt: string,
-      stamps: [
-        {
-          stampId: string,
-          count: number
-        }
-      ]
-    }
-  ]
+  questionMessage: TraqMessage,
+  answerMessages: TraqMessage[]
 }
 const title = ref<string>("");
 const question = ref<string>("");
@@ -90,6 +68,7 @@ const sodan = ref<Sodan>({
     }
   ]
 });
+const messageReady = ref<boolean>(false);
 
 const Close = () =>{
   const updateDate = sodan.value.questionMessage.updatedAt.split(" ")
@@ -107,18 +86,15 @@ onMounted(async () => {
   const responce = await fetch('/api/sodan?wikiId=' + route.params.id)
   if(responce.ok){
       sodan.value = await responce.json();
+      messageReady.value = true;
   }
-  title.value = await marked.parse(sodan.value.title);
-  question.value = await marked.parse(sodan.value.questionMessage.content);
-  for(let i=0; i < sodan.value.answerMessages.length; i++){
-    answers.value[i] = await marked.parse(sodan.value.answerMessages[i].content);
-    sodan.value.answerMessages[i].content = answers.value[i]
-  }
+  title.value = sodan.value.title
   myid.value = sodan.value.questionMessage.userTraqId
   console.log("user判定", sodan.value.questionMessage.userTraqId, userStore, sodan.value.questionMessage.userTraqId == userStore.traqId)
   isClose.value = Close() && sodan.value.questionMessage.userTraqId == userStore.traqId;
   console.log("時間＆user判定", isClose.value)
 })
+
 const TagClick = (tag :string) => {
     router.push('/wiki/tag/' + tag.replace(/ /g, "+"))
 }
@@ -135,12 +111,12 @@ const TagClick = (tag :string) => {
   <br>
   <br>
   <h2>question:</h2>
-  <div v-html="question" class="msg leftContent"></div>
+  <message :message="sodan.questionMessage" v-if="messageReady" />
   <!-- markdownにする！！！！！！！ -->
   <h2>answer:</h2>
   <div v-for="msg in sodan.answerMessages" :key="msg.createdAt" class="leftContent">
     <div>
-      <div v-html="msg.content" class="msg" :class="{ isOthers: msg.userTraqId != sodan.questionMessage.userTraqId }"></div>
+      <message :message="msg" v-if="messageReady" />
     </div>
   </div>
   <div class="mdeditor">
