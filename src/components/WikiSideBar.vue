@@ -12,7 +12,7 @@
         <router-link to="/wiki/favoritewiki">
           <li class="sidebar_link_content">お気に入りのWiki</li>
         </router-link>
-        <router-link to="/creatememo">
+        <router-link to="/wiki/creatememo">
           <li class="sidebar_link_content">Wikiを書く</li>
         </router-link>
       </ul>
