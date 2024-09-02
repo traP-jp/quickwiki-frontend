@@ -11,6 +11,7 @@ import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import { useUserStore } from '../store/user'
 import { log } from 'console'
+import Wiki from "../types/wiki";
 
 type Memo = {
     id: number,
@@ -19,17 +20,6 @@ type Memo = {
     content: string,
     createdAt: string,
     updatedAt: string,
-    tags: string[]
-}
-
-type Wiki = {
-    id: number,
-    type: string,
-    title: string,
-    Abstract: string,
-    createdAt: string,
-    updatedAt: string,
-    ownerTraqId: string,
     tags: string[]
 }
 

@@ -5,17 +5,8 @@ import WikiCard from '../components/WikiCard.vue';
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import router from '../router';
+import Wiki from '../types/wiki';
 
-type Wiki = {
-    id: number,
-    type: string,
-    title: string,
-    Abstract: string,
-    createdAt: string,
-    updatedAt: string,
-    ownerTraqId: string,
-    tags: string[]
-}
 const $toast = useToast();
 const getTags = ref<string[]>([]);
 const getKeywords = ref<string[]>([]);

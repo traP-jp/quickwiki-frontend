@@ -3,21 +3,13 @@ import { onMounted, ref } from "vue";
 import router from "../router";
 import { useUserStore } from '../store/user.js';
 import { useToast } from "vue-toast-notification";
+import Wiki from "../types/wiki";
 
-type Wiki = {
-  id: number;
-  type: string;
-  title: string;
-  Abstract: string;
-  createdAt: string;
-  updatedAt: string;
-  ownerTraqId: string;
-  tags: string[];
-};
-const props = defineProps({
-  wiki: Object,
+
+const props = defineProps<{
+  wiki: Wiki,
   isMyPage: Boolean
-});
+}>();
 const wiki = ref(props.wiki);
 const isMyPage = ref(props.isMyPage)
 const canDelete = ref<boolean>(false)

@@ -4,19 +4,9 @@ import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import WikiCard from '../components/WikiCard.vue';
 import router from "../router";
+import Wiki from "../types/wiki";
 
 const $toast = useToast();
-
-type Wiki = {
-    id: number,
-    type: string,
-    title: string,
-    Abstract: string,
-    createdAt: string,
-    updatedAt: string,
-    ownerTraqId: string,
-    tags: string[]
-}
 
 const wikis = ref<Wiki[]>([]);
 const memos = ref<Wiki[]>([]);
