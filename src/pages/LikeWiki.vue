@@ -25,9 +25,9 @@ onMounted(async () => {
 <template>
   <div>
     <h1 :class="$style.head_text">お気に入りのWiki</h1>
-    <table class="cardTable">
+    <div>
       <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" />
-    </table>
+    </div>
   </div>
 </template>
 

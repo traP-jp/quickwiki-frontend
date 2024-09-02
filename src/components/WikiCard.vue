@@ -96,9 +96,9 @@ const DeleteMemo = async(wiki: Wiki) =>{
 </script>
 
 <template>
-  <tr v-if="!hide" class="card" @click="SelectWiki(wiki)">
-    <li class="title">{{ wiki.title }}</li>
-    <li class="content">{{ wiki.Abstract }}</li>
+  <div v-if="!hide" class="card" @click="SelectWiki(wiki)">
+    <div class="title">{{ wiki.title }}</div>
+    <div class="content">{{ wiki.Abstract }}</div>
     <div class="button-container">
     <div
       v-for="tag in wiki.tags"
@@ -125,7 +125,7 @@ const DeleteMemo = async(wiki: Wiki) =>{
         <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
       </button>
     </div>
-  </tr>
+  </div>
 </template>
 
 <style scoped>

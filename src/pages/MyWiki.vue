@@ -77,17 +77,17 @@ onMounted(async () => {
         <button @click="Submit" :class="$style.search_button"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
       </div>
       <h2 :class="$style.anker" id="memo">自分の備忘録一覧</h2>
-      <table :class="$style.cardTable">
+      <div>
         <WikiCard :wiki="memo" :isMyPage="true" v-for="memo in memos" :key="memo.id" />
-      </table>
+      </div>
       <h2 :class="$style.anker" id="sodan">自分の相談一覧</h2>
-      <table :class="$style.cardTable">
+      <div>
         <WikiCard :wiki="sodan" :isMyPage="true" v-for="sodan in sodans" :key="sodan.id" />
-      </table>
+      </div>
       <h2>すべて 後で消す！！！！！！！！</h2>
-      <table :class="$style.cardTable">
+      <div>
         <WikiCard :wiki="wiki" :isMyPage="true" v-for="wiki in wikis" :key="wiki.id" />
-      </table>
+      </div>
     </main>
   </div>
 </template>
@@ -103,9 +103,6 @@ onMounted(async () => {
 
 main {
   height: fit-content;
-}
-.cardTable {
-  width: 95%;
 }
 
 .head_text {

@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.container">
     <wiki-side-bar :isMyPage="isMyPage" />
-    <main>
+    <main :class="$style.main">
       <router-view :class="$style.view" />
     </main>
   </div>
@@ -24,6 +24,10 @@
 .view {
   width: 80%;
   margin: 0 auto;
+}
+
+.main {
+  flex-grow: 1;
 }
 </style>
 <script setup lang="ts">

@@ -47,7 +47,7 @@ onBeforeRouteUpdate(async (to, from) => {
 <template>
   <div :class="$style.container">
     <lecture-side-bar />
-    <main>
+    <main :class="$style.mainWrapper">
       <div :class="$style.main">
         <div :class="$style.mainHeader">
           <p v-if="isUrl('sougou')">総合/融合</p>
@@ -60,14 +60,14 @@ onBeforeRouteUpdate(async (to, from) => {
           <p v-if="isUrl('graphics')">グラフィック</p>
           <p v-if="isUrl('others')">その他講習会</p>
         </div>
-        <table>
-          <tr v-for="lecture in lectures" :key="lecture.id" :class="$style.card">
+        <div>
+          <div v-for="lecture in lectures" :key="lecture.id" :class="$style.card">
             <ul>
               <li :class="$style.title">{{ lecture.title }}</li>
               <li :class="$style.content">講義資料URL : <a href="{{ lecture.content }}" :class="$style.link">{{ lecture.content }}</a></li>
             </ul>
-          </tr>
-        </table>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -119,5 +119,9 @@ onBeforeRouteUpdate(async (to, from) => {
 }
 .link:hover {
   text-decoration: underline;
+}
+
+.mainWrapper {
+  flex-grow: 1;
 }
 </style>

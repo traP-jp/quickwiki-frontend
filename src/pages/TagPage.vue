@@ -63,9 +63,9 @@ getTags.value.forEach(tag => {
 <template>
   <div>
     <h1 :class="$style.head_text">タグ: {{ tagsString }} の一覧</h1>
-    <table>
-      <WikiCard :wiki="wiki" :isMyPage=false v-for="wiki in wikis" :key="wiki.id" />
-    </table>
+    <div>
+      <WikiCard :wiki="wiki" :isMyPage=false v-for="wiki in wikis" :key="wiki.id" :class="$style.card" />
+    </div>
   </div>
 </template>
 <style module>
@@ -74,5 +74,9 @@ getTags.value.forEach(tag => {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.card {
+  width: 100%;
 }
 </style>
