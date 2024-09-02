@@ -79,7 +79,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div :class="$style.container">
+  <div>
     <main>
       <h1 :class="$style.head_text">QuickWiki</h1>
       <div>
@@ -110,12 +110,8 @@ onMounted(async () => {
   padding-top: 140px;
   margin-top: -140px;
 }
-.container {
-  display: flex;
-}
 
 main {
-  flex: 1 1 auto;
   height: fit-content;
 }
 .cardTable {
@@ -126,7 +122,7 @@ main {
   font-family: "Alfa Slab One", serif;
   font-weight: 400;
   font-style: normal;
-  font-size: 100px;
+  font-size: 90px;
   padding: 10px;
 }
 

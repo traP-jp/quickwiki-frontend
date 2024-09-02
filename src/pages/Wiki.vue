@@ -2,7 +2,7 @@
   <div :class="$style.container">
     <wiki-side-bar :isMyPage="isMyPage" />
     <main>
-      <router-view />
+      <router-view :class="$style.view" />
     </main>
   </div>
 </template>
@@ -11,9 +11,6 @@
 * {
   margin: 0;
   padding: 0;
-}
-.headerLink{
-  color: gray;
 }
 .container {
   display: flex;
@@ -24,12 +21,9 @@
   min-height: 100vh;
 }
 
-main {
-  flex: 1 1 auto;
-  height: 100vh;
-}
-.view{
-  border-left: 5px double gray;
+.view {
+  width: 80%;
+  margin: 0 auto;
 }
 </style>
 <script setup lang="ts">
