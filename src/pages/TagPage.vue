@@ -19,6 +19,7 @@ const $toast = useToast();
 const getTags = ref<string[]>([]);
 const route = useRoute();
 const wikis = ref<Wiki[]>([]);
+const tagsString = ref<string>("");
 
 async function Search(tags: string[]) {
     let apipath = '/api/wiki/tag';
@@ -46,6 +47,7 @@ onMounted(() => {
     route.params.name != null &&
     typeof route.params.name == "string"
   ){
+    tagsString.value = route.params.name.replaceAll("+", " ");;
     getTags.value = route.params.name.split(",");
   }
   Search(getTags.value);
@@ -55,20 +57,29 @@ onBeforeRouteUpdate((to, from) => {
     to.params.name != null &&
     typeof to.params.name == "string"
   ) {
+    tagsString.value = to.params.name.replaceAll("+", " ");
     getTags.value = to.params.name.split(",");
   }
   Search(getTags.value);
+});
+getTags.value.forEach(tag => {
+    tagsString.value += tag + " ";
 });
 </script>
 
 <template>
   <div>
-    <h1>tag</h1>
+    <h1 :class="$style.head_text">タグ: {{ tagsString }} の一覧</h1>
     <table>
       <WikiCard :wiki="wiki" :isMyPage=false v-for="wiki in wikis" :key="wiki.id" />
     </table>
   </div>
 </template>
 <style module>
-
+.head_text {
+  font-size: 50px;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 </style>
