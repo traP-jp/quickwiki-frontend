@@ -102,7 +102,7 @@ const DeleteMemo = async(wiki: Wiki) =>{
   <div v-if="!hide" :class="$style.card" @click="SelectWiki(wiki)">
     <img :src="iconUrl" :class="$style.icon" />
     <header :class="$style.header">
-      <p :class="$style.user_traq_id">@{{wiki.ownerTraqId}}</p>
+      <p :class="$style.owner_traq_id">@{{wiki.ownerTraqId}}</p>
       <p :class="$style.created_at">{{wiki.createdAt}}</p>
     </header>
     <div :class="$style.content">
@@ -212,11 +212,27 @@ const DeleteMemo = async(wiki: Wiki) =>{
 .header {
   grid-column: 2;
   grid-row: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  padding-left: 10px;
 }
 
 .content {
   grid-column: 2;
   grid-row: 2 / 4;
+  padding-left: 10px;
+}
+
+.owner_traq_id {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.created_at {
+  font-size: 0.8em;
+  color: #777777;
+  margin-left: 8px;
 }
 
 </style>
