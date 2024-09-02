@@ -85,6 +85,7 @@ onBeforeRouteUpdate(async (to, from) => {
   display: flex;
   gap: 10px;
   height: fit-content;
+  min-height: 100vh;
 }
 
 .main {
