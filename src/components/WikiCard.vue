@@ -17,6 +17,7 @@ const favorites = ref<Wiki[]>([])
 const hide = ref<boolean>(false)
 const userStore = useUserStore();
 const $toast = useToast();
+const iconUrl = ref<string>("")
 
 
 const SelectWiki = (wiki: Wiki) => {
@@ -44,6 +45,8 @@ onMounted(async() =>{
     }
   });
   canDelete.value = wiki.value.type == "memo" && isMyPage.value
+  iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + wiki.value.ownerTraqId
+  iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
 })
 const StartLiking = async (wiki: Wiki) => {
   if (isLiking.value) {
@@ -96,52 +99,58 @@ const DeleteMemo = async(wiki: Wiki) =>{
 </script>
 
 <template>
-  <div v-if="!hide" class="card" @click="SelectWiki(wiki)">
-    <div class="title">{{ wiki.title }}</div>
-    <div class="content">{{ wiki.Abstract }}</div>
-    <div class="button-container">
-    <div
-      v-for="tag in wiki.tags"
-      :key="tag"
-    >
-      <button
-        class="tag-content"
-        type="button"
-        @click.stop="TagClick(tag)"
-        v-if="tag != ''"
-      >
-        {{ tag }}
-      </button>
+  <div v-if="!hide" :class="$style.card" @click="SelectWiki(wiki)">
+    <img :src="iconUrl" :class="$style.icon" />
+    <header :class="$style.header">
+      <p :class="$style.user_traq_id">@{{wiki.ownerTraqId}}</p>
+      <p :class="$style.created_at">{{wiki.createdAt}}</p>
+    </header>
+    <div :class="$style.content">
+      <div :class="$style.title">{{ wiki.title }}</div>
+      <div :class="$style.abstract">{{ wiki.Abstract }}</div>
+      <div :class="$style.button_container">
+        <div
+            v-for="tag in wiki.tags"
+            :key="tag"
+        >
+          <button
+              :class="$style.tag_content"
+              type="button"
+              @click.stop="TagClick(tag)"
+              v-if="tag != ''"
+          >
+            {{ tag }}
+          </button>
+        </div>
       </div>
-    </div>
-    <div class="button-container">
-      <button v-if="isLiking" class="iine" @click.stop="StartLiking(wiki)">
-        <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
-      </button>
-      <button v-else class="iine" @click.stop="StartLiking(wiki)">
-        <font-awesome-icon :icon="['far', 'heart']" /> いいね！
-      </button>
-      <button v-if="canDelete" class="iine" @click.stop="DeleteMemo(wiki)">
-        <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
-      </button>
+      <div :class="$style.button_container">
+        <button v-if="isLiking" :class="$style.iine" @click.stop="StartLiking(wiki)">
+          <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
+        </button>
+        <button v-else :class="$style.iine" @click.stop="StartLiking(wiki)">
+          <font-awesome-icon :icon="['far', 'heart']" /> いいね！
+        </button>
+        <button v-if="canDelete" :class="$style.iine" @click.stop="DeleteMemo(wiki)">
+          <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
-<style scoped>
-.button-container {
+<style module>
+.button_container {
   display: flex;
   flex-wrap: wrap;
   justify-content: left;
-  margin-left: 80px;
 }
 
-.tag-content {
+.tag_content {
   margin: 5px;
   background-color: rgb(244, 244, 244);
 }
 
-.tag-content:hover {
+.tag_content:hover {
   background-color: rgb(211, 211, 211);
 }
 
@@ -154,17 +163,18 @@ const DeleteMemo = async(wiki: Wiki) =>{
   font-size: 20px;
 }
 
-.content {
-  font-size: 15px;
+.abstract {
+  font-size: 25px;
   text-align: left;
-  margin-left: 80px;
   list-style: none;
 }
 
 .card {
   width: 100%;
   height: 100%;
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  grid-template-rows: 20px 20px 1fr;
   flex-direction: column;
   padding: 16px;
   background-color: #fff;
@@ -178,12 +188,6 @@ const DeleteMemo = async(wiki: Wiki) =>{
 .title {
   font-size: 35px;
   text-align: left;
-  margin-left: 80px;
-  list-style: none;
-}
-
-.content {
-  font-size: 25px;
   list-style: none;
 }
 
@@ -196,4 +200,23 @@ const DeleteMemo = async(wiki: Wiki) =>{
   font-size: 18px;
   width: 120px;
 }
+
+.icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+
+.header {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.content {
+  grid-column: 2;
+  grid-row: 2 / 4;
+}
+
 </style>
