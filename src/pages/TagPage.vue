@@ -22,7 +22,7 @@ async function Search(tags: string[]) {
         }
         apipath += tag;
     });
-    console.log(apipath)
+    // console.log(apipath)
     const responce = await fetch(apipath)
     if(responce && responce.ok){
         wikis.value = await responce.json();
