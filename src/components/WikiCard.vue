@@ -46,7 +46,7 @@ onMounted(async() =>{
   });
   canDelete.value = wiki.value.type == "memo" && isMyPage.value
   iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + wiki.value.ownerTraqId
-  iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
+  //iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
 })
 const StartLiking = async (wiki: Wiki) => {
   if (isLiking.value) {
