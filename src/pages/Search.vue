@@ -101,7 +101,7 @@ const backPage = () =>{
 <template>
   <div>
     <h1 :class="$style.head_text">検索結果: {{ getKeywords.join(",") }}</h1>
-    <p :class="$style.pagenum_text">{{ pageNum }}ページ目 {{ (pageNum - 1) * 20 + 1 }}～{{ (pageNum - 1) * 20 + wikis.length }}件目を表示中</p>
+    <p :class="$style.pagenum_text">{{ pageNum + 1 }}ページ目 {{ pageNum * 20 + 1 }}～{{ pageNum * 20 + wikis.length }}件目を表示中</p>
     <div>
       <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" :class="$style.card" />
     </div>
