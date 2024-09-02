@@ -4,6 +4,8 @@ import { useRoute } from 'vue-router'
 import router from '../router'
 import { Marked } from 'marked'
 import hljs from 'highlight.js'
+import markedKatex from 'marked-katex-extension'
+import customHeadingId from "marked-custom-heading-id";
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import { useUserStore } from '../store/user'
@@ -30,7 +32,10 @@ const marked = new Marked(markedHighlight({
         return hljs.highlight(code, { language }).value
       }
     })
-);
+).use(markedKatex({
+    throwOnError: false,
+    nonStandard: true
+})).use(customHeadingId());;
 marked.setOptions({ breaks: true });
 const memo = ref<Memo>({
     id: -1,
@@ -63,26 +68,25 @@ const Edit = () =>{
 </script>
 
 <template>
-  <div class="title" v-html="title"></div>
-  <button type="button" @click="Edit" class="editButton" v-if="myid == memo.ownerTraqId">edit</button>
-  <div class="tagcontainer">
-    <button type="button" @click="TagClick(tag)" v-for="tag in memo.tags" :key="tag" class="tag">{{ tag }}</button>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+  <div :class="$style.title" v-html="title"></div>
+  <button type="button" @click="Edit" :class="$style.editButton" v-if="myid == memo.ownerTraqId">edit</button>
+  <div :class="$style.tagcontainer">
+    <button type="button" @click="TagClick(tag)" v-for="tag in memo.tags" :key="tag" :class="$style.tag">{{ tag }}</button>
   </div>
   <br>
-  <br>
-  <div v-html="content" class="msg leftContent"></div>
+  <div v-html="content" :class="$style.content"></div>
 </template>
-
-<style scoped>
-
+<style module>
 .title{
     text-align: left;
-    margin-top: 5px;
+    margin: 10px 10px;
     padding:5px;
     font-size: 200%;
     font-weight:bold;
     padding-left: 40px;
     padding-right: 40px;
+    border-bottom: 5px double lightgray;
 }
 .tagcontainer{
   margin-top: 10px;
@@ -108,22 +112,128 @@ const Edit = () =>{
     line-height: 10px;
     float: left;
 }
-h2{
+.content h1{
+  border-bottom: 1px solid lightgray;
+  margin-bottom: 20px;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.content h2{
+  border-bottom: 1px solid lightgray;
+  margin-bottom: 20px;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.content h3{
+  text-align: left;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.content h4{
+  text-align: left;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.content h5{
+  text-align: left;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.content h6{
+  text-align: left;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.content{
+  margin-top: 15px;
+  padding:5px;
+  padding-left: 50px;
+  padding-right: 40px;
+  text-align: left;
+}
+.content p{
+  line-height: 1.9em;
+}
+.content :not(pre) > code{
+  background-color: rgb(236, 236, 236);
+  font-size: 16px;
+  background-color: rgb(236, 236, 236);
+  border-radius: 6px;
+  padding: 3px 10px;
+  margin: 0px 2px;
+}
+.content pre > code{
+  margin: 10px 0px;
+  border-radius: 10px ;
+}
+.content th{
+    border: 1px solid black;
+    background-color: rgb(244, 244, 244);
+}
+.content td{
+    border: 1px solid black;
+    background-color: rgb(255, 255, 255);
+}
+.content tr{
+    padding-right: 4px;
+    padding-left: 4px;
+    width: 30%;
+    height: 40px;
+}
+.content table{
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 90%;
+    table-layout: fixed;
+    margin: 0 auto; 
+}
+.content ul{
+    padding-left: 30px;
     text-align: left;
 }
-.msg{
-    margin-top: 15px;
-    padding:5px;
-    padding-left: 40px;
-    padding-right: 40px;
-}
-.isOthers{
-  background-color: rgb(228, 228, 228);
-}
-.leftContent{
+.content li:has(input){
+    list-style:none;
     text-align: left;
 }
-.rightContent{
-    text-align: right;
+.content li > input{
+  margin-right: 10px
 }
+.content ol{
+  margin-left: 10px;
+}
+.content li{
+  padding-left: 10px;
+}
+.content blockquote{
+    border-left: 3px solid lightgray;
+    color: gray;
+    padding-left: 10px;
+}
+.content img{
+    max-width: 100%;
+}
+.editor{
+    font-size: large;
+    line-height: 1.5em;
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 90%;
+    height: 200px;
+    resize:none;
+    border-color: lightgray;
+}
+.editor:focus{
+    border-color: gray;
+}
+.editors{
+    display: flex;
+}
+.uppercontent{
+    text-align: left;
+}
+.uppercontent button{
+    color: rgb(90, 90, 90);
+}
+
 </style>

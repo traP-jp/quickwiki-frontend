@@ -58,7 +58,7 @@ const sodan = ref<Sodan>({
         userTraqId: "",
         content: "",
         createdAt: "",
-        updatedAt: "",
+        updatedAt: ""
       }
     ]
   },
@@ -80,7 +80,7 @@ const sodan = ref<Sodan>({
           userTraqId: "",
           content: "",
           createdAt: "",
-          updatedAt: "",
+          updatedAt: ""
         }
       ]
     }

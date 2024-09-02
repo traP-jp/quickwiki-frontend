@@ -2,6 +2,8 @@
 import { ref, watch, onMounted } from 'vue'
 import { Marked } from 'marked'
 import hljs from 'highlight.js'
+import markedKatex from "marked-katex-extension";
+import customHeadingId from "marked-custom-heading-id";
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import router from '../router'
@@ -66,14 +68,17 @@ const checkTargets = ref<string[]>(["- [ ] ", "- ", "1. ", "> "])
 const tags = ref([])
 const sendToRoom = ref<number>();
 const isLoading = ref(false)
-const marked = new Marked(markedHighlight({
+const marked = new Marked(
+    markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
         const language = hljs.getLanguage(lang) ? lang : 'plaintext'
         return hljs.highlight(code, { language }).value
       }
-    })
-);
+    })).use(markedKatex({
+        throwOnError: false,
+        nonStandard: true
+    })).use(customHeadingId());
 marked.setOptions({ breaks: true });
 
 // 2回以上改行した際の補正
@@ -496,20 +501,14 @@ const CreateLists = (target: string) =>{
 const DeleteContent = () =>{
     Content.value = "";
 }
-const ToBolds = (target: string, isLinkorImage: boolean) =>{
+const ToBolds = (startContent: string, endContent: string) =>{
     const startPos = document.querySelector('textarea')?.selectionStart;
     const endPos = document.querySelector('textarea')?.selectionEnd;
     console.log(startPos, endPos)
-    let endContent;
-    if(isLinkorImage){
-        endContent = "](https://)";
-    }else{
-        endContent = target;
-    }
     if(startPos && endPos && startPos != 0){
-        Content.value = Content.value.slice(0,startPos) + target + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
+        Content.value = Content.value.slice(0,startPos) + startContent + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
     }else{
-        Content.value = target + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
+        Content.value = startContent + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
     }
 }
 // ctrl + z, command + z
@@ -768,6 +767,7 @@ onMounted(async() =>{
 })
 </script>
 <template>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
     <div :class="$style.buttons" v-if="type == 1">
         <button type="button" @click="Save">save</button>
         <button type="button" @click="Create(true)" v-if="wikiId < 0">create</button>
@@ -839,17 +839,19 @@ onMounted(async() =>{
                     ></v-combobox>
                 </div>
                 <h3>contents</h3>
-                <button type="button" @click="ToBolds('**', false)"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
-                <button type="button" @click="ToBolds('*', false)"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
-                <button type="button" @click="ToBolds('~~', false)"><font-awesome-icon :icon="['fas', 'strikethrough']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('**','**')"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('*','*')"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('~~','~~')"><font-awesome-icon :icon="['fas', 'strikethrough']" transform="shrink-3" /></button>
+                <button type="button" @click="CreateLists('\n# header {#custom-id}\n[headerLink](#custom-id)')"><font-awesome-icon :icon="['fas', 'heading']" transform="shrink-3"  /></button>
                 <button type="button" @click="CreateLists('> ')"><font-awesome-icon :icon="['fas', 'quote-right']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('\n```c\n', '\n```')"><font-awesome-icon :icon="['fas', 'code']" transform="shrink-3" /></button>
                 <button type="button" @click="CreateLists('- ')"><font-awesome-icon :icon="['fas', 'list-ul']" transform="shrink-3" /></button>
                 <button type="button" @click="CreateLists('1. ')"><font-awesome-icon :icon="['fas', 'list-ol']" transform="shrink-3" /></button>
                 <button type="button" @click="CreateTable"><font-awesome-icon :icon="['fas', 'table']" transform="shrink-1" /></button>
                 <button type="button" @click="CreateLists('- [ ] ')"><font-awesome-icon :icon="['fas', 'square-check']" transform="shrink-3" /></button>
                 <button type="button" @click="DeleteContent"><font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" /></button>
-                <button type="button" @click="ToBolds('[', true)"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
-                <button type="button" @click="ToBolds('![', true)"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
+                <button type="button" @click="ToBolds('[', '](https://)')"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('![', '](https://)')"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
             </div>   
             <v-textarea v-if="type == 1"
             name="input-7-1"
@@ -931,17 +933,74 @@ onMounted(async() =>{
     table-layout: fixed;
     margin: 0 auto; 
 }
+.viewer h1{
+  border-bottom: 1px solid lightgray;
+  margin-bottom: 20px;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.viewer h2{
+  border-bottom: 1px solid lightgray;
+  margin-bottom: 20px;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.viewer h3{
+  text-align: left;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.viewer h4{
+  text-align: left;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.viewer h5{
+  text-align: left;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.viewer h6{
+  text-align: left;
+  padding-top: 140px;
+  margin-top: -140px;
+}
+.viewer p{
+  line-height: 1.9em;
+}
+.viewer :not(pre) > code{
+  background-color: rgb(236, 236, 236);
+  border-radius: 5px;
+  padding: 2px 5px;
+  margin: 0px 2px;
+}
+.viewer pre > code{
+  margin: 10px 0px;
+  border-radius: 10px ;
+}
 .viewer ul{
-    padding-left: 20px;
+    padding-left: 30px;
     text-align: left;
 }
 .viewer li:has(input){
     list-style:none;
     text-align: left;
 }
+.viewer li > input{
+  margin-right: 10px
+}
+.viewer ol{
+  margin-left: 10px;
+}
+.viewer li{
+  padding-left: 10px;
+}
 .viewer blockquote{
     border-left: 3px solid lightgray;
     color: gray;
+}
+.viewer img{
+    max-width: 100%;
 }
 .title{
     border:1px solid lightgray;
@@ -973,9 +1032,12 @@ onMounted(async() =>{
     border-radius: 10px;
     margin-top: 80px;
     height: 100%;
+    text-align: left;
+    word-break: break-all;
 }
 .content{
     width:45%;
+    max-width: 45%;
     display:flex;
     flex-direction:column;
 }

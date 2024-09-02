@@ -107,7 +107,7 @@ const backPage = () =>{
 
 <template>
   <table class="cardTable">
-    <WikiCard :wiki="wiki" v-for="wiki in wikis" :key="wiki.id" />
+    <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" />
   </table>
   <button type="button" @click="backPage" v-if="pageNum > 0">back</button>
   <button type="button" @click="nextPage">next</button>

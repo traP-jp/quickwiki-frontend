@@ -35,6 +35,6 @@ onMounted(async () => {
 <template>
     <h1>LikeWiki</h1>
     <table class="cardTable">
-      <WikiCard :wiki="wiki" v-for="wiki in wikis" :key="wiki.id" />
+      <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" />
     </table>
 </template>

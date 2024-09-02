@@ -18,11 +18,19 @@ type Wiki = {
 }
 
 const wikis = ref<Wiki[]>([]);
+const memos = ref<Wiki[]>([]);
+const sodans = ref<Wiki[]>([]);
 
 onMounted(async () => {
   const resMyWiki = await fetch("/api/wiki/user");
   if (resMyWiki.ok) {
     wikis.value = await resMyWiki.json();
+    memos.value = wikis.value.filter(value =>{
+      return value.type == "memo"
+    });
+    sodans.value = wikis.value.filter(value =>{
+      return value.type == "sodan"
+    });
   }else{
     $toast.error("something wrong", {
         duration: 1200,
@@ -36,8 +44,17 @@ onMounted(async () => {
   <div :class="$style.container">
     <main>
       <h1>MyWiki</h1>
+      <h2 :class="$style.anker" id="memo">備忘録一覧</h2>
       <table :class="$style.cardTable">
-        <WikiCard :wiki="wiki" v-for="wiki in wikis" :key="wiki.id" />
+        <WikiCard :wiki="memo" :isMyPage="true" v-for="memo in memos" :key="memo.id" />
+      </table>
+      <h2 :class="$style.anker" id="sodan">相談一覧</h2>
+      <table :class="$style.cardTable">
+        <WikiCard :wiki="sodan" :isMyPage="true" v-for="sodan in sodans" :key="sodan.id" />
+      </table>
+      <h2>すべて 後で消す！！！！！！！！</h2>
+      <table :class="$style.cardTable">
+        <WikiCard :wiki="wiki" :isMyPage="true" v-for="wiki in wikis" :key="wiki.id" />
       </table>
     </main>
   </div>
@@ -47,7 +64,10 @@ onMounted(async () => {
   margin: 0;
   padding: 0;
 }
-
+.anker{
+  padding-top: 140px;
+  margin-top: -140px;
+}
 .container {
   display: flex;
 }
