@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { onBeforeRouteUpdate, useRoute } from "vue-router";
-import "../styles/SideBar.css";
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import LectureSideBar from "../components/LectureSideBar.vue";
 
 const $toast = useToast();
 const lectures = ref<string>("Now Preparing");
@@ -39,40 +39,7 @@ onBeforeRouteUpdate(async (to, from) => {
 </script>
 <template>
   <div :class="$style.container">
-    <div class="sidebar">
-      <div class="sidebar_content">
-        <h2 class="sidebar_header">講習会</h2>
-        <ul>
-          <router-link to="/lectures/sougou">
-            <li class="sidebar_link_content">総合/融合</li>
-          </router-link>
-          <router-link to="/lectures/SysAd">
-            <li class="sidebar_link_content">SysAd</li>
-          </router-link>
-          <router-link to="/lectures/algorithm">
-            <li class="sidebar_link_content">アルゴリズム</li>
-          </router-link>
-          <router-link to="/lectures/CTF">
-            <li class="sidebar_link_content">CTF</li>
-          </router-link>
-          <router-link to="/lectures/Kaggle">
-            <li class="sidebar_link_content">Kaggle</li>
-          </router-link>
-          <router-link to="/lectures/Game">
-            <li class="sidebar_link_content">ゲーム</li>
-          </router-link>
-          <router-link to="/lectures/sound">
-            <li class="sidebar_link_content">サウンド</li>
-          </router-link>
-          <router-link to="/lectures/graphics">
-            <li class="sidebar_link_content">グラフィック/デザイン</li>
-          </router-link>
-          <router-link to="/lectures/others">
-            <li class="sidebar_link_content">その他講習会</li>
-          </router-link>
-        </ul>
-      </div>
-    </div>
+    <lecture-side-bar />
     <main>
       <div :class="$style.mainHeader">
         <p v-if="isUrl('sougou')">総合/融合</p>
