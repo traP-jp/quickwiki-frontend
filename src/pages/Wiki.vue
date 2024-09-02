@@ -24,6 +24,9 @@ main {
   flex: 1 1 auto;
   height: 100vh;
 }
+.view{
+  border-left: 5px double gray;
+}
 </style>
 <script setup lang="ts">
 import WikiSideBar from "../components/WikiSideBar.vue";

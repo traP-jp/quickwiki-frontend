@@ -20,13 +20,13 @@ const favorites = ref<Wiki[]>([])
 const SelectWiki = (wiki: Wiki) => {
   console.log(wiki);
   if (wiki.type == "sodan") {
-    router.push("/sodan/" + wiki.id.toString());
+    router.push("/wiki/sodan/" + wiki.id.toString());
   } else if (wiki.type == "memo") {
-    router.push("/memo/" + wiki.id.toString());
+    router.push("/wiki/memo/" + wiki.id.toString());
   }
 };
 const TagClick = (tag: string) => {
-  router.push("/tag/" + tag.replace(/ /g, "+"));
+  router.push("/wiki/tag/" + tag.replace(/ /g, "+"));
 };
 
 const isLiking = ref<boolean>(false);
