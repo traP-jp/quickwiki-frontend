@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import router from "../router";
 import { useRoute } from "vue-router";
 import '../styles/header.css';
+
+const props = defineProps<{userTraqId: string}>();
+const iconUrl = ref<string>("");
 
 const SearchWord = ref<string>("");
 const Words = ref<string[]>([]);
@@ -37,15 +40,31 @@ const Submit = () => {
       keywords.value.join(",") +
       "&page=0"
   );
-};</script>
+};
+
+onMounted(() => {
+  iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + props.userTraqId;
+  // iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
+});
+
+</script>
 <template>
   <div :class="$style.header">
-    <div :class="$style.header_header">QuickWiki</div>
-    <div :class="$style.search">
-      <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50" placeholder="すべてのsodanとmemoを検索"/>
-      <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
+    <div :class="$style.header_header">
+      <router-link to="/" :class="$style.header_header_text">QuickWiki</router-link>
     </div>
-    <header :class="$style.header_list">
+    <div :class="$style.header_right">
+      <div>
+        <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50" placeholder="すべてのsodanとmemoを検索"/>
+        <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
+      </div>
+      <div>
+        <router-link to="/wiki/mywiki">
+          <img :src="iconUrl" :class="$style.icon">
+        </router-link>
+      </div>
+    </div>
+    <div :class="$style.header_list">
       <ul>
         <router-link to="/wiki/mywiki">
           <li class="header_link_content">QuickWiki</li>
@@ -60,7 +79,7 @@ const Submit = () => {
           <li class="header_link_content">講習会資料</li>
         </router-link>
       </ul>
-    </header>
+    </div>
   </div>
 </template>
 
@@ -82,12 +101,19 @@ const Submit = () => {
 .header_header {
   top: 0;
   z-index: 10;
-  color: rgb(253, 122, 0);
-  font-size: 62px;
-  background-color: #ffffff;
   text-align: left;
   padding-left: 30px;
   user-select: none;
+}
+
+.header_header_text {
+  color: rgb(253, 122, 0);
+  font-size: 62px;
+  font-weight: normal;
+}
+
+.header_header_text:hover {
+  color: rgb(253, 122, 0);
 }
 
 .header_list ul {
@@ -120,11 +146,20 @@ const Submit = () => {
   height: 30px;
   border-radius: 8px;
   border: 1px solid #aaa;
+  padding: 5px;
 }
 
-.search {
+.icon {
+  width: 40px;
+  border-radius: 50%;
+}
+
+.header_right {
   position: absolute;
   top: 30px;
-  right: 50px;
+  right: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 </style>
