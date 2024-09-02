@@ -20,17 +20,30 @@ const marked = new Marked(markedHighlight({
 );
 // const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/" + message.value.userTraqId)
 const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/kavos")
+const fileUrls = ref<string[]>([])
 
 onMounted( async () => {
   content.value = await marked.parse(message.value.content)
 
   for (const stamp of message.value.stamps) {
-    const res = await fetch("/api/files" + stamp.stampId)
+    const res = await fetch("/api/files/" + stamp.stampId)
     const body = await res.blob()
-    const url = URL.createObjectURL(body)
-    stamp.stampUrl = url
+    stamp.stampUrl = URL.createObjectURL(body)
   }
+
+  await extraceFileUrls()
 })
+
+const extraceFileUrls = async () => {
+  const re = /https:\/\/q.trap.jp\/files\/([^!*]{36)/;
+  const urls = content.value.match(re)
+  for (const url of urls) {
+    const fileId = url.slice("https://q.trap.jp/files/".length)
+    const res = await fetch("/api/files/" + fileId)
+    const body = await res.blob()
+    fileUrls.value.push(URL.createObjectURL(body))
+  }
+}
 </script>
 
 <template>
@@ -43,6 +56,7 @@ onMounted( async () => {
       </header>
       <div :class="$style.msg_content" >
         <div v-html="content"></div>
+        <img v-for="url in fileUrls" :src="url" :class="$style.image" alt="file">
         <div v-for="citation in message.citations" :key="citation.createdAt" :class="$style.citation">
           <img :src="icon" width="24" height="24" alt="icon" :class="$style.citation_icon">
           <div :class="$style.citation_header">
@@ -126,8 +140,8 @@ onMounted( async () => {
 
 .citation {
   display: grid;
-  grid-template-rows: 20px 1fr;
-  grid-template-columns: 20px 1fr;
+  grid-template-rows: 24px 1fr;
+  grid-template-columns: 24px 1fr;
   border-left: 3px solid #dddddd;
   padding-left: 10px;
   margin-top: 5px;
@@ -145,13 +159,13 @@ onMounted( async () => {
   align-items: baseline;
   grid-row: 1;
   grid-column: 2;
-  padding-left: 10px;
+  padding-left: 5px;
 }
 
 .citation_content {
   grid-row: 2;
   grid-column: 2;
-  padding-left: 10px;
+  padding-left: 5px;
   color: #444444;
 }
 
@@ -164,5 +178,9 @@ onMounted( async () => {
   font-size: 0.7em;
   color: #999999;
   margin-left: 8px;
+}
+
+.image {
+  width: 50%;
 }
 </style>
