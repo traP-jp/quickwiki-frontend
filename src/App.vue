@@ -24,7 +24,7 @@ onMounted(async() =>{
 </script>
 
 <template>
-  <div :class="$style.page">
+  <div :class="$style.page" id="page">
     <Header :user-traq-id="userTraqId" />
     <router-view :class="$style.contents" />
   </div>

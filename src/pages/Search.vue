@@ -56,6 +56,7 @@ onMounted(() => {
     pageNum.value = Number(route.query.page);
   }
   Search(getKeywords.value, getTags.value, pageNum.value * 20);
+  document.getElementById("page").scrollTop = 0;
 });
 onBeforeRouteUpdate((to, from) => {
   console.log("search");
@@ -72,6 +73,7 @@ onBeforeRouteUpdate((to, from) => {
     pageNum.value = Number(to.query.page);
   }
   Search(getKeywords.value, getTags.value, pageNum.value * 20);
+  document.getElementById("page").scrollTop = 0;
 });
 
 const nextPage = () =>{
@@ -97,14 +99,41 @@ const backPage = () =>{
 </script>
 
 <template>
-  <table class="cardTable">
-    <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" />
-  </table>
-  <button type="button" @click="backPage" v-if="pageNum > 0">back</button>
-  <button type="button" @click="nextPage">next</button>
+  <div>
+    <h1 :class="$style.head_text">検索結果: {{ getKeywords.join(",") }}</h1>
+    <p :class="$style.pagenum_text">{{ pageNum }}ページ目 {{ (pageNum - 1) * 20 + 1 }}～{{ (pageNum - 1) * 20 + wikis.length }}件目を表示中</p>
+    <table>
+      <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" :class="$style.card" />
+    </table>
+    <button type="button" @click="backPage" v-if="pageNum > 0" :class="$style.button">back</button>
+    <button type="button" @click="nextPage" :class="$style.button">next</button>
+  </div>
 </template>
-<style scoped>
-.cardTable{
-  width: 95%;
+<style module>
+.head_text {
+  font-size: 50px;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.pagenum_text {
+  font-size: 15px;
+  text-align: left;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.button {
+  background-color: #eeeeee;
+  border-radius: 10px;
+}
+
+.button:hover {
+  background-color: #dddddd;
+}
+
+.card {
+  width: 100%;
 }
 </style>

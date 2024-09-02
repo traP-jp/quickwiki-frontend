@@ -42,6 +42,7 @@ onMounted(() => {
     getTags.value = route.params.name.split(",");
   }
   Search(getTags.value);
+  document.getElementById("page").scrollTop = 0;
 });
 onBeforeRouteUpdate((to, from) => {
   if (
@@ -52,6 +53,7 @@ onBeforeRouteUpdate((to, from) => {
     getTags.value = to.params.name.split(",");
   }
   Search(getTags.value);
+  document.getElementById("page").scrollTop = 0;
 });
 getTags.value.forEach(tag => {
     tagsString.value += tag + " ";
