@@ -60,6 +60,7 @@ const StartLiking = async (wiki: Wiki) => {
         wikiId: wiki.id.toString()
       })
     });
+    wiki.favorites -= 1;
   }else {
     isLiking.value = true;
     await fetch("/api/wiki/user/favorite", {
@@ -71,6 +72,7 @@ const StartLiking = async (wiki: Wiki) => {
         wikiId: wiki.id.toString()
       })
     });
+    wiki.favorites += 1;
   }
 }
 const DeleteMemo = async(wiki: Wiki) =>{
@@ -125,10 +127,14 @@ const DeleteMemo = async(wiki: Wiki) =>{
       </div>
       <div :class="$style.button_container">
         <button v-if="isLiking" :class="$style.iine" @click.stop="StartLiking(wiki)">
-          <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
+          <font-awesome-icon :icon="['fas', 'heart']" />
+          <span>いいね！</span>
+          <span :class="$style.favorite_count">{{ wiki.favorites }}</span>
         </button>
         <button v-else :class="$style.iine" @click.stop="StartLiking(wiki)">
-          <font-awesome-icon :icon="['far', 'heart']" /> いいね！
+          <font-awesome-icon :icon="['far', 'heart']" />
+          <span>いいね！</span>
+          <span :class="$style.favorite_count">{{ wiki.favorites }}</span>
         </button>
         <button v-if="canDelete" :class="$style.iine" @click.stop="DeleteMemo(wiki)">
           <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
@@ -143,6 +149,7 @@ const DeleteMemo = async(wiki: Wiki) =>{
   display: flex;
   flex-wrap: wrap;
   justify-content: left;
+  align-items: center;
 }
 
 .tag_content {
@@ -196,9 +203,11 @@ const DeleteMemo = async(wiki: Wiki) =>{
 }
 
 .iine {
-  padding: 8px;
   font-size: 18px;
-  width: 120px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
 }
 
 .icon {
@@ -235,4 +244,6 @@ const DeleteMemo = async(wiki: Wiki) =>{
   margin-left: 8px;
 }
 
+.favorite_count {
+}
 </style>

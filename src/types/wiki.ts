@@ -7,6 +7,7 @@ type Wiki = {
     updatedAt: string;
     ownerTraqId: string;
     tags: string[];
+    favorites : number;
 };
 
 export default Wiki;
