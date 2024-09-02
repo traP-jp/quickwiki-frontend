@@ -114,6 +114,6 @@ const backPage = () =>{
 </template>
 <style scoped>
 .cardTable{
-    margin: 10px 0px;
+  width: 95%;
 }
 </style>

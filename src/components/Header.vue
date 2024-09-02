@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import router from "../router";
 import { useRoute } from "vue-router";
+import '../styles/header.css';
 
 const SearchWord = ref<string>("");
 const Words = ref<string[]>([]);
@@ -47,7 +48,7 @@ const Submit = () => {
     <header :class="$style.header_list">
       <ul>
         <router-link to="/wiki/mywiki">
-          <li>QuickWiki</li>
+          <li class="header_link_content">QuickWiki</li>
         </router-link>
         <router-link to="/wiki/createsodan">
           <li>匿名質問</li>
@@ -56,7 +57,7 @@ const Submit = () => {
           <li>Wikiを書く</li>
         </router-link>
         <router-link to="/lectures/sougou">
-          <li>講習会資料</li>
+          <li class="header_link_content">講習会資料</li>
         </router-link>
       </ul>
     </header>
@@ -105,14 +106,9 @@ const Submit = () => {
   color: #1a1a1a;
 }
 
-.header_list li a:hover {
-  font-size: 25px;
-  color: #1a1a1a;
-}
-
 .header_list ul li:hover {
-  background-color: #dedede;
-  border-radius: 10px;;
+  background-color: #f0f0f0;
+  border-bottom: 3px solid #fd7a00;
 }
 
 .header_list li {

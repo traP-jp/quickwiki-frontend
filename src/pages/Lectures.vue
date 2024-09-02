@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { onBeforeRouteUpdate, useRoute } from "vue-router";
-import "../styles/SideBar.css";
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import LectureSideBar from "../components/LectureSideBar.vue";
 
 const $toast = useToast();
 const lectures = ref<string>("Now Preparing");
@@ -39,40 +39,7 @@ onBeforeRouteUpdate(async (to, from) => {
 </script>
 <template>
   <div :class="$style.container">
-    <div class="sidebar">
-      <div class="sidebar_content">
-        <h2 class="sidebar_header">講習会</h2>
-        <ul>
-          <router-link to="/lectures/sougou">
-            <li>総合/融合</li>
-          </router-link>
-          <router-link to="/lectures/SysAd">
-            <li>SysAd</li>
-          </router-link>
-          <router-link to="/lectures/algorithm">
-            <li>アルゴリズム</li>
-          </router-link>
-          <router-link to="/lectures/CTF">
-            <li>CTF</li>
-          </router-link>
-          <router-link to="/lectures/Kaggle">
-            <li>Kaggle</li>
-          </router-link>
-          <router-link to="/lectures/Game">
-            <li>ゲーム</li>
-          </router-link>
-          <router-link to="/lectures/sound">
-            <li>サウンド</li>
-          </router-link>
-          <router-link to="/lectures/graphics">
-            <li>グラフィック/デザイン</li>
-          </router-link>
-          <router-link to="/lectures/others">
-            <li>その他講習会</li>
-          </router-link>
-        </ul>
-      </div>
-    </div>
+    <lecture-side-bar />
     <main>
       <div :class="$style.mainHeader">
         <p v-if="isUrl('sougou')">総合/融合</p>
@@ -89,7 +56,7 @@ onBeforeRouteUpdate(async (to, from) => {
         <tr v-for="lecture in lectures" :key="lecture.id" :class="$style.card">
           <ul>
             <li :class="$style.title">{{ lecture.title }}</li>
-            <li :class="$style.content">講義資料url:<a href="{{ lecture.content }}">{{ lecture.content }}</a></li>
+            <li :class="$style.content">講義資料url:<a href="{{ lecture.content }}" :class="$style.link">{{ lecture.content }}</a></li>
           </ul>
         </tr>
       </table>
@@ -107,6 +74,7 @@ onBeforeRouteUpdate(async (to, from) => {
 
 .container {
   display: flex;
+  gap: 10px;
 }
 
 .card {
@@ -120,6 +88,8 @@ onBeforeRouteUpdate(async (to, from) => {
   border-radius: 6px;
   margin-bottom: 16px;
   transition: box-shadow 0.3s ease;
+  transition-property: box-shadow, border;
+  transition-duration: 0.2s;
 }
 
 .title {
@@ -131,5 +101,8 @@ onBeforeRouteUpdate(async (to, from) => {
 .content {
   font-size: 25px;
   list-style: none;
+}
+.link:hover {
+  text-decoration: underline;
 }
 </style>

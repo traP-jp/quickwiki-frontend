@@ -115,20 +115,9 @@ const StartLiking = async (wiki: Wiki) => {
 }
 
 .card:hover {
-  background-color: rgb(211, 211, 211);
-}
-.card:has(.tag-container:hover) {
-  background-color: rgb(244, 244, 244);
-}
-.card:has(.iine:hover) {
-  background-color: rgb(244, 244, 244);
-}
-.card{
-  background-color: rgb(244, 244, 244);
-  padding-right: 4px;
-  width: 30%;
-  height: 70px;
-  transition: background-color 0.25s ease-in-out;
+  border: 2px solid rgba(253, 122, 0, 0.4);
+  box-shadow: 0 0 5px rgba(253, 122, 0, 0.4);
+  cursor: pointer;
 }
 .card {
   border-spacing: 0 2px;
@@ -154,10 +143,11 @@ const StartLiking = async (wiki: Wiki) => {
   flex-direction: column;
   padding: 16px;
   background-color: #fff;
-  border: 1px solid #e1e4e8;
+  border: 2px solid #dddddd;
   border-radius: 6px;
   margin-bottom: 16px;
-  transition: box-shadow 0.3s ease;
+  transition-property: box-shadow, border;
+  transition-duration: 0.2s;
 }
 
 .title {
