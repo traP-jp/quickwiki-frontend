@@ -19,6 +19,7 @@
   padding-top: 10px;
   gap: 10px;
   height: fit-content;
+  min-height: 100vh;
 }
 
 main {
