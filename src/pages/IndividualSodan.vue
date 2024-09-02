@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import { useRoute } from 'vue-router'
 import router from '../router'
 import MarkDownEditor from '../components/MarkDownEditor.vue'
@@ -8,6 +8,8 @@ import hljs from 'highlight.js'
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import { useUserStore } from '../store/user.js';
+import TraqMessage from "../types/message";
+import Message from "../components/Message.vue";
 
 const userStore = useUserStore();
 
@@ -15,48 +17,8 @@ type Sodan = {
   id: number,
   title: string,
   tags: string[],
-  questionMessage: {
-    userTraqId: string,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
-    stamps: [
-      {
-        stampId: string,
-        count: number
-      }
-    ],
-    citations: [
-      {
-        userTraqId: string,
-        content: string,
-        createdAt: string,
-        updatedAt: string
-      }
-    ]
-  },
-  answerMessages: [
-    {
-      userTraqId: string,
-      content: string,
-      createdAt: string,
-      updatedAt: string,
-      stamps: [
-        {
-          stampId: string,
-          count: number
-        }
-      ],
-      citations: [
-        {
-          userTraqId: string,
-          content: string,
-          createdAt: string,
-          updatedAt: string
-        }
-      ]
-    }
-  ]
+  questionMessage: TraqMessage,
+  answerMessages: TraqMessage[]
 }
 const title = ref<string>("");
 const question = ref<string>("");
@@ -87,6 +49,7 @@ const sodan = ref<Sodan>({
     stamps: [
       {
         stampId: "",
+        stampUrl: "",
         count: 0
       }
     ],
@@ -108,6 +71,7 @@ const sodan = ref<Sodan>({
       stamps: [
         {
           stampId: "",
+          stampUrl: "",
           count: 0
         }
       ],
@@ -122,6 +86,7 @@ const sodan = ref<Sodan>({
     }
   ]
 });
+const messageReady = ref<boolean>(false);
 
 const Close = () =>{
   const updateDate = sodan.value.questionMessage.updatedAt.split(" ")
@@ -139,18 +104,15 @@ onMounted(async () => {
   const responce = await fetch('/api/sodan?wikiId=' + route.params.id)
   if(responce.ok){
       sodan.value = await responce.json();
+      messageReady.value = true;
   }
-  title.value = await marked.parse(sodan.value.title);
-  question.value = await marked.parse(sodan.value.questionMessage.content);
-  for(let i=0; i < sodan.value.answerMessages.length; i++){
-    answers.value[i] = await marked.parse(sodan.value.answerMessages[i].content);
-    sodan.value.answerMessages[i].content = answers.value[i]
-  }
+  title.value = sodan.value.title
   myid.value = sodan.value.questionMessage.userTraqId
   console.log("user判定", sodan.value.questionMessage.userTraqId, userStore, sodan.value.questionMessage.userTraqId == userStore.traqId)
   isClose.value = Close() && sodan.value.questionMessage.userTraqId == userStore.traqId;
   console.log("時間＆user判定", isClose.value)
 })
+
 const TagClick = (tag :string) => {
     router.push('/wiki/tag/' + tag.replace(/ /g, "+"))
 }
@@ -159,36 +121,35 @@ const TagClick = (tag :string) => {
 </script>
 
 <template>
-  <h2>title:</h2>
-  <div class="title" v-html="title"></div>
-  <div class="tagcontainer">
-    <button type="button" @click="TagClick(tag)" v-for="tag in sodan.tags" :key="tag" class="tag">{{ tag }}</button>
-  </div>
-  <br>
-  <br>
-  <h2>question:</h2>
-  <div v-html="question" class="msg leftContent"></div>
-  <!-- markdownにする！！！！！！！ -->
-  <h2>answer:</h2>
-  <div v-for="msg in sodan.answerMessages" :key="msg.createdAt" class="leftContent">
-    <div>
-      <div v-html="msg.content" class="msg" :class="{ isOthers: msg.userTraqId != sodan.questionMessage.userTraqId }"></div>
+  <div class="contents">
+    <div class="title" v-html="title"></div>
+    <div class="tagcontainer">
+      <button type="button" @click="TagClick(tag)" v-for="tag in sodan.tags" :key="tag" class="tag">{{ tag }}</button>
     </div>
-  </div>
-  <div class="mdeditor">
-    <MarkDownEditor :editorType=3 :editSodanId="sodan.id" v-if="sodan.questionMessage.userTraqId == myid"/>
+    <div class="messages">
+      <h2>Question:</h2>
+      <message :message="sodan.questionMessage" v-if="messageReady" />
+      <!-- markdownにする！！！！！！！ -->
+      <h2>Answer:</h2>
+      <div v-for="msg in sodan.answerMessages" :key="msg.createdAt" class="leftContent">
+        <div>
+          <message :message="msg" v-if="messageReady" />
+        </div>
+      </div>
+      <div class="mdeditor">
+        <MarkDownEditor :editorType=3 :editSodanId="sodan.id" v-if="sodan.questionMessage.userTraqId == myid"/>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .title{
     text-align: left;
-    background-color: rgb(244, 244, 244);
     margin-top: 5px;
     padding:5px;
     font-weight:bold;
-    padding-left: 40px;
-    padding-right: 40px;
+    font-size: 32px;
 }
 .tagcontainer{
   margin-top: 10px;
@@ -203,17 +164,13 @@ const TagClick = (tag :string) => {
     height: 25px;
     line-height: 10px;
     float: right;
+    overflow: hidden;
+}
+.tag:hover{
+    background-color: rgb(228, 228, 228);
 }
 h2{
     text-align: left;
-}
-.msg{
-    background-color: rgb(244, 244, 244);
-    margin-top: 15px;
-    padding:5px;
-    font-weight:bold;
-    padding-left: 40px;
-    padding-right: 40px;
 }
 .isOthers{
   background-color: rgb(228, 228, 228);
@@ -226,5 +183,13 @@ h2{
 }
 .mdeditor{
   margin: 20px;
+}
+.contents{
+  width: 80%;
+  margin: 0 auto;
+}
+.messages {
+  margin-top: 50px;
+  border-top: 1px solid #aaaaaa;
 }
 </style>

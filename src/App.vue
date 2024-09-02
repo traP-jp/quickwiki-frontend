@@ -8,6 +8,7 @@ import 'vue-toast-notification/dist/theme-sugar.css';
 const userStore = useUserStore();
 const existUser = ref<boolean>(false);
 const $toast = useToast();
+const userTraqId = ref<string>("");
 
 onMounted(async() =>{
   await userStore.setUser();
@@ -18,19 +19,19 @@ onMounted(async() =>{
       position:  'top-right'
     })
   }
+  userTraqId.value = userStore.traqId;
 })
 </script>
 
 <template>
   <div :class="$style.page">
-    <Header />
+    <Header :user-traq-id="userTraqId" />
     <router-view :class="$style.contents" />
   </div>
 </template>
 <style module>
 .page {
   height: 100%;
-  background: #f2f2f2;
   overflow-x: hidden;
 }
 .contents {

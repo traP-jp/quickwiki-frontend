@@ -45,15 +45,15 @@ onMounted(async () => {
     <main>
       <h1>MyWiki</h1>
       <h2 :class="$style.anker" id="memo">備忘録一覧</h2>
-      <table class="cardTable">
+      <table :class="$style.cardTable">
         <WikiCard :wiki="memo" :isMyPage="true" v-for="memo in memos" :key="memo.id" />
       </table>
       <h2 :class="$style.anker" id="sodan">相談一覧</h2>
-      <table class="cardTable">
+      <table :class="$style.cardTable">
         <WikiCard :wiki="sodan" :isMyPage="true" v-for="sodan in sodans" :key="sodan.id" />
       </table>
       <h2>すべて 後で消す！！！！！！！！</h2>
-      <table class="cardTable">
+      <table :class="$style.cardTable">
         <WikiCard :wiki="wiki" :isMyPage="true" v-for="wiki in wikis" :key="wiki.id" />
       </table>
     </main>
@@ -70,11 +70,13 @@ onMounted(async () => {
 }
 .container {
   display: flex;
-  height: 100vh;
 }
 
 main {
   flex: 1 1 auto;
-  /* background: #f2f2f2; */
+  height: fit-content;
+}
+.cardTable {
+  width: 95%;
 }
 </style>
