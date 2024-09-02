@@ -18,8 +18,8 @@ const marked = new Marked(markedHighlight({
       }
     })
 );
-// const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/" + message.value.userTraqId)
-const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/kavos")
+const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/" + message.value.userTraqId)
+// const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/kavos")
 const fileUrls = ref<string[]>([])
 
 onMounted( async () => {
