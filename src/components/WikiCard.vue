@@ -119,12 +119,6 @@ const StartLiking = async (wiki: Wiki) => {
   box-shadow: 0 0 5px rgba(253, 122, 0, 0.4);
   cursor: pointer;
 }
-.card {
-  border-spacing: 0 2px;
-  width: 90%;
-  table-layout: fixed;
-  margin: 0 auto;
-}
 .title {
   font-size: 20px;
 }

@@ -18,6 +18,7 @@
   margin-top: -10px;
   padding-top: 10px;
   gap: 10px;
+  height: fit-content;
 }
 
 main {
