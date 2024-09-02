@@ -1,21 +1,6 @@
-<script setup lang="ts">
-import { use } from 'marked';
-import { onBeforeUpdate, onMounted, ref, Ref } from 'vue';
-import { useRoute } from 'vue-router';
-
-console.log(useRoute().path)
-const isMyPage = ref<boolean>(false);
-onMounted(() =>{
-  isMyPage.value = useRoute().path == "/" || useRoute().path == "/wiki/mywiki"
-})
-
-onBeforeUpdate(() =>{
-  isMyPage.value = useRoute().path == "/" || useRoute().path == "/wiki/mywiki"
-})
-</script>
 <template>
   <div :class="$style.container">
-    <wiki-side-bar />
+    <wiki-side-bar :isMyPage="isMyPage" />
     <main>
       <router-view />
     </main>
@@ -48,5 +33,16 @@ main {
 }
 </style>
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
+import { onBeforeUpdate, onMounted, ref } from 'vue';
 import WikiSideBar from "../components/WikiSideBar.vue";
+
+const isMyPage = ref<boolean>(false);
+onMounted(() =>{
+  isMyPage.value = useRoute().path == "/" || useRoute().path == "/wiki/mywiki"
+})
+
+onBeforeUpdate(() =>{
+  isMyPage.value = useRoute().path == "/" || useRoute().path == "/wiki/mywiki"
+})
 </script>

@@ -58,7 +58,7 @@ const sodan = ref<Sodan>({
         userTraqId: "",
         content: "",
         createdAt: "",
-        updatedAt: ""
+        updatedAt: "",
       }
     ]
   },
@@ -80,7 +80,7 @@ const sodan = ref<Sodan>({
           userTraqId: "",
           content: "",
           createdAt: "",
-          updatedAt: ""
+          updatedAt: "",
         }
       ]
     }
@@ -129,7 +129,6 @@ const TagClick = (tag :string) => {
     <div class="messages">
       <h2>Question:</h2>
       <message :message="sodan.questionMessage" v-if="messageReady" />
-      <!-- markdownにする！！！！！！！ -->
       <h2>Answer:</h2>
       <div v-for="msg in sodan.answerMessages" :key="msg.createdAt" class="leftContent">
         <div>

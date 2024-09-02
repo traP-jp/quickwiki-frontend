@@ -1,7 +1,21 @@
-<script setup>
+<script setup lang="ts">
+import { onBeforeUpdate, onMounted, ref, Ref } from 'vue';
+import { watch } from 'vue';
 
+const props =defineProps<{
+  isMyPage: Boolean
+}>();
+const mypage = ref<boolean>(false)
+console.log(props.isMyPage);
+
+watch(() => props.isMyPage,
+  () =>{
+    if(typeof props.isMyPage === "boolean"){
+      mypage.value = props.isMyPage
+    }
+  }
+);
 </script>
-
 <template>
   <div class="sidebar">
     <div class="sidebar_content">
@@ -9,6 +23,12 @@
         <router-link to="/wiki/mywiki">
           <li class="sidebar_link_content">自分のWiki</li>
         </router-link>
+        <a href="#memo" v-if="mypage">
+          <li class="headerLink">備忘録一覧</li>
+        </a>
+        <a href="#sodan" v-if="mypage">
+          <li class="headerLink">相談一覧</li>
+        </a>
         <router-link to="/wiki/favoritewiki">
           <li class="sidebar_link_content">お気に入りのWiki</li>
         </router-link>
@@ -66,5 +86,8 @@
 .router-link-active .sidebar_link_content {
   background-color: #f0f0f0;
   border-right: 5px solid #fd7a00;
+}
+.headerLink{
+  color: gray;
 }
 </style>
