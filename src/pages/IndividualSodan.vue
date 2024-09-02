@@ -121,36 +121,35 @@ const TagClick = (tag :string) => {
 </script>
 
 <template>
-  <h2>title:</h2>
-  <div class="title" v-html="title"></div>
-  <div class="tagcontainer">
-    <button type="button" @click="TagClick(tag)" v-for="tag in sodan.tags" :key="tag" class="tag">{{ tag }}</button>
-  </div>
-  <br>
-  <br>
-  <h2>question:</h2>
-  <message :message="sodan.questionMessage" v-if="messageReady" />
-  <!-- markdownにする！！！！！！！ -->
-  <h2>answer:</h2>
-  <div v-for="msg in sodan.answerMessages" :key="msg.createdAt" class="leftContent">
-    <div>
-      <message :message="msg" v-if="messageReady" />
+  <div class="contents">
+    <div class="title" v-html="title"></div>
+    <div class="tagcontainer">
+      <button type="button" @click="TagClick(tag)" v-for="tag in sodan.tags" :key="tag" class="tag">{{ tag }}</button>
     </div>
-  </div>
-  <div class="mdeditor">
-    <MarkDownEditor :editorType=3 :editSodanId="sodan.id" v-if="sodan.questionMessage.userTraqId == myid"/>
+    <div class="messages">
+      <h2>Question:</h2>
+      <message :message="sodan.questionMessage" v-if="messageReady" />
+      <!-- markdownにする！！！！！！！ -->
+      <h2>Answer:</h2>
+      <div v-for="msg in sodan.answerMessages" :key="msg.createdAt" class="leftContent">
+        <div>
+          <message :message="msg" v-if="messageReady" />
+        </div>
+      </div>
+      <div class="mdeditor">
+        <MarkDownEditor :editorType=3 :editSodanId="sodan.id" v-if="sodan.questionMessage.userTraqId == myid"/>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .title{
     text-align: left;
-    background-color: rgb(244, 244, 244);
     margin-top: 5px;
     padding:5px;
     font-weight:bold;
-    padding-left: 40px;
-    padding-right: 40px;
+    font-size: 32px;
 }
 .tagcontainer{
   margin-top: 10px;
@@ -165,6 +164,10 @@ const TagClick = (tag :string) => {
     height: 25px;
     line-height: 10px;
     float: right;
+    overflow: hidden;
+}
+.tag:hover{
+    background-color: rgb(228, 228, 228);
 }
 h2{
     text-align: left;
@@ -180,5 +183,13 @@ h2{
 }
 .mdeditor{
   margin: 20px;
+}
+.contents{
+  width: 80%;
+  margin: 0 auto;
+}
+.messages {
+  margin-top: 50px;
+  border-top: 1px solid #aaaaaa;
 }
 </style>
