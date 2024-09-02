@@ -23,32 +23,49 @@ const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/kavos")
 
 onMounted( async () => {
   content.value = await marked.parse(message.value.content)
+
+  for (const stamp of message.value.stamps) {
+    const res = await fetch("/api/files" + stamp.stampId)
+    const body = await res.blob()
+    const url = URL.createObjectURL(body)
+    stamp.stampUrl = url
+  }
 })
 </script>
 
 <template>
   <div :class="$style.msg">
-    <img :src="icon" width="40" height="40" alt="icon" :class="$style.icon">
-    <header :class="$style.header">
-      <span>{{message.userTraqId}}</span>
-      <span>{{message.createdAt}}</span>
-    </header>
-    <div v-html="content" :class="$style.msg_content"></div>
+    <div :class="$style.msg_body">
+      <img :src="icon" width="40" height="40" alt="icon" :class="$style.icon">
+      <header :class="$style.header">
+        <p :class="$style.user_traq_id">@{{message.userTraqId}}</p>
+        <p :class="$style.created_at">{{message.createdAt}}</p>
+      </header>
+      <div v-html="content" :class="$style.msg_content"></div>
+    </div>
+    <div :class="$style.stamps">
+      <div v-for="stamp in message.stamps" :class="$style.stamp">
+        <img :src="stamp.stampUrl" width="20" height="20" alt="stamp">
+        <p>{{stamp.count}}</p>
+      </div>
+    </div>
   </div>
 </template>
 
 <style module>
 .msg{
-  background-color: rgb(244, 244, 244);
   margin-top: 15px;
   padding:5px;
+}
+
+.msg_body {
   display: grid;
   grid-template-rows: 20px 20px 1fr;
   grid-template-columns: 40px 1fr;
+  text-align: left;
 }
 
 .msg_content {
-  font-weight:bold;
   grid-row: 2 / 4;
   grid-column: 2;
   padding-left: 10px;
@@ -56,6 +73,8 @@ onMounted( async () => {
 
 .header {
   display: flex;
+  flex-direction: row;
+  align-items: baseline;
   grid-row: 1;
   grid-column: 2;
   padding-left: 10px;
@@ -65,5 +84,30 @@ onMounted( async () => {
   grid-row: 1 / 3;
   grid-column: 1;
   border-radius: 50%;
+}
+
+.user_traq_id {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.created_at {
+  font-size: 0.8em;
+  color: #777777;
+  margin-left: 8px;
+}
+
+.stamps {
+  display: flex;
+  flex-direction: row;
+}
+
+.stamp {
+  display: flex;
+  flex-direction: row;
+  background-color: #eeeeee;
+  margin-left: 10px;
+  border-radius: 5px;
+  padding: 2px;
 }
 </style>

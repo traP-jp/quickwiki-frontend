@@ -49,6 +49,7 @@ const sodan = ref<Sodan>({
     stamps: [
       {
         stampId: "",
+        stampUrl: "",
         count: 0
       }
     ]
@@ -62,6 +63,7 @@ const sodan = ref<Sodan>({
       stamps: [
         {
           stampId: "",
+          stampUrl: "",
           count: 0
         }
       ]

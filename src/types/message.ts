@@ -6,6 +6,7 @@ type TraqMessage = {
     stamps: [
         {
             stampId: string,
+            stampUrl: string,
             count: number
         }
     ]
