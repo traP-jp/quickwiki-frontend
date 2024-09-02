@@ -151,14 +151,6 @@ const TagClick = (tag :string) => {
 h2{
     text-align: left;
 }
-.msg{
-    background-color: rgb(244, 244, 244);
-    margin-top: 15px;
-    padding:5px;
-    font-weight:bold;
-    padding-left: 40px;
-    padding-right: 40px;
-}
 .isOthers{
   background-color: rgb(228, 228, 228);
 }

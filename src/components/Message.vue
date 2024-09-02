@@ -18,16 +18,23 @@ const marked = new Marked(markedHighlight({
       }
     })
 );
+// const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/" + message.value.userTraqId)
+const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/kavos")
 
 onMounted( async () => {
-  console.log(`message: ${message.value.content}`)
   content.value = await marked.parse(message.value.content)
-  console.log(`content: ${content.value}`)
 })
 </script>
 
 <template>
-  <div v-html="content" :class="$style.msg"></div>
+  <div :class="$style.msg">
+    <img :src="icon" width="40" height="40" alt="icon" :class="$style.icon">
+    <header :class="$style.header">
+      <span>{{message.userTraqId}}</span>
+      <span>{{message.createdAt}}</span>
+    </header>
+    <div v-html="content" :class="$style.msg_content"></div>
+  </div>
 </template>
 
 <style module>
@@ -35,8 +42,28 @@ onMounted( async () => {
   background-color: rgb(244, 244, 244);
   margin-top: 15px;
   padding:5px;
+  display: grid;
+  grid-template-rows: 20px 20px 1fr;
+  grid-template-columns: 40px 1fr;
+}
+
+.msg_content {
   font-weight:bold;
-  padding-left: 40px;
-  padding-right: 40px;
+  grid-row: 2 / 4;
+  grid-column: 2;
+  padding-left: 10px;
+}
+
+.header {
+  display: flex;
+  grid-row: 1;
+  grid-column: 2;
+  padding-left: 10px;
+}
+
+.icon {
+  grid-row: 1 / 3;
+  grid-column: 1;
+  border-radius: 50%;
 }
 </style>
