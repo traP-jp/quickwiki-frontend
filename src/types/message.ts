@@ -9,7 +9,15 @@ type TraqMessage = {
             stampUrl: string,
             count: number
         }
-    ]
+    ],
+    citations: [
+        {
+            userTraqId: string,
+            content: string,
+            createdAt: string,
+            updatedAt: string,
+        }
+    ],
 }
 
 export default TraqMessage;

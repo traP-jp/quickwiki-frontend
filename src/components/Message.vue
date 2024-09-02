@@ -41,7 +41,19 @@ onMounted( async () => {
         <p :class="$style.user_traq_id">@{{message.userTraqId}}</p>
         <p :class="$style.created_at">{{message.createdAt}}</p>
       </header>
-      <div v-html="content" :class="$style.msg_content"></div>
+      <div :class="$style.msg_content" >
+        <div v-html="content"></div>
+        <div v-for="citation in message.citations" :key="citation.createdAt" :class="$style.citation">
+          <img :src="icon" width="24" height="24" alt="icon" :class="$style.citation_icon">
+          <div :class="$style.citation_header">
+            <p :class="$style.citation_user_traq_id">@{{citation.userTraqId}}</p>
+            <p :class="$style.citation_created_at">{{citation.createdAt}}</p>
+          </div>
+          <div :class="$style.citation_content">
+            <div v-html="citation.content"></div>
+          </div>
+        </div>
+      </div>
     </div>
     <div :class="$style.stamps">
       <div v-for="stamp in message.stamps" :class="$style.stamp">
@@ -100,6 +112,7 @@ onMounted( async () => {
 .stamps {
   display: flex;
   flex-direction: row;
+  margin-top: 5px;
 }
 
 .stamp {
@@ -109,5 +122,47 @@ onMounted( async () => {
   margin-left: 10px;
   border-radius: 5px;
   padding: 2px;
+}
+
+.citation {
+  display: grid;
+  grid-template-rows: 20px 1fr;
+  grid-template-columns: 20px 1fr;
+  border-left: 3px solid #dddddd;
+  padding-left: 10px;
+  margin-top: 5px;
+}
+
+.citation_icon {
+  grid-row: 1;
+  grid-column: 1;
+  border-radius: 50%;
+}
+
+.citation_header {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  grid-row: 1;
+  grid-column: 2;
+  padding-left: 10px;
+}
+
+.citation_content {
+  grid-row: 2;
+  grid-column: 2;
+  padding-left: 10px;
+  color: #444444;
+}
+
+.citation_user_traq_id {
+  font-weight: bold;
+  color: #444444;
+}
+
+.citation_created_at {
+  font-size: 0.7em;
+  color: #999999;
+  margin-left: 8px;
 }
 </style>

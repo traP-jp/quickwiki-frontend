@@ -52,6 +52,14 @@ const sodan = ref<Sodan>({
         stampUrl: "",
         count: 0
       }
+    ],
+    citations: [
+      {
+        userTraqId: "",
+        content: "",
+        createdAt: "",
+        updatedAt: "",
+      }
     ]
   },
   answerMessages: [
@@ -65,6 +73,14 @@ const sodan = ref<Sodan>({
           stampId: "",
           stampUrl: "",
           count: 0
+        }
+      ],
+      citations: [
+        {
+          userTraqId: "",
+          content: "",
+          createdAt: "",
+          updatedAt: "",
         }
       ]
     }
