@@ -11,6 +11,7 @@ const $toast = useToast();
 const getTags = ref<string[]>([]);
 const getKeywords = ref<string[]>([]);
 const route = useRoute();
+const searchLength = ref<number>(20)
 const wikis = ref<Wiki[]>([]);
 const pageNum = ref<number>(0);
 
@@ -29,7 +30,7 @@ async function Search(keywords :string[], tags :string[], startNum: number) {
         body: JSON.stringify({
           query: filterKeyWord[0], 
           tags: filterTags,
-          resultCount: 20,
+          resultCount: searchLength.value,
           from: startNum})
     }).catch((e) => {
         $toast.error("something wrong", {

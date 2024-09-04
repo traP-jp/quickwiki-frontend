@@ -914,37 +914,18 @@ onMounted(async() =>{
     table-layout: fixed;
     margin: 0 auto; 
 }
-.viewer h1{
+.viewer h1,h2{
   border-bottom: 1px solid lightgray;
   margin-bottom: 20px;
   padding-top: 140px;
   margin-top: -140px;
+  pointer-events: none;
 }
-.viewer h2{
-  border-bottom: 1px solid lightgray;
-  margin-bottom: 20px;
-  padding-top: 140px;
-  margin-top: -140px;
-}
-.viewer h3{
+.viewer h3,h4,h5,h6{
   text-align: left;
   padding-top: 140px;
   margin-top: -140px;
-}
-.viewer h4{
-  text-align: left;
-  padding-top: 140px;
-  margin-top: -140px;
-}
-.viewer h5{
-  text-align: left;
-  padding-top: 140px;
-  margin-top: -140px;
-}
-.viewer h6{
-  text-align: left;
-  padding-top: 140px;
-  margin-top: -140px;
+  pointer-events: none;
 }
 .viewer p{
   line-height: 1.9em;
