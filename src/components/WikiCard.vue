@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import router from "../router";
 import { useUserStore } from '../store/user.js';
+import getPassedTime from '../scripts/getPassedTime.js'
 import { useToast } from "vue-toast-notification";
 
 type Wiki = {
@@ -27,58 +28,6 @@ const userStore = useUserStore();
 const $toast = useToast();
 const passedTime = ref<string>("")
 
-const Pass = (update: string) =>{
-  const now = new Date();
-  console.log(update)
-  const updateDate = update.split("T")
-  console.log(updateDate[0])
-  const updateDates = updateDate[0].split("-")
-  const updateTimes = updateDate[1].split(":")
-  updateTimes[2] = updateTimes[2].slice(2)
-  const updatedAt = new Date(Number(updateDates[0]), Number(updateDates[1]) - 1, Number(updateDates[2]), Number(updateTimes[0]), Number(updateTimes[1]), Number(updateTimes[2]));
-  const diffDate = new Date()
-  console.log(diffDate.toLocaleDateString('ja-JP'))
-  console.log(updatedAt.toLocaleDateString('ja-JP'), now.getFullYear() - updatedAt.getFullYear())
-  diffDate.setFullYear(now.getFullYear() - updatedAt.getFullYear());
-  console.log(diffDate.toLocaleDateString('ja-JP'), now.getMonth() - updatedAt.getMonth()-1)
-  diffDate.setMonth(now.getMonth() - updatedAt.getMonth()-1);
-  console.log(diffDate.toLocaleDateString('ja-JP'), now.getDate() - updatedAt.getDate())
-  diffDate.setDate(now.getDate() - updatedAt.getDate());
-  console.log(diffDate.toLocaleDateString('ja-JP'), now.getHours() - updatedAt.getHours())
-  diffDate.setHours(now.getHours() - updatedAt.getHours());
-  console.log(diffDate.toLocaleDateString('ja-JP'), now.getMinutes() - updatedAt.getMinutes())
-  diffDate.setMinutes(now.getMinutes() - updatedAt.getMinutes());
-  console.log(diffDate.toLocaleDateString('ja-JP'), now.getSeconds() - updatedAt.getSeconds())
-  diffDate.setSeconds(now.getSeconds() - updatedAt.getSeconds());
-  console.log(diffDate.toLocaleDateString('ja-JP'),diffDate.getFullYear()
-  ,diffDate.getMonth(),
-  diffDate.getDate(),
-  diffDate.getHours(),
-  diffDate.getMinutes(),
-  diffDate.getSeconds())
-  const year = diffDate.getFullYear();
-  const month = year * 12 + diffDate.getMonth() + 1;
-  const seconds = Math.floor((now.getTime() - updatedAt.getTime()) / 1000)
-  const minute = Math.floor(seconds / 60)
-  const hour = Math.floor(minute / 60)
-  const date = Math.floor(hour / 24 );
-  console.log(year, month, date, hour, minute, seconds)
-  if(year > 0){
-    return year.toString() + "年前";
-  }else if(month > 0){
-    return (month % 12).toString() + "ヶ月前"
-  }else if(date > 0){
-    return date.toString() + "日前"
-  }else if(hour > 0){
-    return (hour % 24).toString() + "時間前"
-  }else if(minute > 0){
-    return (minute % 60).toString() + "分前"
-  }else if(seconds >= 0){
-    return (seconds % 60).toString() + "秒前"
-  }else{
-    return "error"
-  }
-}
 const isLiking = ref<boolean>(false);
 onMounted(async() =>{
   const res = await fetch("/api/wiki/user/favorite");
@@ -92,7 +41,7 @@ onMounted(async() =>{
     }
   });
   canDelete.value = wiki.value.type == "memo" && isMyPage.value
-  if(wiki.value != null) passedTime.value = Pass(wiki.value.updatedAt)
+  if(wiki.value != null) passedTime.value = getPassedTime(wiki.value.updatedAt)
   console.log(passedTime.value)
 })
 
