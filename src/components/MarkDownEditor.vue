@@ -1028,5 +1028,14 @@ onMounted(async() =>{
 .uppercontent button{
     color: rgb(90, 90, 90);
 }
+@media screen and (max-width: 960px) {
+  .editors{
+    display: block;
+  }
+  .content{
+    width: 100%;
+    max-width: 100%;
+  }
+}
 
 </style>
