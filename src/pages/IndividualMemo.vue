@@ -9,16 +9,8 @@ import customHeadingId from "marked-custom-heading-id";
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import { useUserStore } from '../store/user'
+import Memo from '../types/memo'
 
-type Memo = {
-    id: number,
-    title: string,
-    ownerTraqId: string,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
-    tags: string[]
-}
 const myid = ref<string>("")
 const title = ref<string>("");
 const content = ref<string>("");
