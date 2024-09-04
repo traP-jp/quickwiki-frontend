@@ -64,7 +64,7 @@ onMounted(() => {
         </router-link>
       </div>
     </div>
-    <header-list />
+    <header-list :class="$style.header_list_hide" />
   </div>
 </template>
 
@@ -133,6 +133,9 @@ onMounted(() => {
   }
   .header_header {
     text-align: center;
+  }
+  .header_list_hide {
+    display: none;
   }
 }
 </style>

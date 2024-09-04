@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { onBeforeUpdate, onMounted, ref, Ref } from 'vue';
 import { watch } from 'vue';
+import HeaderList from "./HeaderList.vue";
+import HeaderListItems from "./HeaderListItems.vue";
 
 const props =defineProps<{
   isMyPage: Boolean
 }>();
 const mypage = ref<boolean>(false)
 console.log(props.isMyPage);
+
+const isSmallScreen = ref<boolean>(window.innerWidth <= 960);
+const isHideSidebar = ref<boolean>(false);
 
 watch(() => props.isMyPage,
   () =>{
@@ -15,11 +20,25 @@ watch(() => props.isMyPage,
     }
   }
 );
+onMounted(() =>{
+  window.addEventListener('resize', () => {
+    isSmallScreen.value = window.innerWidth <= 960;
+  });
+})
+
+const changeSideBarStatus = () => {
+  isHideSidebar.value = !isHideSidebar.value;
+}
 </script>
 <template>
-  <div class="sidebar">
+  <button v-if="isSmallScreen" class="sidebar_button" @click="changeSideBarStatus">
+    aaa
+    <font-awesome-icon :icon="['fas', 'bars']" />
+  </button>
+  <div class="sidebar" :class="{ sidebar_hide: isHideSidebar }">
     <div class="sidebar_content">
       <ul>
+        <header-list-items v-if="isSmallScreen" class="sidebar_header_list" />
         <router-link to="/wiki/mywiki">
           <li class="sidebar_link_content">自分のWiki</li>
         </router-link>
@@ -89,5 +108,31 @@ watch(() => props.isMyPage,
 }
 .headerLink{
   color: gray;
+}
+
+@media screen and (max-width: 960px) {
+  .sidebar_content {
+    top: 175px;
+  }
+  .sidebar_button {
+    color: #000000;
+    font-size: 20px;
+    font-weight: bold;
+    position: fixed;
+    top: 0;
+    z-index: 15;
+  }
+  .sidebar_hide {
+    transform: scaleX(0);
+  }
+  .sidebar {
+    z-index: 14;
+    position: fixed;
+    background-color: #ffffff;
+    top: 0;
+    height: 110vh;
+    transition-property: transform;
+    transition-duration: 0.2s;
+  }
 }
 </style>

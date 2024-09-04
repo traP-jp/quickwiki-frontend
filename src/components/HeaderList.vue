@@ -1,5 +1,6 @@
 <script setup>
 import HeaderListItems from "./HeaderListItems.vue";
+import '../styles/header.css';
 </script>
 
 <template>
