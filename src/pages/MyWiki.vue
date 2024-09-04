@@ -132,9 +132,52 @@ main {
   padding: 10px;
   margin-top: 10px;
   margin-bottom: 10px;
- } 
- .card{
+}
+.card{
   width: 100%;
   max-width: 170vh;
+}
+@media screen and (max-width: 960px) {
+  .head_text {
+    font-size: 60px;
+  }
+  .text_box {
+    height: 30px;
+    border-radius: 20px;
+    border: 1px solid #000000;
+    padding: 25px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    width: 70%;
+  }
+  .search_button {
+    font-size: 20px;
+  }
+  .nowiki_text {
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .card{
+    width: 100%;
+    max-width: 170vh;
+  }
+}
+@media screen and (max-width: 450px) {
+  .head_text {
+    font-size: 40px;
+  }
+  .search_button {
+    font-size: 20px;
+  }
+  .nowiki_text {
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .card {
+    width: 100%;
+    max-width: 170vh;
+  }
 }
 </style>
