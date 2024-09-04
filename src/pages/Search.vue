@@ -40,6 +40,8 @@ async function Search(keywords :string[], tags :string[], startNum: number) {
     })
     if(responce && responce.ok){
         wikis.value = await responce.json();
+    }else{
+      wikis.value = []
     }
 }
 onMounted(() => {
@@ -101,7 +103,8 @@ const backPage = () =>{
 <template>
   <div>
     <h1 :class="$style.head_text">検索結果: {{ getKeywords.join(",") }}</h1>
-    <p :class="$style.pagenum_text">{{ pageNum + 1 }}ページ目 {{ pageNum * 20 + 1 }}～{{ pageNum * 20 + wikis.length }}件目を表示中</p>
+    <p :class="$style.pagenum_text" v-if="wikis.length != 0">{{ pageNum + 1 }}ページ目 {{ pageNum * 20 + 1 }}～{{ pageNum * 20 + wikis.length }}件目を表示中</p>
+    <p v-else>検索結果が見つかりませんでした</p>
     <div>
       <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" :class="$style.card" />
     </div>

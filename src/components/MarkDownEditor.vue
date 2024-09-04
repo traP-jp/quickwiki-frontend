@@ -13,6 +13,7 @@ import { useUserStore } from '../store/user'
 import { log } from 'console'
 import Wiki from "../types/wiki";
 import Memo from "../types/memo";
+import { before } from 'node:test';
 
 const props = defineProps({
     editorType: Number,
@@ -38,6 +39,7 @@ const MarkedContent = ref<string>("");
 const myWikis = ref<Wiki[]>([]);
 const beforeContents = ref<string[]>([]);
 const afterContents = ref<string[]>([]);
+const beforeTags = ref<string[]>([])
 const contentHistory = ref<string[]>([""]);
 const HistoryNum = ref<number>(0);
 const enterFlg = ref<boolean>(false);
@@ -49,11 +51,12 @@ const checkTargets = ref<string[]>(["- [ ] ", "- ", "1. ", "> "])
 const tags = ref([])
 const sendToRoom = ref<number>();
 const isLoading = ref(false)
+const itemAbled = ref<boolean>(false)
 const marked = new Marked(
     markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
-        const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+        const language = hljs.getLanguage(lang) ? lang : 'js'
         return hljs.highlight(code, { language }).value
       }
     })).use(markedKatex({
@@ -535,7 +538,7 @@ const Update = async() =>{
         }
         console.log("user判定",myWikis.value, wikiId.value,thisWikiIndex)
         // if(thisWikiIndex >= 0){
-            const response = await fetch('/api/memo', {
+            const memoResponse = await fetch('/api/memo', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -544,21 +547,95 @@ const Update = async() =>{
                     id: wikiId.value,
                     title: title.value, 
                     content: Content.value,
-                    tags: selectTags.value})
+                    tags: selectTags.value
+                    })
             }).catch((e) =>{
                 $toast.error("something wrong", {
                     duration: 1200,
                     position:  'top-right'
                 })
                 return e})
-            if(response != null && response.ok){
-                $toast.success("saved!!", {
+            if(memoResponse != null && memoResponse.ok){
+                const allTags = Array.from(new Set(beforeTags.value.concat(selectTags.value)))
+                const deleteTags = allTags.filter(tag =>{
+                    return !selectTags.value.includes(tag);
+                })
+                const addTags = allTags.filter(tag =>{
+                    return !beforeTags.value.includes(tag)
+                })
+                let tagResponse;
+                let errorFlg = false;
+                console.log(addTags, deleteTags, allTags, beforeTags.value, selectTags.value)
+                for(let i=0; i < Math.min(deleteTags.length, addTags.length); i++){
+                    tagResponse = await fetch("/api/wiki/tag", {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            id: wikiId.value,
+                            tag: deleteTags[i],
+                            newTag: addTags[i]
+                            })
+                    }).catch((e) =>{
+                        errorFlg = true;
+                        return e
+                    })
+                }
+                if(addTags.length > deleteTags.length){
+                    for(let i=deleteTags.length; i < addTags.length; i++){
+                        tagResponse = await fetch("/api/wiki/tag", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                id: wikiId.value,
+                                tag: addTags[i],
+                                })
+                        }).catch((e) =>{
+                            errorFlg = true;
+                            return e
+                        })
+                    }
+                }else if(deleteTags.length > addTags.length){
+                    for(let i=addTags.length; i < deleteTags.length; i++){
+                        tagResponse = await fetch("/api/wiki/tag", {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                id: wikiId.value,
+                                tag: deleteTags[i],
+                                })
+                        }).catch((e) =>{
+                            errorFlg = true;
+                            return e
+                        })
+                    }
+                }
+                if(tagResponse != null && tagResponse.ok && !errorFlg){
+                    $toast.success("saved!!", {
+                        duration: 1200,
+                        position:  'top-right'
+                    })
+                    myWikis.value[thisWikiIndex] = await tagResponse.json();
+                }else{
+                    $toast.error("Some tags were not saved", {
+                        duration: 1200,
+                        position:  'top-right'
+                    })
+                }
+                return tagResponse;
+            }else{
+                $toast.error("memo were not saved", {
                     duration: 1200,
                     position:  'top-right'
                 })
-                myWikis.value[thisWikiIndex] = await response.json();
+                return memoResponse
             }
-            return response;
+           
         // }else{
         //     $toast.error("this memo isn't yours", {
         //         duration: 1200,
@@ -601,7 +678,7 @@ const Create = async(CreateButtonDown: boolean) =>{
                 console.log(myWikis.value.length)
                 myWikis.value.push(wikiAbstract)
                 console.log(myWikis.value.length)
-
+                beforeTags.value = selectTags.value;
                 if(CreateButtonDown)router.push("/wiki/memo/" + wikiAbstract.id);
             }
         }
@@ -728,6 +805,7 @@ onMounted(async() =>{
             if(initMemo.value != null){
                 title.value = initMemo.value.title
                 selectTags.value = initMemo.value.tags
+                beforeTags.value = initMemo.value.tags
                 Content.value = initMemo.value.content
                 MarkedTitle.value = await marked.parse(title.value);
                 MarkedContent.value = await marked.parse(Content.value);
@@ -739,8 +817,8 @@ onMounted(async() =>{
             })
         }
         const response = await fetch("/api/wiki/user")
-        if(res != null && response.ok){
-            myWikis.value = await res.json();
+        if(response != null && response.ok){
+            myWikis.value = await response.json();
         }
     }
     
@@ -800,6 +878,7 @@ onMounted(async() =>{
                     variant="underlined"
                     v-on:keydown.ctrl.prevent.s="Send"  
                     v-on:keydown.meta.prevent.s="Send"
+                    item-disabled="itemAbled"
                     ></v-combobox>
                 </div>
                 <div v-if="type == 1">
