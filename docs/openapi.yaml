@@ -190,6 +190,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/wikiTag'
+    patch:
+      tags:
+        - wiki
+      summary: wikiのタグを更新
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wikiTagPatch'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wikiTag'
+    delete:
+      tags:
+        - wiki
+      summary: wikiのタグを削除
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wikiTag'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wikiTag'
   /sodan:
     get:
       tags:
@@ -484,6 +518,26 @@ paths:
               schema:
                 type: string
                 format: binary
+  /stamps/{stampID}:
+    get:
+      tags:
+        - other
+      summary: スタンプの取得(ダウンロード)
+      parameters:
+        - name: stampID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: スタンプID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
 
 
 components:
@@ -546,6 +600,9 @@ components:
           items:
             type: string
             example: ComputerScience
+        favorites:
+          type: integer
+          example: 3
     folderList:
       type: array
       items:
@@ -635,6 +692,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/message'
+        favorites:
+          type: integer
+          example: 3
     message:
       type: object
       properties:
@@ -706,6 +766,9 @@ components:
         updatedAt:
           type: string
           example: 2021-01-01 00:00:00
+        favorites:
+          type: integer
+          example: 3
     memoList:
       type: array
       items:
@@ -738,3 +801,15 @@ components:
         tag:
           type: string
           example: ComputerScience
+    wikiTagPatch:
+      type: object
+      properties:
+        wikiId:
+          type: string
+          example: 123
+        tag:
+          type: string
+          example: ComputerScience
+        newTag:
+          type: string
+          example: Python
