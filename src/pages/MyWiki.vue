@@ -83,12 +83,12 @@ onMounted(async () => {
       </div>
       <h2 :class="$style.anker" id="sodan">自分の相談一覧</h2>
       <div>
-        <WikiCard :wiki="sodan" :isMyPage="true" v-for="sodan in sodans" :key="sodan.id" />
+        <WikiCard :wiki="sodan" :isMyPage="true" v-for="sodan in sodans" :key="sodan.id" :class="$style.card" />
         <p v-if="sodans.length == 0" :class="$style.nowiki_text">まだ相談がありません 作成は<router-link to="/wiki/createsodan">こちら</router-link></p>
       </div>
       <h2>すべて 後で消す！！！！！！！！</h2>
       <div>
-        <WikiCard :wiki="wiki" :isMyPage="true" v-for="wiki in wikis" :key="wiki.id" />
+        <WikiCard :wiki="wiki" :isMyPage="true" v-for="wiki in wikis" :key="wiki.id" :class="$style.card" />
       </div>
     </main>
   </div>
@@ -132,5 +132,9 @@ main {
   padding: 10px;
   margin-top: 10px;
   margin-bottom: 10px;
+ } 
+ .card{
+  width: 100%;
+  max-width: 170vh;
 }
 </style>
