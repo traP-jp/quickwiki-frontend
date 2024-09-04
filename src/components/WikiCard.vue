@@ -168,23 +168,20 @@ const DeleteMemo = async(wiki: Wiki) =>{
   box-shadow: 0 0 5px rgba(253, 122, 0, 0.4);
   cursor: pointer;
 }
-.title {
-  font-size: 20px;
-}
 
 .abstract {
-  font-size: 25px;
+  font-size: 15px;
   text-align: left;
   list-style: none;
+  overflow-wrap: anywhere;
 }
 
 .card {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: 40px 1fr;
+  grid-template-columns: 40px minmax(0, 1fr);
   grid-template-rows: 20px 20px 1fr;
-  flex-direction: column;
   padding: 16px;
   background-color: #fff;
   border: 2px solid #dddddd;
@@ -195,9 +192,10 @@ const DeleteMemo = async(wiki: Wiki) =>{
 }
 
 .title {
-  font-size: 35px;
+  font-size: 22px;
   text-align: left;
   list-style: none;
+  overflow-wrap: anywhere;
 }
 
 .title:hover {
@@ -246,6 +244,7 @@ const DeleteMemo = async(wiki: Wiki) =>{
   margin-left: 8px;
 }
 
-.favorite_count {
+@media screen and (max-width: 960px) {
+
 }
 </style>

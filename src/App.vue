@@ -32,7 +32,6 @@ onMounted(async() =>{
 <style module>
 .page {
   height: 100%;
-  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 .contents {
