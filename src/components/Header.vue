@@ -122,6 +122,7 @@ onMounted(() => {
     top: 0;
     left: 30px;
     display: block;
+    padding-bottom: 10px;
   }
   .icon_wrapper {
     position: fixed;
