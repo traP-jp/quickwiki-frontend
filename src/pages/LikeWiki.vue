@@ -26,7 +26,7 @@ onMounted(async () => {
   <div>
     <h1 :class="$style.head_text">お気に入りのWiki</h1>
     <div>
-      <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" />
+      <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" :class="$style.card" />
     </div>
   </div>
 </template>
@@ -37,5 +37,9 @@ onMounted(async () => {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 20px;
+}
+.card {
+  width: 100%;
+  max-width: 170vh;
 }
 </style>
