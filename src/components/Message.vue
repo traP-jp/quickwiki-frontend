@@ -5,6 +5,7 @@ import {markedHighlight} from "marked-highlight";
 import hljs from "highlight.js";
 import TraqMessage from "../types/message";
 import {convertDate} from "../lib/date";
+import markedKatex from "marked-katex-extension";
 
 const props = defineProps<{
   message: TraqMessage
@@ -17,8 +18,10 @@ const marked = new Marked(markedHighlight({
         const language = hljs.getLanguage(lang) ? lang : 'plaintext'
         return hljs.highlight(code, { language }).value
       }
-    })
-);
+    })).use(markedKatex({
+          throwOnError: false,
+          nonStandard: true
+    }));
 const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/" + message.value.userTraqId)
 // const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/kavos")
 const fileUrls = ref<string[]>([])
@@ -33,12 +36,6 @@ onMounted( async () => {
   }
 
   await extraceFileUrls()
-  message.value.createdAt = convertDate(message.value.createdAt)
-  message.value.updatedAt = convertDate(message.value.updatedAt)
-  for (let i = 0; i < message.value.citations.length; i++) {
-    message.value.citations[i].createdAt = convertDate(message.value.citations[i].createdAt)
-    message.value.citations[i].updatedAt = convertDate(message.value.citations[i].updatedAt)
-  }
   extractCitation()
 })
 

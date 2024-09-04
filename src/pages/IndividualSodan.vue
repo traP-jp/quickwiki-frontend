@@ -10,6 +10,7 @@ import 'highlight.js/styles/github-dark.css'
 import { useUserStore } from '../store/user.js';
 import TraqMessage from "../types/message";
 import Message from "../components/Message.vue";
+import {convertDate, convertDateTime} from "../lib/date";
 
 const userStore = useUserStore();
 
@@ -111,6 +112,12 @@ onMounted(async () => {
   console.log("user判定", sodan.value.questionMessage.userTraqId, userStore, sodan.value.questionMessage.userTraqId == userStore.traqId)
   isClose.value = Close() && sodan.value.questionMessage.userTraqId == userStore.traqId;
   console.log("時間＆user判定", isClose.value)
+  sodan.value.questionMessage.createdAt = convertDateTime(sodan.value.questionMessage.createdAt)
+  sodan.value.questionMessage.updatedAt = convertDateTime(sodan.value.questionMessage.updatedAt)
+  for (let i = 0; i < sodan.value.answerMessages.length; i++) {
+    sodan.value.answerMessages[i].createdAt = convertDateTime(sodan.value.answerMessages[i].createdAt)
+    sodan.value.answerMessages[i].updatedAt = convertDateTime(sodan.value.answerMessages[i].updatedAt)
+  }
 })
 
 const TagClick = (tag :string) => {
