@@ -198,6 +198,8 @@ const DeleteMemo = async(wiki: Wiki) =>{
   font-size: 35px;
   text-align: left;
   list-style: none;
+  word-break: break-all;
+
 }
 
 .title:hover {

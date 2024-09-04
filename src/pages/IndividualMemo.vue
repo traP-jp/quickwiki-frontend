@@ -68,6 +68,8 @@ const Edit = () =>{
   </div>
   <br>
   <div v-html="content" :class="$style.content"></div>
+  <br>
+  <br>
 </template>
 <style module>
 .title{

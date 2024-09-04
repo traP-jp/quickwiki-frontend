@@ -26,15 +26,6 @@ const answers = ref<string[]>([]);
 const myid = ref<string>("");
 const isClose = ref<boolean>(false);
 const route = useRoute();
-const marked = new Marked(markedHighlight({
-      langPrefix: 'hljs language-',
-      highlight(code, lang) {
-        const language = hljs.getLanguage(lang) ? lang : 'plaintext'
-        return hljs.highlight(code, { language }).value
-      }
-    })
-);
-marked.setOptions({ breaks: true });
 const sodan = ref<Sodan>({
   id: 0,
   title: "",

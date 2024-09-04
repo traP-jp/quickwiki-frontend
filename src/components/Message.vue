@@ -11,20 +11,28 @@ const props = defineProps<{
 }>()
 const message = ref<TraqMessage>(props.message)
 const content = ref<string>("")
+const citations = ref<string[]>([])
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
-        const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+        const language = hljs.getLanguage(lang) ? lang : 'js'
         return hljs.highlight(code, { language }).value
       }
     })
 );
+marked.setOptions({ breaks: true });
 const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/" + message.value.userTraqId)
 // const icon = ref<string>("https://q.trap.jp/api/v3/public/icon/kavos")
 const fileUrls = ref<string[]>([])
 
 onMounted( async () => {
   content.value = await marked.parse(message.value.content)
+  console.log(content.value)
+  content.value = content.value.replaceAll("<pre><code>",'<pre><code class="hljs language-js">')
+  for(let i=0; i < message.value.citations.length; i++){
+    const citation = await marked.parse(message.value.citations[i].content)
+    message.value.citations[i].content = citation.replaceAll("<pre><code>",'<pre><code class="hljs language-js">')
+  }
 
   for (const stamp of message.value.stamps) {
     const res = await fetch("/api/stamps/" + stamp.stampId)
@@ -116,6 +124,65 @@ const extractCitation = () => {
   max-width: 145vh;
   word-break: break-all;
 }
+.msg_content :not(pre) > code{
+  background-color: rgb(236, 236, 236);
+  font-size: 16px;
+  background-color: rgb(236, 236, 236);
+  border-radius: 6px;
+  padding: 3px 10px;
+  margin: 0px 2px;
+}
+.msg_content pre > code{
+  margin: 10px 0px;
+  border-radius: 10px ;
+}
+.msg_contentt th{
+    border: 1px solid black;
+    background-color: rgb(244, 244, 244);
+}
+.msg_content td{
+    border: 1px solid black;
+    background-color: rgb(255, 255, 255);
+}
+.msg_content tr{
+    padding-right: 4px;
+    padding-left: 4px;
+    width: 30%;
+    height: 40px;
+}
+.msg_content table{
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 90%;
+    table-layout: fixed;
+    margin: 0 auto; 
+}
+.msg_content ul{
+    padding-left: 30px;
+    text-align: left;
+}
+.msg_content li:has(input){
+    list-style:none;
+    text-align: left;
+}
+.msg_content li > input{
+  margin-right: 10px
+}
+.msg_content ol{
+  margin-left: 10px;
+}
+.msg_content li{
+  padding-left: 10px;
+}
+.msg_content blockquote{
+    border-left: 3px solid lightgray;
+    color: gray;
+    padding-left: 10px;
+}
+.msg_content img{
+    max-width: 100%;
+}
+
 .header {
   display: flex;
   flex-direction: row;
