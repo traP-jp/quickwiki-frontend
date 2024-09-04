@@ -79,10 +79,12 @@ onMounted(async () => {
       <h2 :class="$style.anker" id="memo">自分の備忘録一覧</h2>
       <div>
         <WikiCard :wiki="memo" :isMyPage="true" v-for="memo in memos" :key="memo.id" />
+        <p v-if="memos.length == 0" :class="$style.nowiki_text">まだ備忘録がありません 作成は<router-link to="/wiki/creatememo">こちら</router-link></p>
       </div>
       <h2 :class="$style.anker" id="sodan">自分の相談一覧</h2>
       <div>
         <WikiCard :wiki="sodan" :isMyPage="true" v-for="sodan in sodans" :key="sodan.id" :class="$style.card" />
+        <p v-if="sodans.length == 0" :class="$style.nowiki_text">まだ相談がありません 作成は<router-link to="/wiki/createsodan">こちら</router-link></p>
       </div>
       <h2>すべて 後で消す！！！！！！！！</h2>
       <div>
@@ -126,7 +128,12 @@ main {
   font-size: 20px;
 }
 
-.card{
+.nowiki_text {
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+ } 
+ .card{
   width: 100%;
   max-width: 170vh;
 }
