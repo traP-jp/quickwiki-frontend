@@ -106,8 +106,9 @@ const extractCitation = () => {
   grid-row: 2 / 4;
   grid-column: 2;
   padding-left: 10px;
+  max-width: 145vh;
+  word-break: break-all;
 }
-
 .header {
   display: flex;
   flex-direction: row;
