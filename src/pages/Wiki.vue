@@ -1,8 +1,8 @@
 <template>
   <div :class="$style.container">
     <wiki-side-bar :isMyPage="isMyPage" />
-    <main>
-      <router-view />
+    <main :class="$style.main">
+      <router-view :class="$style.view" />
     </main>
   </div>
 </template>
@@ -11,9 +11,6 @@
 * {
   margin: 0;
   padding: 0;
-}
-.headerLink{
-  color: gray;
 }
 .container {
   display: flex;
@@ -24,12 +21,14 @@
   min-height: 100vh;
 }
 
-main {
-  flex: 1 1 auto;
-  height: 100vh;
+.view {
+  width: 80%;
+  max-width: 170vh;
+  margin: 0 auto;
 }
-.view{
-  border-left: 5px double gray;
+
+.main {
+  flex-grow: 1;
 }
 </style>
 <script setup lang="ts">
