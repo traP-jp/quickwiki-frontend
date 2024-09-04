@@ -9,16 +9,8 @@ import customHeadingId from "marked-custom-heading-id";
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import { useUserStore } from '../store/user'
+import Memo from '../types/memo'
 
-type Memo = {
-    id: number,
-    title: string,
-    ownerTraqId: string,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
-    tags: string[]
-}
 const myid = ref<string>("")
 const title = ref<string>("");
 const content = ref<string>("");
@@ -112,34 +104,14 @@ const Edit = () =>{
     line-height: 10px;
     float: left;
 }
-.content h1{
+.content h1,h2{
   border-bottom: 1px solid lightgray;
   margin-bottom: 20px;
   padding-top: 140px;
   margin-top: -140px;
 }
-.content h2{
-  border-bottom: 1px solid lightgray;
-  margin-bottom: 20px;
-  padding-top: 140px;
-  margin-top: -140px;
-}
-.content h3{
-  text-align: left;
-  padding-top: 140px;
-  margin-top: -140px;
-}
-.content h4{
-  text-align: left;
-  padding-top: 140px;
-  margin-top: -140px;
-}
-.content h5{
-  text-align: left;
-  padding-top: 140px;
-  margin-top: -140px;
-}
-.content h6{
+
+.content h3,h4,h5,h6{
   text-align: left;
   padding-top: 140px;
   margin-top: -140px;

@@ -24,10 +24,10 @@ watch(() => props.isMyPage,
           <li class="sidebar_link_content">自分のWiki</li>
         </router-link>
         <a href="#memo" v-if="mypage">
-          <li class="headerLink">備忘録一覧</li>
+          <li class="headerLink sidebar_link_content">備忘録一覧</li>
         </a>
         <a href="#sodan" v-if="mypage">
-          <li class="headerLink">相談一覧</li>
+          <li class="headerLink sidebar_link_content">相談一覧</li>
         </a>
         <router-link to="/wiki/favoritewiki">
           <li class="sidebar_link_content">お気に入りのWiki</li>

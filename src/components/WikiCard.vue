@@ -3,21 +3,13 @@ import { onMounted, ref } from "vue";
 import router from "../router";
 import { useUserStore } from '../store/user.js';
 import { useToast } from "vue-toast-notification";
+import Wiki from "../types/wiki";
+import { convertDate } from "../lib/date";
 
-type Wiki = {
-  id: number;
-  type: string;
-  title: string;
-  Abstract: string;
-  createdAt: string;
-  updatedAt: string;
-  ownerTraqId: string;
-  tags: string[];
-};
-const props = defineProps({
-  wiki: Object,
+const props = defineProps<{
+  wiki: Wiki,
   isMyPage: Boolean
-});
+}>();
 const wiki = ref(props.wiki);
 const isMyPage = ref(props.isMyPage)
 const canDelete = ref<boolean>(false)
@@ -25,60 +17,21 @@ const favorites = ref<Wiki[]>([])
 const hide = ref<boolean>(false)
 const userStore = useUserStore();
 const $toast = useToast();
-const passedTime = ref<string>("")
+const iconUrl = ref<string>("")
 
-const Pass = (update: string) =>{
-  const now = new Date();
-  console.log(update)
-  const updateDate = update.split("T")
-  console.log(updateDate[0])
-  const updateDates = updateDate[0].split("-")
-  const updateTimes = updateDate[1].split(":")
-  updateTimes[2] = updateTimes[2].slice(2)
-  const updatedAt = new Date(Number(updateDates[0]), Number(updateDates[1]) - 1, Number(updateDates[2]), Number(updateTimes[0]), Number(updateTimes[1]), Number(updateTimes[2]));
-  const diffDate = new Date()
-  console.log(diffDate.toLocaleDateString('ja-JP'))
-  console.log(updatedAt.toLocaleDateString('ja-JP'), now.getFullYear() - updatedAt.getFullYear())
-  diffDate.setFullYear(now.getFullYear() - updatedAt.getFullYear());
-  console.log(diffDate.toLocaleDateString('ja-JP'), now.getMonth() - updatedAt.getMonth()-1)
-  diffDate.setMonth(now.getMonth() - updatedAt.getMonth()-1);
-  console.log(diffDate.toLocaleDateString('ja-JP'), now.getDate() - updatedAt.getDate())
-  diffDate.setDate(now.getDate() - updatedAt.getDate());
-  console.log(diffDate.toLocaleDateString('ja-JP'), now.getHours() - updatedAt.getHours())
-  diffDate.setHours(now.getHours() - updatedAt.getHours());
-  console.log(diffDate.toLocaleDateString('ja-JP'), now.getMinutes() - updatedAt.getMinutes())
-  diffDate.setMinutes(now.getMinutes() - updatedAt.getMinutes());
-  console.log(diffDate.toLocaleDateString('ja-JP'), now.getSeconds() - updatedAt.getSeconds())
-  diffDate.setSeconds(now.getSeconds() - updatedAt.getSeconds());
-  console.log(diffDate.toLocaleDateString('ja-JP'),diffDate.getFullYear()
-  ,diffDate.getMonth(),
-  diffDate.getDate(),
-  diffDate.getHours(),
-  diffDate.getMinutes(),
-  diffDate.getSeconds())
-  const year = diffDate.getFullYear();
-  const month = year * 12 + diffDate.getMonth() + 1;
-  const seconds = Math.floor((now.getTime() - updatedAt.getTime()) / 1000)
-  const minute = Math.floor(seconds / 60)
-  const hour = Math.floor(minute / 60)
-  const date = Math.floor(hour / 24 );
-  console.log(year, month, date, hour, minute, seconds)
-  if(year > 0){
-    return year.toString() + "年前";
-  }else if(month > 0){
-    return (month % 12).toString() + "ヶ月前"
-  }else if(date > 0){
-    return date.toString() + "日前"
-  }else if(hour > 0){
-    return (hour % 24).toString() + "時間前"
-  }else if(minute > 0){
-    return (minute % 60).toString() + "分前"
-  }else if(seconds >= 0){
-    return (seconds % 60).toString() + "秒前"
-  }else{
-    return "error"
+
+const SelectWiki = (wiki: Wiki) => {
+  console.log(wiki);
+  if (wiki.type == "sodan") {
+    router.push("/wiki/sodan/" + wiki.id.toString());
+  } else if (wiki.type == "memo") {
+    router.push("/wiki/memo/" + wiki.id.toString());
   }
-}
+};
+const TagClick = (tag: string) => {
+  router.push("/wiki/tag/" + tag.replace(/ /g, "+"));
+};
+
 const isLiking = ref<boolean>(false);
 onMounted(async() =>{
   const res = await fetch("/api/wiki/user/favorite");
@@ -92,21 +45,11 @@ onMounted(async() =>{
     }
   });
   canDelete.value = wiki.value.type == "memo" && isMyPage.value
-  if(wiki.value != null) passedTime.value = Pass(wiki.value.updatedAt)
-  console.log(passedTime.value)
+  iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + wiki.value.ownerTraqId
+  //iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
+  wiki.value.createdAt = convertDate(wiki.value.createdAt)
+  wiki.value.updatedAt = convertDate(wiki.value.updatedAt)
 })
-
-const SelectWiki = (wiki: Wiki) => {
-  console.log(wiki);
-  if (wiki.type == "sodan") {
-    router.push("/wiki/sodan/" + wiki.id.toString());
-  } else if (wiki.type == "memo") {
-    router.push("/wiki/memo/" + wiki.id.toString());
-  }
-};
-const TagClick = (tag: string) => {
-  router.push("/wiki/tag/" + tag.replace(/ /g, "+"));
-};
 const StartLiking = async (wiki: Wiki) => {
   if (isLiking.value) {
     isLiking.value = false;
@@ -119,6 +62,7 @@ const StartLiking = async (wiki: Wiki) => {
         wikiId: wiki.id.toString()
       })
     });
+    wiki.favorites -= 1;
   }else {
     isLiking.value = true;
     await fetch("/api/wiki/user/favorite", {
@@ -130,6 +74,7 @@ const StartLiking = async (wiki: Wiki) => {
         wikiId: wiki.id.toString()
       })
     });
+    wiki.favorites += 1;
   }
 }
 const DeleteMemo = async(wiki: Wiki) =>{
@@ -158,59 +103,63 @@ const DeleteMemo = async(wiki: Wiki) =>{
 </script>
 
 <template>
-  <tr v-if="!hide" class="card" @click="SelectWiki(wiki)">
-    <li class="title">{{ wiki.title }}</li>
-    <li class="content">{{ wiki.Abstract }}</li>
-    <div class="button-container">
-    <div
-      v-for="tag in wiki.tags"
-      :key="tag"
-    >
-      <button
-        class="tag-content"
-        type="button"
-        @click.stop="TagClick(tag)"
-        v-if="tag != ''"
-      >
-        {{ tag }}
-      </button>
+  <div v-if="!hide" :class="$style.card" @click="SelectWiki(wiki)">
+    <img :src="iconUrl" :class="$style.icon" />
+    <header :class="$style.header">
+      <p :class="$style.owner_traq_id">@{{wiki.ownerTraqId}}</p>
+      <p :class="$style.created_at">{{wiki.createdAt}}</p>
+    </header>
+    <div :class="$style.content">
+      <div :class="$style.title">{{ wiki.title }}</div>
+      <div :class="$style.abstract">{{ wiki.Abstract }}</div>
+      <div :class="$style.button_container">
+        <div
+            v-for="tag in wiki.tags"
+            :key="tag"
+        >
+          <button
+              :class="$style.tag_content"
+              type="button"
+              @click.stop="TagClick(tag)"
+              v-if="tag != ''"
+          >
+            {{ tag }}
+          </button>
+        </div>
+      </div>
+      <div :class="$style.button_container">
+        <button v-if="isLiking" :class="$style.iine" @click.stop="StartLiking(wiki)">
+          <font-awesome-icon :icon="['fas', 'heart']" />
+          <span>いいね！</span>
+          <span :class="$style.favorite_count">{{ wiki.favorites }}</span>
+        </button>
+        <button v-else :class="$style.iine" @click.stop="StartLiking(wiki)">
+          <font-awesome-icon :icon="['far', 'heart']" />
+          <span>いいね！</span>
+          <span :class="$style.favorite_count">{{ wiki.favorites }}</span>
+        </button>
+        <button v-if="canDelete" :class="$style.iine" @click.stop="DeleteMemo(wiki)">
+          <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
+        </button>
       </div>
     </div>
-    <div class="button-container">
-      <button v-if="isLiking" class="iine" @click.stop="StartLiking(wiki)">
-        <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
-      </button>
-      <button v-else class="iine" @click.stop="StartLiking(wiki)">
-        <font-awesome-icon :icon="['far', 'heart']" /> いいね！
-      </button>
-      <button v-if="canDelete" class="iine" @click.stop="DeleteMemo(wiki)">
-        <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
-      </button>
-      <div class="passed">
-        <p>{{ passedTime }}</p>
-      </div>
-    </div>
-  </tr>
+  </div>
 </template>
 
-<style scoped>
-.passed{
-  height: 50px;
-  line-height: 50px;
-}
-.button-container {
+<style module>
+.button_container {
   display: flex;
   flex-wrap: wrap;
   justify-content: left;
-  margin-left: 80px;
+  align-items: center;
 }
 
-.tag-content {
+.tag_content {
   margin: 5px;
   background-color: rgb(244, 244, 244);
 }
 
-.tag-content:hover {
+.tag_content:hover {
   background-color: rgb(211, 211, 211);
 }
 
@@ -223,17 +172,18 @@ const DeleteMemo = async(wiki: Wiki) =>{
   font-size: 20px;
 }
 
-.content {
-  font-size: 15px;
+.abstract {
+  font-size: 25px;
   text-align: left;
-  margin-left: 80px;
   list-style: none;
 }
 
 .card {
   width: 100%;
   height: 100%;
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  grid-template-rows: 20px 20px 1fr;
   flex-direction: column;
   padding: 16px;
   background-color: #fff;
@@ -247,12 +197,6 @@ const DeleteMemo = async(wiki: Wiki) =>{
 .title {
   font-size: 35px;
   text-align: left;
-  margin-left: 80px;
-  list-style: none;
-}
-
-.content {
-  font-size: 25px;
   list-style: none;
 }
 
@@ -261,8 +205,47 @@ const DeleteMemo = async(wiki: Wiki) =>{
 }
 
 .iine {
-  padding: 8px;
   font-size: 18px;
-  width: 120px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+
+.header {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  padding-left: 10px;
+}
+
+.content {
+  grid-column: 2;
+  grid-row: 2 / 4;
+  padding-left: 10px;
+}
+
+.owner_traq_id {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.created_at {
+  font-size: 0.8em;
+  color: #777777;
+  margin-left: 8px;
+}
+
+.favorite_count {
 }
 </style>
