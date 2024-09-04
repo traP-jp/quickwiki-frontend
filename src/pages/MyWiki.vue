@@ -82,11 +82,11 @@ onMounted(async () => {
       </div>
       <h2 :class="$style.anker" id="sodan">自分の相談一覧</h2>
       <div>
-        <WikiCard :wiki="sodan" :isMyPage="true" v-for="sodan in sodans" :key="sodan.id" />
+        <WikiCard :wiki="sodan" :isMyPage="true" v-for="sodan in sodans" :key="sodan.id" :class="$style.card" />
       </div>
       <h2>すべて 後で消す！！！！！！！！</h2>
       <div>
-        <WikiCard :wiki="wiki" :isMyPage="true" v-for="wiki in wikis" :key="wiki.id" />
+        <WikiCard :wiki="wiki" :isMyPage="true" v-for="wiki in wikis" :key="wiki.id" :class="$style.card" />
       </div>
     </main>
   </div>
@@ -124,5 +124,10 @@ main {
 
 .search_button {
   font-size: 20px;
+}
+
+.card{
+  width: 100%;
+  max-width: 170vh;
 }
 </style>

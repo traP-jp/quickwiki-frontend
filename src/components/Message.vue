@@ -26,23 +26,33 @@ onMounted( async () => {
   content.value = await marked.parse(message.value.content)
 
   for (const stamp of message.value.stamps) {
-    const res = await fetch("/api/files/" + stamp.stampId)
+    const res = await fetch("/api/stamps/" + stamp.stampId)
     const body = await res.blob()
     stamp.stampUrl = URL.createObjectURL(body)
   }
 
   await extraceFileUrls()
+  extractCitation()
 })
 
 const extraceFileUrls = async () => {
-  const re = /https:\/\/q.trap.jp\/files\/([^!*]{36)/;
+  const re = new RegExp("https://q.trap.jp/files/[0-9a-zA-Z-]{36}");
   const urls = content.value.match(re)
+  if(urls === null) return
   for (const url of urls) {
     const fileId = url.slice("https://q.trap.jp/files/".length)
     const res = await fetch("/api/files/" + fileId)
     const body = await res.blob()
-    fileUrls.value.push(URL.createObjectURL(body))
+    if (body.type.startsWith("image")){
+      fileUrls.value.push(URL.createObjectURL(body))
+    }
   }
+}
+
+const extractCitation = () => {
+  const re = /https:\/\/q.trap.jp\/messages\/[0-9a-zA-Z-]{36}/g
+  console.log(content.value.match(re))
+  content.value = content.value.replaceAll(re, "")
 }
 </script>
 
@@ -58,7 +68,7 @@ const extraceFileUrls = async () => {
         <div v-html="content"></div>
         <img v-for="url in fileUrls" :src="url" :class="$style.image" alt="file">
         <div v-for="citation in message.citations" :key="citation.createdAt" :class="$style.citation">
-          <img :src="icon" width="24" height="24" alt="icon" :class="$style.citation_icon">
+          <img :src="'https://q.trap.jp/api/v3/public/icon/' + citation.userTraqId" width="24" height="24" alt="icon" :class="$style.citation_icon">
           <div :class="$style.citation_header">
             <p :class="$style.citation_user_traq_id">@{{citation.userTraqId}}</p>
             <p :class="$style.citation_created_at">{{citation.createdAt}}</p>
@@ -82,6 +92,7 @@ const extraceFileUrls = async () => {
 .msg{
   margin-top: 15px;
   padding:5px;
+  font-family: "M PLUS 1p", sans-serif;
 }
 
 .msg_body {
@@ -95,8 +106,9 @@ const extraceFileUrls = async () => {
   grid-row: 2 / 4;
   grid-column: 2;
   padding-left: 10px;
+  max-width: 145vh;
+  word-break: break-all;
 }
-
 .header {
   display: flex;
   flex-direction: row;

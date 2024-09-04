@@ -78,5 +78,6 @@ getTags.value.forEach(tag => {
 
 .card {
   width: 100%;
+  max-width: 170vh;
 }
 </style>
