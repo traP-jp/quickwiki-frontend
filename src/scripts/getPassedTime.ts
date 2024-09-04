@@ -35,21 +35,20 @@ const getPassedTime = (update: string) =>{
   const hour = Math.floor(minute / 60)
   const date = Math.floor(hour / 24 );
   console.log(year, month, date, hour, minute, seconds)
-//   if(year > 0){
-//     return year.toString() + "年前";
+  if(year > 0){
+    return {year: year.toString(), card: updateDate[0].replace("-", "年").replace("-", "月") + "日"};
 //   }else if(month > 0){
 //     return (month % 12).toString() + "ヶ月前"
-//   }else if(date > 0){
-  if(date > 0){
-    return updateDate[0].replace("-", "年").replace("-", "月") + "日"
+  }else if(date > 0){
+    return {year: "", card: updateDate[0].replace("-", "年").replace("-", "月") + "日"}
   }else if(hour > 0){
-    return (hour % 24).toString() + "時間前"
+    return {year: "", card: (hour % 24).toString() + "時間前"}
   }else if(minute > 0){
-    return (minute % 60).toString() + "分前"
+    return {year: "", card: (minute % 60).toString() + "分前"}
   }else if(seconds >= 0){
-    return (seconds % 60).toString() + "秒前"
+    return {year: "", card: (seconds % 60).toString() + "秒前"}
   }else{
-    return "error"
+    return {year: "", card: "error"}
   }
 }
 

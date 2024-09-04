@@ -20,6 +20,7 @@ const $toast = useToast();
 const getTags = ref<string[]>([]);
 const getKeywords = ref<string[]>([]);
 const route = useRoute();
+const searchLength = ref<number>(20)
 const wikis = ref<Wiki[]>([]);
 const pageNum = ref<number>(0);
 
@@ -38,7 +39,7 @@ async function Search(keywords :string[], tags :string[], startNum: number) {
         body: JSON.stringify({
           query: filterKeyWord[0], 
           tags: filterTags,
-          resultCount: 20,
+          resultCount: searchLength.value,
           from: startNum})
     }).catch((e) => {
         $toast.error("something wrong", {
@@ -110,7 +111,7 @@ const backPage = () =>{
     <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" />
   </table>
   <button type="button" @click="backPage" v-if="pageNum > 0">back</button>
-  <button type="button" @click="nextPage">next</button>
+  <button type="button" @click="nextPage" v-if="wikis.length == searchLength">next</button>
 </template>
 <style scoped>
 .cardTable{

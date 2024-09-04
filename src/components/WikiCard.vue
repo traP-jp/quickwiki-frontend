@@ -41,7 +41,7 @@ onMounted(async() =>{
     }
   });
   canDelete.value = wiki.value.type == "memo" && isMyPage.value
-  if(wiki.value != null) passedTime.value = getPassedTime(wiki.value.updatedAt)
+  if(wiki.value != null) passedTime.value = getPassedTime(wiki.value.updatedAt).card
   console.log(passedTime.value)
 })
 
