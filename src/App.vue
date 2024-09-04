@@ -24,7 +24,7 @@ onMounted(async() =>{
 </script>
 
 <template>
-  <div :class="$style.page">
+  <div :class="$style.page" id="page">
     <Header :user-traq-id="userTraqId" />
     <router-view :class="$style.contents" />
   </div>
@@ -33,6 +33,7 @@ onMounted(async() =>{
 .page {
   height: 100%;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 .contents {
   height: fit-content;

@@ -3,19 +3,9 @@ import { onMounted, ref } from "vue";
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import WikiCard from '../components/WikiCard.vue';
+import Wiki from '../types/wiki';
 
 const $toast = useToast();
-
-type Wiki = {
-    id: number,
-    type: string,
-    title: string,
-    Abstract: string,
-    createdAt: string,
-    updatedAt: string,
-    ownerTraqId: string,
-    tags: string[]
-}
 
 const wikis = ref<Wiki[]>([]);
 
@@ -33,8 +23,19 @@ onMounted(async () => {
 </script>
 
 <template>
-    <h1>LikeWiki</h1>
-    <table class="cardTable">
+  <div>
+    <h1 :class="$style.head_text">お気に入りのWiki</h1>
+    <div>
       <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" />
-    </table>
+    </div>
+  </div>
 </template>
+
+<style module>
+.head_text {
+  font-size: 50px;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+</style>
