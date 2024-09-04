@@ -10,6 +10,8 @@ import 'highlight.js/styles/github-dark.css'
 import { useUserStore } from '../store/user.js';
 import TraqMessage from "../types/message";
 import Message from "../components/Message.vue";
+import getPassedTime from '../scripts/getPassedTime.js'
+import Info from '../components/Info.vue'
 
 const userStore = useUserStore();
 
@@ -25,6 +27,7 @@ const question = ref<string>("");
 const answers = ref<string[]>([]);
 const myid = ref<string>("");
 const isClose = ref<boolean>(false);
+const passedYear = ref<string>("")
 const route = useRoute();
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
@@ -111,6 +114,7 @@ onMounted(async () => {
   console.log("user判定", sodan.value.questionMessage.userTraqId, userStore, sodan.value.questionMessage.userTraqId == userStore.traqId)
   isClose.value = Close() && sodan.value.questionMessage.userTraqId == userStore.traqId;
   console.log("時間＆user判定", isClose.value)
+  passedYear.value = getPassedTime(sodan.value.questionMessage.updatedAt).year
 })
 
 const TagClick = (tag :string) => {
@@ -123,6 +127,7 @@ const TagClick = (tag :string) => {
 <template>
   <div class="contents">
     <div class="title" v-html="title"></div>
+  <Info :year="passedYear" v-if="passedYear != ''" />
     <div class="tagcontainer">
       <button type="button" @click="TagClick(tag)" v-for="tag in sodan.tags" :key="tag" class="tag">{{ tag }}</button>
     </div>
