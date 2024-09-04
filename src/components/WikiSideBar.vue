@@ -28,6 +28,7 @@ onMounted(() =>{
   window.addEventListener('resize', () => {
     isSmallScreen.value = window.innerWidth <= 960;
   });
+  isHideSidebar.value = true;
 })
 
 const changeSideBarStatus = () => {
@@ -126,9 +127,6 @@ const closeSidebar = () => {
 }
 
 @media screen and (max-width: 960px) {
-  .sidebar_content {
-    top: 175px;
-  }
   .sidebar_button {
     color: #000000;
     font-size: 20px;
@@ -161,6 +159,7 @@ const closeSidebar = () => {
     background-color: #ffffff;
     top: 0;
     height: 110vh;
+    width: 220px;
     transition-property: transform;
     transition-duration: 0.2s;
   }
@@ -171,9 +170,9 @@ const closeSidebar = () => {
     position: absolute;
     left: 10px;
     width: 30px;
-    height: 2px;
+    height: 3px;
     background-color: #000000;
-    border-radius: 2px;
+    border-radius: 3px;
   }
   .sidebar_button_bar_1 {
     top: 15px;
@@ -216,6 +215,7 @@ const closeSidebar = () => {
   }
   .whole_overlay_active {
     opacity: 0;
+    z-index: -1;
   }
 }
 </style>
