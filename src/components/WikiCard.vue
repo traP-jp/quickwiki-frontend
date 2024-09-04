@@ -4,7 +4,7 @@ import router from "../router";
 import { useUserStore } from '../store/user.js';
 import { useToast } from "vue-toast-notification";
 import Wiki from "../types/wiki";
-
+import { convertDate } from "../lib/date";
 
 const props = defineProps<{
   wiki: Wiki,
@@ -47,6 +47,8 @@ onMounted(async() =>{
   canDelete.value = wiki.value.type == "memo" && isMyPage.value
   iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + wiki.value.ownerTraqId
   //iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
+  wiki.value.createdAt = convertDate(wiki.value.createdAt)
+  wiki.value.updatedAt = convertDate(wiki.value.updatedAt)
 })
 const StartLiking = async (wiki: Wiki) => {
   if (isLiking.value) {

@@ -4,6 +4,7 @@ import {Marked} from "marked";
 import {markedHighlight} from "marked-highlight";
 import hljs from "highlight.js";
 import TraqMessage from "../types/message";
+import {convertDate} from "../lib/date";
 
 const props = defineProps<{
   message: TraqMessage
@@ -32,6 +33,12 @@ onMounted( async () => {
   }
 
   await extraceFileUrls()
+  message.value.createdAt = convertDate(message.value.createdAt)
+  message.value.updatedAt = convertDate(message.value.updatedAt)
+  for (let i = 0; i < message.value.citations.length; i++) {
+    message.value.citations[i].createdAt = convertDate(message.value.citations[i].createdAt)
+    message.value.citations[i].updatedAt = convertDate(message.value.citations[i].updatedAt)
+  }
   extractCitation()
 })
 
