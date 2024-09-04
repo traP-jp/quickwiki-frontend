@@ -32,6 +32,7 @@ onMounted( async () => {
   }
 
   await extraceFileUrls()
+  extractCitation()
 })
 
 const extraceFileUrls = async () => {
@@ -46,6 +47,12 @@ const extraceFileUrls = async () => {
       fileUrls.value.push(URL.createObjectURL(body))
     }
   }
+}
+
+const extractCitation = () => {
+  const re = /https:\/\/q.trap.jp\/messages\/[0-9a-zA-Z-]{36}/g
+  console.log(content.value.match(re))
+  content.value = content.value.replaceAll(re, "")
 }
 </script>
 
