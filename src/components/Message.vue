@@ -58,7 +58,6 @@ const extraceFileUrls = async () => {
 
 const extractCitation = () => {
   const re = /https:\/\/q.trap.jp\/messages\/[0-9a-zA-Z-]{36}/g
-  console.log(content.value.match(re))
   content.value = content.value.replaceAll(re, "")
 }
 </script>

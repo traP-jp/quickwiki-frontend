@@ -58,7 +58,7 @@ onMounted(() => {
         <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50" placeholder="すべてのsodanとmemoを検索"/>
         <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
       </div>
-      <div>
+      <div :class="$style.icon_wrapper">
         <router-link to="/wiki/mywiki">
           <img :src="iconUrl" :class="$style.icon">
         </router-link>
@@ -161,5 +161,19 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+@media screen and (max-width: 959px) {
+  .header_right {
+    position: relative;
+    top: 0;
+    left: 30px;
+    display: block;
+  }
+  .icon_wrapper {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+  }
 }
 </style>
