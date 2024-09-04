@@ -58,7 +58,7 @@ const extraceFileUrls = async () => {
         <div v-html="content"></div>
         <img v-for="url in fileUrls" :src="url" :class="$style.image" alt="file">
         <div v-for="citation in message.citations" :key="citation.createdAt" :class="$style.citation">
-          <img :src="icon" width="24" height="24" alt="icon" :class="$style.citation_icon">
+          <img :src="'https://q.trap.jp/api/v3/public/icon/' + citation.userTraqId" width="24" height="24" alt="icon" :class="$style.citation_icon">
           <div :class="$style.citation_header">
             <p :class="$style.citation_user_traq_id">@{{citation.userTraqId}}</p>
             <p :class="$style.citation_created_at">{{citation.createdAt}}</p>
