@@ -26,7 +26,7 @@ onMounted( async () => {
   content.value = await marked.parse(message.value.content)
 
   for (const stamp of message.value.stamps) {
-    const res = await fetch("/api/files/" + stamp.stampId)
+    const res = await fetch("/api/stamps/" + stamp.stampId)
     const body = await res.blob()
     stamp.stampUrl = URL.createObjectURL(body)
   }
@@ -35,13 +35,16 @@ onMounted( async () => {
 })
 
 const extraceFileUrls = async () => {
-  const re = /https:\/\/q.trap.jp\/files\/([^!*]{36)/;
+  const re = new RegExp("https://q.trap.jp/files/[0-9a-zA-Z-]{36}");
   const urls = content.value.match(re)
+  if(urls === null) return
   for (const url of urls) {
     const fileId = url.slice("https://q.trap.jp/files/".length)
     const res = await fetch("/api/files/" + fileId)
     const body = await res.blob()
-    fileUrls.value.push(URL.createObjectURL(body))
+    if (body.type.startsWith("image")){
+      fileUrls.value.push(URL.createObjectURL(body))
+    }
   }
 }
 </script>
@@ -82,6 +85,7 @@ const extraceFileUrls = async () => {
 .msg{
   margin-top: 15px;
   padding:5px;
+  font-family: "M PLUS 1p", sans-serif;
 }
 
 .msg_body {
