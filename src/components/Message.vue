@@ -40,8 +40,8 @@ onMounted( async () => {
 })
 
 const extraceFileUrls = async () => {
-  const re = new RegExp("https://q.trap.jp/files/[0-9a-zA-Z-]{36}");
-  const urls = content.value.match(re)
+  const re = /https:\/\/q.trap.jp\/files\/[0-9a-zA-Z-]{36}/g;
+  const urls = [...message.value.content.matchAll(re)].map((match) => match[0])
   if(urls === null) return
   for (const url of urls) {
     const fileId = url.slice("https://q.trap.jp/files/".length)
@@ -55,7 +55,6 @@ const extraceFileUrls = async () => {
 
 const extractCitation = () => {
   const re = /https:\/\/q.trap.jp\/messages\/[0-9a-zA-Z-]{36}/g
-  console.log(content.value.match(re))
   content.value = content.value.replaceAll(re, "")
 }
 </script>
