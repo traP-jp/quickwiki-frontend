@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import router from "../router";
 import { useUserStore } from '../store/user.js';
+import getPassedTime from '../scripts/getPassedTime.js'
 import { useToast } from "vue-toast-notification";
 import Wiki from "../types/wiki";
 import { convertDate } from "../lib/date";
@@ -17,6 +18,7 @@ const favorites = ref<Wiki[]>([])
 const hide = ref<boolean>(false)
 const userStore = useUserStore();
 const $toast = useToast();
+const passedTime = ref<string>("")
 const iconUrl = ref<string>("")
 
 
@@ -45,6 +47,8 @@ onMounted(async() =>{
     }
   });
   canDelete.value = wiki.value.type == "memo" && isMyPage.value
+  if(wiki.value != null) passedTime.value = getPassedTime(wiki.value.updatedAt).card
+  console.log(passedTime.value)
   iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + wiki.value.ownerTraqId
   //iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
   wiki.value.createdAt = convertDate(wiki.value.createdAt)
@@ -141,12 +145,19 @@ const DeleteMemo = async(wiki: Wiki) =>{
         <button v-if="canDelete" :class="$style.iine" @click.stop="DeleteMemo(wiki)">
           <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
         </button>
+        <div :class="$style.passed">
+          <p>{{ passedTime }}</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style module>
+.passed{
+  height: 50px;
+  line-height: 50px;
+}
 .button_container {
   display: flex;
   flex-wrap: wrap;
@@ -168,23 +179,20 @@ const DeleteMemo = async(wiki: Wiki) =>{
   box-shadow: 0 0 5px rgba(253, 122, 0, 0.4);
   cursor: pointer;
 }
-.title {
-  font-size: 20px;
-}
 
 .abstract {
-  font-size: 25px;
+  font-size: 15px;
   text-align: left;
   list-style: none;
+  overflow-wrap: anywhere;
 }
 
 .card {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: 40px 1fr;
+  grid-template-columns: 40px minmax(0, 1fr);
   grid-template-rows: 20px 20px 1fr;
-  flex-direction: column;
   padding: 16px;
   background-color: #fff;
   border: 2px solid #dddddd;
@@ -195,11 +203,10 @@ const DeleteMemo = async(wiki: Wiki) =>{
 }
 
 .title {
-  font-size: 35px;
+  font-size: 22px;
   text-align: left;
   list-style: none;
-  word-break: break-all;
-
+  overflow-wrap: anywhere;
 }
 
 .title:hover {
@@ -248,6 +255,7 @@ const DeleteMemo = async(wiki: Wiki) =>{
   margin-left: 8px;
 }
 
-.favorite_count {
+@media screen and (max-width: 960px) {
+
 }
 </style>

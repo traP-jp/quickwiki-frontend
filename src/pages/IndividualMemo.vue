@@ -9,12 +9,16 @@ import customHeadingId from "marked-custom-heading-id";
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import { useUserStore } from '../store/user'
+import Info from '../components/Info.vue'
+import getPassedTime from '../scripts/getPassedTime'
+import { get } from 'http'
 import Memo from '../types/memo'
 
 const myid = ref<string>("")
 const title = ref<string>("");
 const content = ref<string>("");
 const updatedAt = ref<string>("");
+const passedYear = ref<string>("")
 const route = useRoute();
 const userStore = useUserStore();
 const marked = new Marked(markedHighlight({
@@ -50,6 +54,7 @@ onMounted(async () => {
   updatedAt.value = memo.value.updatedAt;
   myid.value = memo.value.ownerTraqId
   console.log("user判定", memo.value.ownerTraqId, userStore.traqId, memo.value.ownerTraqId == userStore.traqId);
+  passedYear.value = getPassedTime(memo.value.updatedAt).year
 })
 const TagClick = (tag :string) => {
     router.push('/wiki/tag/' + tag.replace(/ /g, "+"))
@@ -62,6 +67,7 @@ const Edit = () =>{
 <template>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
   <div :class="$style.title" v-html="title"></div>
+  <Info :year="passedYear" v-if="passedYear != ''" />
   <button type="button" @click="Edit" :class="$style.editButton" v-if="myid == memo.ownerTraqId">edit</button>
   <div :class="$style.tagcontainer">
     <button type="button" @click="TagClick(tag)" v-for="tag in memo.tags" :key="tag" :class="$style.tag">{{ tag }}</button>
