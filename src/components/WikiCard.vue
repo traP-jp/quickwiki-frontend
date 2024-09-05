@@ -54,18 +54,6 @@ onMounted(async() =>{
   wiki.value.createdAt = convertDate(wiki.value.createdAt)
   wiki.value.updatedAt = convertDate(wiki.value.updatedAt)
 })
-
-const SelectWiki = (wiki: Wiki) => {
-  console.log(wiki);
-  if (wiki.type == "sodan") {
-    router.push("/wiki/sodan/" + wiki.id.toString());
-  } else if (wiki.type == "memo") {
-    router.push("/wiki/memo/" + wiki.id.toString());
-  }
-};
-const TagClick = (tag: string) => {
-  router.push("/wiki/tag/" + tag.replace(/ /g, "+"));
-};
 const StartLiking = async (wiki: Wiki) => {
   if (isLiking.value) {
     isLiking.value = false;
@@ -157,31 +145,20 @@ const DeleteMemo = async(wiki: Wiki) =>{
         <button v-if="canDelete" :class="$style.iine" @click.stop="DeleteMemo(wiki)">
           <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
         </button>
+        <div :class="$style.passed">
+          <p>{{ passedTime }}</p>
+        </div>
       </div>
     </div>
-    <div class="button-container">
-      <button v-if="isLiking" class="iine" @click.stop="StartLiking(wiki)">
-        <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
-      </button>
-      <button v-else class="iine" @click.stop="StartLiking(wiki)">
-        <font-awesome-icon :icon="['far', 'heart']" /> いいね！
-      </button>
-      <button v-if="canDelete" class="iine" @click.stop="DeleteMemo(wiki)">
-        <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
-      </button>
-      <div class="passed">
-        <p>{{ passedTime }}</p>
-      </div>
-    </div>
-  </tr>
+  </div>
 </template>
 
-<style scoped>
+<style module>
 .passed{
   height: 50px;
   line-height: 50px;
 }
-.button-container {
+.button_container {
   display: flex;
   flex-wrap: wrap;
   justify-content: left;
