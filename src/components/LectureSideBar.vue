@@ -38,7 +38,7 @@ const closeSidebar = () => {
   <div class="sidebar" :class="{ sidebar_hide: isHideSidebar }">
     <div class="sidebar_content">
       <ul>
-        <header-list-items v-if="isSmallScreen" class="sidebar_header_list" />
+        <header-list-items v-if="isSmallScreen" class="sidebar_header_list" :is-my-page="false" :is-small-screen="isSmallScreen" />
         <li class="sidebar_header">講習会</li>
         <router-link to="/lectures/sougou" @click="closeSidebar">
           <li class="sidebar_link_content">総合/融合</li>
@@ -83,6 +83,7 @@ const closeSidebar = () => {
   border-right: 2px solid #aaaaaa;
   box-shadow: #aaaaaa 2px 2px 2px;
   margin-top: -10px;
+  overflow-y: auto;
 }
 .sidebar_content {
   position: sticky;
@@ -162,13 +163,16 @@ const closeSidebar = () => {
     position: fixed;
     background-color: #ffffff;
     top: 0;
-    height: 110vh;
+    height: 100vh;
     width: 220px;
     transition-property: transform;
     transition-duration: 0.2s;
+    margin-top: 0;
+    padding-bottom: 30px;
   }
   .sidebar_content {
-    top: 70px;
+    top: 0;
+    padding-top: 70px;
   }
   .sidebar_button_bar {
     position: absolute;
@@ -219,6 +223,7 @@ const closeSidebar = () => {
   }
   .whole_overlay_active {
     opacity: 0;
+    z-index: -1;
   }
 }
 </style>

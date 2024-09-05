@@ -53,20 +53,20 @@ const closeSidebar = () => {
   <div class="sidebar" :class="{ sidebar_hide: isHideSidebar }">
     <div class="sidebar_content">
       <ul>
-        <header-list-items v-if="isSmallScreen" class="sidebar_header_list" />
-        <router-link to="/wiki/mywiki" @click="closeSidebar">
+        <header-list-items v-if="isSmallScreen" :is-my-page="mypage" :is-small-screen="isSmallScreen" />
+        <router-link to="/wiki/mywiki" @click="closeSidebar" v-if="!isSmallScreen">
           <li class="sidebar_link_content">自分のWiki</li>
         </router-link>
-        <a href="#memo" v-if="mypage" @click="closeSidebar">
+        <a href="#memo" v-if="mypage && !isSmallScreen" @click="closeSidebar">
           <li class="headerLink sidebar_link_content">備忘録一覧</li>
         </a>
-        <a href="#sodan" v-if="mypage" @click="closeSidebar">
+        <a href="#sodan" v-if="mypage && !isSmallScreen" @click="closeSidebar">
           <li class="headerLink sidebar_link_content">相談一覧</li>
         </a>
         <router-link to="/wiki/favoritewiki" @click="closeSidebar">
           <li class="sidebar_link_content">お気に入りのWiki</li>
         </router-link>
-        <router-link to="/wiki/creatememo" @click="closeSidebar">
+        <router-link to="/wiki/creatememo" @click="closeSidebar" v-if="!isSmallScreen">
           <li class="sidebar_link_content">Wikiを書く</li>
         </router-link>
       </ul>
@@ -162,9 +162,12 @@ const closeSidebar = () => {
     width: 220px;
     transition-property: transform;
     transition-duration: 0.2s;
+    margin-top: 0;
+    padding-bottom: 30px;
   }
   .sidebar_content {
-    top: 70px;
+    top: 0;
+    padding-top: 70px;
   }
   .sidebar_button_bar {
     position: absolute;

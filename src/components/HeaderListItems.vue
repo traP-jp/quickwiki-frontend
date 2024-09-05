@@ -1,10 +1,23 @@
-<script setup>
+<script setup lang="ts">
+import { watch } from "vue";
+import { defineProps, ref } from "vue";
+
+const props =defineProps<{
+  isMyPage: Boolean,
+  isSmallScreen: Boolean,
+}>();
 </script>
 
 <template>
   <router-link to="/wiki/mywiki">
     <li class="header_link_content">QuickWiki</li>
   </router-link>
+  <a href="#memo" v-if="props.isMyPage && props.isSmallScreen">
+    <li class="headerLink header_link_content">備忘録一覧</li>
+  </a>
+  <a href="#sodan" v-if="props.isMyPage && props.isSmallScreen">
+    <li class="headerLink header_link_content">相談一覧</li>
+  </a>
   <router-link to="/wiki/createsodan">
     <li class="header_link_content">匿名質問</li>
   </router-link>
@@ -12,7 +25,7 @@
     <li class="header_link_content">Wikiを書く</li>
   </router-link>
   <router-link to="/lectures/sougou">
-    <li class="header_link_content header_link_content_last">講習会資料</li>
+    <li class="header_link_content">講習会資料</li>
   </router-link>
 </template>
 
@@ -33,8 +46,8 @@
     border-right: 5px solid #fd7a00;
     border-bottom: none;
   }
-  .header_link_content_last {
-    margin-bottom: 30px;
+  .headerLink{
+    color: gray;
   }
 }
 </style>
