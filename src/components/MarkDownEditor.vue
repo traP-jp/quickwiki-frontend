@@ -14,6 +14,7 @@ import { log } from 'console'
 import Wiki from "../types/wiki";
 import Memo from "../types/memo";
 import { before } from 'node:test';
+import { de } from 'vuetify/locale';
 
 const props = defineProps({
     editorType: Number,
@@ -555,6 +556,7 @@ const Update = async() =>{
                     position:  'top-right'
                 })
                 return e})
+                console.log(memoResponse != null, memoResponse.ok )
             if(memoResponse != null && memoResponse.ok){
                 const allTags = Array.from(new Set(beforeTags.value.concat(selectTags.value)))
                 const deleteTags = allTags.filter(tag =>{
@@ -563,71 +565,80 @@ const Update = async() =>{
                 const addTags = allTags.filter(tag =>{
                     return !beforeTags.value.includes(tag)
                 })
-                let tagResponse;
-                let errorFlg = false;
-                console.log(addTags, deleteTags, allTags, beforeTags.value, selectTags.value)
-                for(let i=0; i < Math.min(deleteTags.length, addTags.length); i++){
-                    tagResponse = await fetch("/api/wiki/tag", {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            id: wikiId.value,
-                            tag: deleteTags[i],
-                            newTag: addTags[i]
-                            })
-                    }).catch((e) =>{
-                        errorFlg = true;
-                        return e
-                    })
-                }
-                if(addTags.length > deleteTags.length){
-                    for(let i=deleteTags.length; i < addTags.length; i++){
+                if(addTags.length != 0 || deleteTags.length != 0){
+                    let tagResponse;
+                    let errorFlg = false;
+                    console.log(wikiId.value, typeof wikiId.value)
+                    console.log(addTags, deleteTags, allTags, beforeTags.value, selectTags.value)
+                    for(let i=0; i < Math.min(deleteTags.length, addTags.length); i++){
                         tagResponse = await fetch("/api/wiki/tag", {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                id: wikiId.value,
-                                tag: addTags[i],
-                                })
-                        }).catch((e) =>{
-                            errorFlg = true;
-                            return e
-                        })
-                    }
-                }else if(deleteTags.length > addTags.length){
-                    for(let i=addTags.length; i < deleteTags.length; i++){
-                        tagResponse = await fetch("/api/wiki/tag", {
-                            method: 'DELETE',
+                            method: 'PATCH',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
                                 id: wikiId.value,
                                 tag: deleteTags[i],
+                                newTag: addTags[i]
                                 })
                         }).catch((e) =>{
                             errorFlg = true;
                             return e
                         })
                     }
-                }
-                if(tagResponse != null && tagResponse.ok && !errorFlg){
+                    if(addTags.length > deleteTags.length){
+                        for(let i=deleteTags.length; i < addTags.length; i++){
+                            tagResponse = await fetch("/api/wiki/tag", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    id: wikiId.value,
+                                    tag: addTags[i],
+                                    })
+                            }).catch((e) =>{
+                                errorFlg = true;
+                                return e
+                            })
+                        }
+                    }else if(deleteTags.length > addTags.length){
+                        for(let i=addTags.length; i < deleteTags.length; i++){
+                            tagResponse = await fetch("/api/wiki/tag", {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    id: wikiId.value,
+                                    tag: deleteTags[i],
+                                    })
+                            }).catch((e) =>{
+                                errorFlg = true;
+                                return e
+                            })
+                        }
+                    }
+                    if(tagResponse != null && tagResponse.ok && !errorFlg){
+                        $toast.success("saved!!", {
+                            duration: 1200,
+                            position:  'top-right'
+                        })
+                        myWikis.value[thisWikiIndex] = await tagResponse.json();
+                    }else{
+                        $toast.error("Some tags were not saved", {
+                            duration: 1200,
+                            position:  'top-right'
+                        })
+                    }
+                    return tagResponse;
+                }else{
                     $toast.success("saved!!", {
                         duration: 1200,
                         position:  'top-right'
                     })
-                    myWikis.value[thisWikiIndex] = await tagResponse.json();
-                }else{
-                    $toast.error("Some tags were not saved", {
-                        duration: 1200,
-                        position:  'top-right'
-                    })
+                    myWikis.value[thisWikiIndex] = await memoResponse.json();
                 }
-                return tagResponse;
             }else{
                 $toast.error("memo were not saved", {
                     duration: 1200,
