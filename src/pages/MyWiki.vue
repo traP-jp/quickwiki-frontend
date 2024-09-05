@@ -44,7 +44,7 @@ const Submit = () => {
       tags.value.join(",") +
       "&keywords=" +
       keywords.value.join(",") +
-      "&page=0"
+      "&page=0&sort=none"
   );
 };
 // search box end

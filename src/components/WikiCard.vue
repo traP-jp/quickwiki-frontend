@@ -145,31 +145,20 @@ const DeleteMemo = async(wiki: Wiki) =>{
         <button v-if="canDelete" :class="$style.iine" @click.stop="DeleteMemo(wiki)">
           <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
         </button>
-      </div>
-    </div>
-    <div class="button-container">
-      <button v-if="isLiking" class="iine" @click.stop="StartLiking(wiki)">
-        <font-awesome-icon :icon="['fas', 'heart']" /> いいね！
-      </button>
-      <button v-else class="iine" @click.stop="StartLiking(wiki)">
-        <font-awesome-icon :icon="['far', 'heart']" /> いいね！
-      </button>
-      <button v-if="canDelete" class="iine" @click.stop="DeleteMemo(wiki)">
-        <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
-      </button>
-      <div class="passed">
-        <p>{{ passedTime }}</p>
+        <div :class="$style.passed">
+          <p>{{ passedTime }}</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
+<style module>
 .passed{
   height: 50px;
   line-height: 50px;
 }
-.button-container {
+.button_container {
   display: flex;
   flex-wrap: wrap;
   justify-content: left;
