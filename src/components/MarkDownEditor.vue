@@ -548,7 +548,6 @@ const Update = async() =>{
                     id: wikiId.value,
                     title: title.value, 
                     content: Content.value,
-                    tags: selectTags.value
                     })
             }).catch((e) =>{
                 $toast.error("something wrong", {
@@ -577,7 +576,7 @@ const Update = async() =>{
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                id: wikiId.value,
+                                wikiId: wikiId.value,
                                 tag: deleteTags[i],
                                 newTag: addTags[i]
                                 })
@@ -594,7 +593,7 @@ const Update = async() =>{
                                     'Content-Type': 'application/json'
                                 },
                                 body: JSON.stringify({
-                                    id: wikiId.value,
+                                    wikiId: wikiId.value,
                                     tag: addTags[i],
                                     })
                             }).catch((e) =>{
@@ -610,7 +609,7 @@ const Update = async() =>{
                                     'Content-Type': 'application/json'
                                 },
                                 body: JSON.stringify({
-                                    id: wikiId.value,
+                                    wikiId: wikiId.value,
                                     tag: deleteTags[i],
                                     })
                             }).catch((e) =>{
