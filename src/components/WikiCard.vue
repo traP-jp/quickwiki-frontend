@@ -54,18 +54,6 @@ onMounted(async() =>{
   wiki.value.createdAt = convertDate(wiki.value.createdAt)
   wiki.value.updatedAt = convertDate(wiki.value.updatedAt)
 })
-
-const SelectWiki = (wiki: Wiki) => {
-  console.log(wiki);
-  if (wiki.type == "sodan") {
-    router.push("/wiki/sodan/" + wiki.id.toString());
-  } else if (wiki.type == "memo") {
-    router.push("/wiki/memo/" + wiki.id.toString());
-  }
-};
-const TagClick = (tag: string) => {
-  router.push("/wiki/tag/" + tag.replace(/ /g, "+"));
-};
 const StartLiking = async (wiki: Wiki) => {
   if (isLiking.value) {
     isLiking.value = false;
@@ -173,7 +161,7 @@ const DeleteMemo = async(wiki: Wiki) =>{
         <p>{{ passedTime }}</p>
       </div>
     </div>
-  </tr>
+  </div>
 </template>
 
 <style scoped>
