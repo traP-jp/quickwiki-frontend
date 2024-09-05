@@ -82,12 +82,11 @@ const closeSidebar = () => {
   user-select: none;
   border-right: 2px solid #aaaaaa;
   box-shadow: #aaaaaa 2px 2px 2px;
-  margin-top: -10px;
-  overflow-y: auto;
+  margin-top: -20px;
 }
 .sidebar_content {
   position: sticky;
-  top: 145px;
+  top: 167px;
 }
 .sidebar ul {
   font-size: 20px;
@@ -169,6 +168,7 @@ const closeSidebar = () => {
     transition-duration: 0.2s;
     margin-top: 0;
     padding-bottom: 30px;
+    overflow-y: auto;
   }
   .sidebar_content {
     top: 0;
