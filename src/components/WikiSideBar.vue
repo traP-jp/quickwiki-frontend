@@ -6,7 +6,6 @@ const props =defineProps<{
   isMyPage: Boolean
 }>();
 const mypage = ref<boolean>(false)
-console.log(props.isMyPage);
 
 watch(() => props.isMyPage,
   () =>{

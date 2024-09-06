@@ -10,11 +10,8 @@ import router from '../router'
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import { useUserStore } from '../store/user'
-import { log } from 'console'
 import Wiki from "../types/wiki";
 import Memo from "../types/memo";
-import { before } from 'node:test';
-import { de } from 'vuetify/locale';
 
 const props = defineProps({
     editorType: Number,
@@ -49,10 +46,9 @@ const tabFlg = ref<boolean>(false);
 const shiftTabFlg = ref<boolean>(false);
 const $toast = useToast();
 const checkTargets = ref<string[]>(["- [ ] ", "- ", "1. ", "> "])
-const tags = ref([])
+const tags = ref<string[]>([])
 const sendToRoom = ref<number>();
 const isLoading = ref(false)
-const itemAbled = ref<boolean>(false)
 const marked = new Marked(
     markedHighlight({
       langPrefix: 'hljs language-',
@@ -276,7 +272,6 @@ const ChangeCorsorPos = (kaigyouIndex: number, corsorPos: number,maxRowIndex: nu
     }else{
         corsorColnum = getColnum(Content.value.slice(getPosBeforeKaigyou(beforeCorsorPos),beforeCorsorPos) + "|") -1;
     } 
-    console.log(corsorColnum);
     
     let beforekaigyouPos = 0;
     for(let i=0; i < kaigyouIndex -1; i++){
@@ -287,15 +282,12 @@ const ChangeCorsorPos = (kaigyouIndex: number, corsorPos: number,maxRowIndex: nu
     let i = 0
     let targetRowContents = [""]
     if(moveTwoLine){
-        console.log("two");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex+1])
         setCorsorPos = nextkaigyouPos + afterContents.value[kaigyouIndex].length + 1;
     }else if(maxRowIndex < kaigyouIndex){
-        console.log("max < kaigy");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex-1])
         setCorsorPos = beforekaigyouPos;
     }else{
-        console.log("other:row");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex])
         setCorsorPos = nextkaigyouPos;
     }
@@ -326,19 +318,15 @@ const CheckTable = (kaigyouIndex: number, corsorPos: number) =>{
     }
     afterContents.value.splice(tables.maxRow + 1,1)
     if(addRowFlg && kaigyouIndex - 1 != tables.minRow ){
-        console.log("k-1=min");
         afterContents.value.splice(kaigyouIndex, 0, CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 1, false);
     }else if(addRowFlg && tables.maxRow == tables.minRow){
-        console.log("max=min");
         afterContents.value.splice(kaigyouIndex, 0, CreateRow(colnum, maxlength, true), CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 2, true);
     }else if(addRowFlg && tables.maxRow - tables.minRow == 1){
-        console.log("max-1=min");
         afterContents.value.splice(kaigyouIndex + 1, 0, CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 1, true);
     }else{
-        console.log("other");
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow, kaigyouIndex - 1 == tables.minRow);
     }
     addRowFlg = true;
@@ -489,7 +477,6 @@ const DeleteContent = () =>{
 const ToBolds = (startContent: string, endContent: string) =>{
     const startPos = document.querySelector('textarea')?.selectionStart;
     const endPos = document.querySelector('textarea')?.selectionEnd;
-    console.log(startPos, endPos)
     if(startPos && endPos && startPos != 0){
         Content.value = Content.value.slice(0,startPos) + startContent + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
     }else{
@@ -555,7 +542,6 @@ const Update = async() =>{
                     position:  'top-right'
                 })
                 return e})
-                console.log(memoResponse != null, memoResponse.ok )
             if(memoResponse != null && memoResponse.ok){
                 const allTags = Array.from(new Set(beforeTags.value.concat(selectTags.value)))
                 const deleteTags = allTags.filter(tag =>{
@@ -567,8 +553,6 @@ const Update = async() =>{
                 if(addTags.length != 0 || deleteTags.length != 0){
                     let tagResponse;
                     let errorFlg = false;
-                    console.log(wikiId.value, typeof wikiId.value)
-                    console.log(addTags, deleteTags, allTags, beforeTags.value, selectTags.value)
                     for(let i=0; i < Math.min(deleteTags.length, addTags.length); i++){
                         tagResponse = await fetch("/api/wiki/tag", {
                             method: 'PATCH',
@@ -685,9 +669,7 @@ const Create = async(CreateButtonDown: boolean) =>{
                     duration: 1200,
                     position:  'top-right'
                 });
-                console.log(myWikis.value.length)
                 myWikis.value.push(wikiAbstract)
-                console.log(myWikis.value.length)
                 beforeTags.value = selectTags.value;
                 if(CreateButtonDown)router.push("/wiki/memo/" + wikiAbstract.id);
             }
@@ -732,7 +714,6 @@ const SendReply = async() =>{
             Content.value = "";
             sendToRoom.value = undefined;
             const cont = await res.json()
-            console.log(cont)
         }
     }else{
         $toast.info("please enter the room number and content", {
@@ -775,7 +756,6 @@ const SendSodan = async() =>{
     }
 }
 const Send = () =>{
-    console.log(editSodanId.value);
     
     if(type.value == 3){
         SendReply();
@@ -888,7 +868,6 @@ onMounted(async() =>{
                     variant="underlined"
                     v-on:keydown.ctrl.prevent.s="Send"  
                     v-on:keydown.meta.prevent.s="Send"
-                    item-disabled="itemAbled"
                     ></v-combobox>
                 </div>
                 <div v-if="type == 1">

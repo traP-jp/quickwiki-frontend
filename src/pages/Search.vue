@@ -61,7 +61,6 @@ onMounted(() => {
   document.getElementById("page").scrollTop = 0;
 });
 onBeforeRouteUpdate((to, from) => {
-  console.log("search");
   if (
     to.query.keywords != null &&
     to.query.tags != null &&

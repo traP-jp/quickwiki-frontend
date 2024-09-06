@@ -3,6 +3,7 @@ import {onMounted, ref} from "vue";
 import router from "../router";
 import { useRoute } from "vue-router";
 import '../styles/header.css';
+import SearchBar from "./SearchBar.vue";
 
 const props = defineProps<{userTraqId: string}>();
 const iconUrl = ref<string>("");
@@ -12,36 +13,6 @@ const Words = ref<string[]>([]);
 const ErrorMessage = ref<string>("");
 const tags = ref<string[]>([]);
 const keywords = ref<string[]>([]);
-const Submit = () => {
-  if (SearchWord.value == "") {
-    return false;
-  }
-  tags.value = [];
-  keywords.value = [];
-  const SearchWords = SearchWord.value.split(/\s+/);
-  // SearchWords.forEach((SearchWord) =>{
-  //     Words.value = Words.value.concat(SearchWord.split("　"));
-  // })
-  SearchWords.forEach((word) => {
-    if (word.substring(0, 1) == "#" || word.substring(0, 1) == "＃") {
-      if (word.substring(1) != "") {
-        tags.value.push(word.substring(1));
-      }
-    } else {
-      if (word != "") {
-        keywords.value.push(word);
-      }
-    }
-  });
-  router.push(
-    "/wiki/search?tags=" +
-      tags.value.join(",") +
-      "&keywords=" +
-      keywords.value.join(",") +
-      "&page=0"
-  );
-};
-
 onMounted(() => {
   iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + props.userTraqId;
   // iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
@@ -55,8 +26,7 @@ onMounted(() => {
     </div>
     <div :class="$style.header_right">
       <div>
-        <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50" placeholder="すべてのsodanとmemoを検索"/>
-        <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
+        <SearchBar :width="300" :class="$style.search" />
       </div>
       <div>
         <router-link to="/wiki/mywiki">
@@ -84,6 +54,9 @@ onMounted(() => {
 </template>
 
 <style module>
+.search{
+  margin-right: 10px;
+}
 .header {
   position: sticky;
   top: 0;

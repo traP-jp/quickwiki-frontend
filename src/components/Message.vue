@@ -27,7 +27,6 @@ const fileUrls = ref<string[]>([])
 
 onMounted( async () => {
   content.value = await marked.parse(message.value.content)
-  console.log(content.value)
   content.value = content.value.replaceAll("<pre><code>",'<pre><code class="hljs language-js">')
   for(let i=0; i < message.value.citations.length; i++){
     const citation = await marked.parse(message.value.citations[i].content)
@@ -66,7 +65,6 @@ const extraceFileUrls = async () => {
 
 const extractCitation = () => {
   const re = /https:\/\/q.trap.jp\/messages\/[0-9a-zA-Z-]{36}/g
-  console.log(content.value.match(re))
   content.value = content.value.replaceAll(re, "")
 }
 </script>
