@@ -113,7 +113,7 @@ const Search = () => {
         return tag.name.slice(4)
     })
     const keySuggests = selectWords.value.filter(word =>{
-        return word.name.startsWith("tag:")
+        return word.name.startsWith("key:")
     })
     const keywords = keySuggests.map(key =>{
         return key.name.slice(4)

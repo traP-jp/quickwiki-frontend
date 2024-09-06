@@ -101,7 +101,19 @@ const backPage = () =>{
 
 <template>
   <div>
-    <h1 :class="$style.head_text">検索結果: {{ getKeywords.join(",") }}</h1>
+    <h1 :class="$style.head_text">検索結果:
+      {{ getKeywords.join(",") }}
+      <v-chip 
+      density="default" 
+      size="large"
+      rounded="lg"
+      prepend-icon="mdi-tag-search-outline" 
+      :class="$style.chip"
+      v-for="tag in getTags" 
+      :key="tag">
+        {{ tag }}
+      </v-chip>
+    </h1>
     <p :class="$style.pagenum_text" v-if="wikis.length != 0">{{ pageNum + 1 }}ページ目 {{ pageNum * 20 + 1 }}～{{ pageNum * 20 + wikis.length }}件目を表示中</p>
     <p v-else>検索結果が見つかりませんでした</p>
     <div>
@@ -112,6 +124,9 @@ const backPage = () =>{
   </div>
 </template>
 <style module>
+.chip{
+  margin: 0 3px; 
+}
 .head_text {
   font-size: 50px;
   text-align: center;
