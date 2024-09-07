@@ -13,7 +13,7 @@ onMounted(async () => {
     const resUser = await fetch('/api/me')
     if (resUser.ok) {
       const me = await resUser.json()
-      user.value = me.traqId
+      user.value = me.userTraqId
     }
 })
 
