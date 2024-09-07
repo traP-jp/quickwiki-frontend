@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router'
 import NotFound from './pages/NotFound.vue'
 import CreateSodan from './pages/CreateSodan.vue'
 import IndividualSodan from './pages/IndividualSodan.vue'
@@ -15,10 +15,6 @@ import TagPage from './pages/TagPage.vue'
 import ApiTest from './pages/ApiTest.vue'
 
 const routes = [
-  { path: '/createsodan', name: 'createsodan', component: CreateSodan },
-  { path: '/sodan/:id', name: 'individualsodan', component: IndividualSodan },
-  { path: '/memo/:id', name: 'individualmemo', component: IndividualMemo },
-  { path: '/search', name: 'search', component: Search },
   { path: '/lectures/:teams', name: 'teamlectures', component: Lectures},
   { path: '/wiki', name: 'wiki', component: Wiki, children: [
         {
@@ -33,19 +29,56 @@ const routes = [
         {
           path: 'search',
           component: Search
+        },
+        { 
+          path: 'creatememo',
+          name: 'creatememo',
+          component: CreateMemo
+        },
+        { 
+          path: 'mysodan',
+          name: 'mysodan',
+          component: MySodan
+        },
+        { 
+          path: 'editmemo/:memoid',
+          name: 'editmemo',
+          component: EditMemo
+        },
+        { 
+          path: 'tag/:name',
+          name: 'tagpage',
+          component: TagPage
+        },
+        { 
+          path: 'createsodan',
+          name: 'createsodan',
+          component: CreateSodan
+        },
+        { 
+          path: 'sodan/:id',
+          name: 'individualsodan',
+          component: IndividualSodan
+        },
+        { 
+          path: 'memo/:id',
+          name: 'individualmemo',
+          component: IndividualMemo
+        },
+        { 
+          path: 'search',
+          name: 'search',
+          component: Search
         }
       ] },
-  { path: '/mysodan', name: 'mysodan', component: MySodan },
-  { path: '/creatememo', name: 'creatememo', component: CreateMemo },
-  { path: '/editmemo/:memoid', name: 'editmemo', component: EditMemo },
-  { path: '/tag/:name', name: 'tagpage', component: TagPage },
+
   { path: '/apitest', name: 'apitest', component: ApiTest },
   { path: '/:path(.*)*', component: NotFound }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
+    history: createWebHistory(),
+    routes
 })
 
 export default router

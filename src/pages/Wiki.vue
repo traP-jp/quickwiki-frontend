@@ -1,22 +1,8 @@
 <template>
   <div :class="$style.container">
-    <div class="sidebar">
-      <div class="sidebar_content">
-        <ul>
-          <router-link to="/wiki/mywiki">
-            <li>自分のWiki</li>
-          </router-link>
-          <router-link to="/wiki/favoritewiki">
-            <li>お気に入りのWiki</li>
-          </router-link>
-          <router-link to="/creatememo">
-            <li>Wikiを書く</li>
-          </router-link>
-        </ul>
-      </div>
-    </div>
-    <main>
-      <router-view />
+    <wiki-side-bar :isMyPage="isMyPage" />
+    <main :class="$style.main">
+      <router-view :class="$style.view" />
     </main>
   </div>
 </template>
@@ -26,18 +12,36 @@
   margin: 0;
   padding: 0;
 }
-
 .container {
   display: flex;
-  height: 100vh;
+  margin-top: -10px;
+  padding-top: 10px;
+  gap: 10px;
+  height: fit-content;
+  min-height: 100vh;
 }
 
-main {
-  flex: 1 1 auto;
-  background: coral;
+.view {
+  width: 80%;
+  max-width: 100vw;
+  margin: 0 auto;
 }
 
-.sidebar_content {
-  top: 0;
+.main {
+  flex-grow: 1;
 }
 </style>
+<script setup lang="ts">
+import { useRoute } from 'vue-router';
+import { onBeforeUpdate, onMounted, ref } from 'vue';
+import WikiSideBar from "../components/WikiSideBar.vue";
+
+const isMyPage = ref<boolean>(false);
+onMounted(() =>{
+  isMyPage.value = useRoute().path == "/" || useRoute().path == "/wiki/mywiki"
+})
+
+onBeforeUpdate(() =>{
+  isMyPage.value = useRoute().path == "/" || useRoute().path == "/wiki/mywiki"
+})
+</script>

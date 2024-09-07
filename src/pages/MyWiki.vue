@@ -3,26 +3,63 @@ import { onMounted, ref } from "vue";
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import WikiCard from '../components/WikiCard.vue';
+import router from "../router";
+import Wiki from "../types/wiki";
+import SearchBar from "../components/SearchBar.vue";
 
 const $toast = useToast();
 
-type Wiki = {
-    id: number,
-    type: string,
-    title: string,
-    Abstract: string,
-    createdAt: string,
-    updatedAt: string,
-    ownerTraqId: string,
-    tags: string[]
-}
-
 const wikis = ref<Wiki[]>([]);
+const memos = ref<Wiki[]>([]);
+const sodans = ref<Wiki[]>([]);
+
+// search box
+const SearchWord = ref<string>("");
+const Words = ref<string[]>([]);
+const ErrorMessage = ref<string>("");
+const tags = ref<string[]>([]);
+const keywords = ref<string[]>([]);
+const Submit = () => {
+  if (SearchWord.value == "") {
+    return false;
+  }
+  tags.value = [];
+  keywords.value = [];
+  const SearchWords = SearchWord.value.split(/\s+/);
+  // SearchWords.forEach((SearchWord) =>{
+  //     Words.value = Words.value.concat(SearchWord.split("　"));
+  // })
+  SearchWords.forEach((word) => {
+    if (word.substring(0, 1) == "#" || word.substring(0, 1) == "＃") {
+      if (word.substring(1) != "") {
+        tags.value.push(word.substring(1));
+      }
+    } else {
+      if (word != "") {
+        keywords.value.push(word);
+      }
+    }
+  });
+  router.push(
+      "/wiki/search?tags=" +
+      tags.value.join(",") +
+      "&keywords=" +
+      keywords.value.join(",") +
+      "&page=0&sort=none"
+  );
+};
+// search box end
 
 onMounted(async () => {
   const resMyWiki = await fetch("/api/wiki/user");
   if (resMyWiki.ok) {
     wikis.value = await resMyWiki.json();
+    memos.value = wikis.value.filter(value =>{
+      return value.type == "memo"
+    });
+    sodans.value = wikis.value.filter(value =>{
+      return value.type == "sodan"
+    });
   }else{
     $toast.error("something wrong", {
         duration: 1200,
@@ -33,12 +70,23 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div :class="$style.container">
+  <div>
     <main>
-      <h1>MyWiki</h1>
-      <table class="cardTable">
-        <WikiCard :wiki="wiki" v-for="wiki in wikis" :key="wiki.id" />
-      </table>
+      <h1 :class="$style.head_text">QuickWiki</h1>
+      <div>
+        <SearchBar :width="500" style="margin: 0 auto;" />
+      </div>
+      
+      <h2 :class="$style.anker" id="memo">自分の備忘録一覧</h2>
+      <div>
+        <WikiCard :wiki="memo" :isMyPage="true" v-for="memo in memos" :key="memo.id" />
+        <p v-if="memos.length == 0" :class="$style.nowiki_text">まだ備忘録がありません 作成は<router-link to="/wiki/creatememo">こちら</router-link></p>
+      </div>
+      <h2 :class="$style.anker" id="sodan">自分の相談一覧</h2>
+      <div>
+        <WikiCard :wiki="sodan" :isMyPage="true" v-for="sodan in sodans" :key="sodan.id" :class="$style.card" />
+        <p v-if="sodans.length == 0" :class="$style.nowiki_text">まだ相談がありません 作成は<router-link to="/wiki/createsodan">こちら</router-link></p>
+      </div>
     </main>
   </div>
 </template>
@@ -47,14 +95,86 @@ onMounted(async () => {
   margin: 0;
   padding: 0;
 }
-
-.container {
-  display: flex;
-  height: 100vh;
+.anker{
+  padding-top: 140px;
+  margin-top: -140px;
 }
 
 main {
-  flex: 1 1 auto;
-  background: #f2f2f2;
+  height: fit-content;
+}
+
+.head_text {
+  font-family: "Alfa Slab One", serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 90px;
+  padding: 10px;
+}
+
+.text_box {
+  height: 30px;
+  border-radius: 20px;
+  border: 1px solid #000000;
+  padding: 25px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.search_button {
+  font-size: 20px;
+}
+
+.nowiki_text {
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.card{
+  width: 100%;
+  max-width: 170vh;
+}
+@media screen and (max-width: 960px) {
+  .head_text {
+    font-size: 60px;
+  }
+  .text_box {
+    height: 30px;
+    border-radius: 20px;
+    border: 1px solid #000000;
+    padding: 25px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    width: 70%;
+  }
+  .search_button {
+    font-size: 20px;
+  }
+  .nowiki_text {
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .card{
+    width: 100%;
+    max-width: 170vh;
+  }
+}
+@media screen and (max-width: 450px) {
+  .head_text {
+    font-size: 40px;
+  }
+  .search_button {
+    font-size: 20px;
+  }
+  .nowiki_text {
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .card {
+    width: 100%;
+    max-width: 170vh;
+  }
 }
 </style>

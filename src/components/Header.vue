@@ -1,69 +1,48 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import router from "../router";
 import { useRoute } from "vue-router";
+import '../styles/header.css';
+import SearchBar from "./SearchBar.vue";
+import HeaderList from "./HeaderList.vue";
+
+const props = defineProps<{userTraqId: string}>();
+const iconUrl = ref<string>("");
 
 const SearchWord = ref<string>("");
 const Words = ref<string[]>([]);
 const ErrorMessage = ref<string>("");
 const tags = ref<string[]>([]);
 const keywords = ref<string[]>([]);
-const Submit = () => {
-  if (SearchWord.value == "") {
-    return false;
-  }
-  tags.value = [];
-  keywords.value = [];
-  const SearchWords = SearchWord.value.split(/\s+/);
-  // SearchWords.forEach((SearchWord) =>{
-  //     Words.value = Words.value.concat(SearchWord.split("　"));
-  // })
-  SearchWords.forEach((word) => {
-    if (word.substring(0, 1) == "#" || word.substring(0, 1) == "＃") {
-      if (word.substring(1) != "") {
-        tags.value.push(word.substring(1));
-      }
-    } else {
-      if (word != "") {
-        keywords.value.push(word);
-      }
-    }
-  });
-  router.push(
-    "/wiki/search?tags=" +
-      tags.value.join(",") +
-      "&keywords=" +
-      keywords.value.join(",") +
-      "&page=0"
-  );
-};</script>
+onMounted(() => {
+  iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + props.userTraqId;
+  // iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
+});
+
+</script>
 <template>
   <div :class="$style.header">
-    <div :class="$style.header_header">QuickWiki</div>
-    <div :class="$style.search">
-      <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50" placeholder="すべてのsodanとmemoを検索"/>
-      <button @click="Submit"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
+    <div :class="$style.header_header">
+      <router-link to="/" :class="$style.header_header_text">QuickWiki</router-link>
     </div>
-    <header :class="$style.header_list">
-      <ul>
+    <div :class="$style.header_right">
+      <div>
+        <SearchBar :width="300" :class="$style.search" />
+      </div>
+      <div :class="$style.icon_wrapper">
         <router-link to="/wiki/mywiki">
-          <li>QuickWiki</li>
+          <img :src="iconUrl" :class="$style.icon">
         </router-link>
-        <router-link to="/createsodan">
-          <li>匿名質問</li>
-        </router-link>
-        <router-link to="/creatememo">
-          <li>Wikiを書く</li>
-        </router-link>
-        <router-link to="/lectures/sougou">
-          <li>講習会資料</li>
-        </router-link>
-      </ul>
-    </header>
+      </div>
+    </div>
+    <header-list :class="$style.header_list_hide" />
   </div>
 </template>
 
 <style module>
+.search{
+  margin-right: 10px;
+}
 .header {
   position: sticky;
   top: 0;
@@ -72,63 +51,66 @@ const Submit = () => {
   box-shadow: 0 2px 1px 0 #5e5e5e;
 }
 
-.header_list a {
-  font-size: 25px;
-  color: #1a1a1a;
-  user-select: none;
-}
-
 .header_header {
   top: 0;
   z-index: 10;
-  color: rgb(253, 122, 0);
-  font-size: 62px;
-  background-color: #ffffff;
   text-align: left;
   padding-left: 30px;
   user-select: none;
 }
 
-.header_list ul {
-  padding-left: 10px;
-  text-align: left;
-  font-size: 20px;
-  list-style: none;
-  margin: 5px;
-  display: block;
-  height: 100%;
-  line-height: 40px;
-  color: #1a1a1a;
+.header_header_text {
+  color: rgb(253, 122, 0);
+  font-size: 62px;
+  font-weight: normal;
 }
 
-.header_list li a {
-  color: #1a1a1a;
-}
-
-.header_list li a:hover {
-  font-size: 25px;
-  color: #1a1a1a;
-}
-
-.header_list ul li:hover {
-  background-color: #dedede;
-  border-radius: 10px;;
-}
-
-.header_list li {
-  display: inline-block;
-  padding: 0px 10px;
+.header_header_text:hover {
+  color: rgb(253, 122, 0);
 }
 
 .text_box {
   height: 30px;
   border-radius: 8px;
   border: 1px solid #aaa;
+  padding: 5px;
 }
 
-.search {
+.icon {
+  width: 40px;
+  border-radius: 50%;
+}
+
+.header_right {
   position: absolute;
   top: 30px;
-  right: 50px;
+  right: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+@media screen and (max-width: 960px) {
+  .header_right {
+    position: relative;
+    top: 0;
+    left: 30px;
+    display: block;
+    padding-bottom: 10px;
+  }
+  .icon_wrapper {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+  }
+  .text_box {
+    width: 75%;
+  }
+  .header_header {
+    text-align: center;
+  }
+  .header_list_hide {
+    display: none;
+  }
 }
 </style>

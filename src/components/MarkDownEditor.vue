@@ -2,21 +2,16 @@
 import { ref, watch, onMounted } from 'vue'
 import { Marked } from 'marked'
 import hljs from 'highlight.js'
+import markedKatex from "marked-katex-extension";
+import customHeadingId from "marked-custom-heading-id";
 import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import router from '../router'
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
-
-type Memo = {
-    id: number,
-    title: string,
-    ownerTraqId: string,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
-    tags: string[]
-}
+import { useUserStore } from '../store/user'
+import Wiki from "../types/wiki";
+import Memo from "../types/memo";
 
 const props = defineProps({
     editorType: Number,
@@ -33,15 +28,16 @@ const type = ref(props.editorType)
 const wikiId = ref(props.defaultId);
 const editSodanId = ref(props.editSodanId);
 // type:  1:memo作成 2:sodan作成 3:sodanに返信
-
+const userStore = useUserStore();
 const title = ref<string>('');
 const selectTags = ref<string[]>([])
 const Content = ref<string>("");
 const MarkedTitle = ref<string>("");
 const MarkedContent = ref<string>("");
-
+const myWikis = ref<Wiki[]>([]);
 const beforeContents = ref<string[]>([]);
 const afterContents = ref<string[]>([]);
+const beforeTags = ref<string[]>([])
 const contentHistory = ref<string[]>([""]);
 const HistoryNum = ref<number>(0);
 const enterFlg = ref<boolean>(false);
@@ -50,17 +46,20 @@ const tabFlg = ref<boolean>(false);
 const shiftTabFlg = ref<boolean>(false);
 const $toast = useToast();
 const checkTargets = ref<string[]>(["- [ ] ", "- ", "1. ", "> "])
-const tags = ref([])
+const tags = ref<string[]>([])
 const sendToRoom = ref<number>();
 const isLoading = ref(false)
-const marked = new Marked(markedHighlight({
+const marked = new Marked(
+    markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
-        const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+        const language = hljs.getLanguage(lang) ? lang : 'js'
         return hljs.highlight(code, { language }).value
       }
-    })
-);
+    })).use(markedKatex({
+        throwOnError: false,
+        nonStandard: true
+    })).use(customHeadingId());
 marked.setOptions({ breaks: true });
 
 // 2回以上改行した際の補正
@@ -273,7 +272,6 @@ const ChangeCorsorPos = (kaigyouIndex: number, corsorPos: number,maxRowIndex: nu
     }else{
         corsorColnum = getColnum(Content.value.slice(getPosBeforeKaigyou(beforeCorsorPos),beforeCorsorPos) + "|") -1;
     } 
-    console.log(corsorColnum);
     
     let beforekaigyouPos = 0;
     for(let i=0; i < kaigyouIndex -1; i++){
@@ -284,15 +282,12 @@ const ChangeCorsorPos = (kaigyouIndex: number, corsorPos: number,maxRowIndex: nu
     let i = 0
     let targetRowContents = [""]
     if(moveTwoLine){
-        console.log("two");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex+1])
         setCorsorPos = nextkaigyouPos + afterContents.value[kaigyouIndex].length + 1;
     }else if(maxRowIndex < kaigyouIndex){
-        console.log("max < kaigy");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex-1])
         setCorsorPos = beforekaigyouPos;
     }else{
-        console.log("other:row");
         targetRowContents = getCellcontents(afterContents.value[kaigyouIndex])
         setCorsorPos = nextkaigyouPos;
     }
@@ -323,19 +318,15 @@ const CheckTable = (kaigyouIndex: number, corsorPos: number) =>{
     }
     afterContents.value.splice(tables.maxRow + 1,1)
     if(addRowFlg && kaigyouIndex - 1 != tables.minRow ){
-        console.log("k-1=min");
         afterContents.value.splice(kaigyouIndex, 0, CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 1, false);
     }else if(addRowFlg && tables.maxRow == tables.minRow){
-        console.log("max=min");
         afterContents.value.splice(kaigyouIndex, 0, CreateRow(colnum, maxlength, true), CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 2, true);
     }else if(addRowFlg && tables.maxRow - tables.minRow == 1){
-        console.log("max-1=min");
         afterContents.value.splice(kaigyouIndex + 1, 0, CreateRow(colnum, maxlength, false));
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow + 1, true);
     }else{
-        console.log("other");
         corsorPos = ChangeCorsorPos(kaigyouIndex, corsorPos, tables.maxRow, kaigyouIndex - 1 == tables.minRow);
     }
     addRowFlg = true;
@@ -483,20 +474,13 @@ const CreateLists = (target: string) =>{
 const DeleteContent = () =>{
     Content.value = "";
 }
-const ToBolds = (target: string, isLinkorImage: boolean) =>{
+const ToBolds = (startContent: string, endContent: string) =>{
     const startPos = document.querySelector('textarea')?.selectionStart;
     const endPos = document.querySelector('textarea')?.selectionEnd;
-    console.log(startPos, endPos)
-    let endContent;
-    if(isLinkorImage){
-        endContent = "](https://)";
-    }else{
-        endContent = target;
-    }
     if(startPos && endPos && startPos != 0){
-        Content.value = Content.value.slice(0,startPos) + target + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
+        Content.value = Content.value.slice(0,startPos) + startContent + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
     }else{
-        Content.value = target + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
+        Content.value = startContent + Content.value.slice(startPos, endPos) + endContent + Content.value.slice(endPos);
     }
 }
 // ctrl + z, command + z
@@ -534,30 +518,124 @@ watch(contentHistory,() =>{
 
 const Update = async() =>{
     if(type.value == 1){
-    // 自分のメモであるかを確認！！！！！！！！！！！！！！！！！
-        const response = await fetch('/api/memo', {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: wikiId.value,
-                title: title.value, 
-                content: Content.value,
-                tags: selectTags.value})
-        }).catch((e) =>{
-            $toast.error("something wrong", {
-                duration: 1200,
-                position:  'top-right'
-            })
-            return e})
-        if(response.ok){
-            $toast.success("saved!!", {
-                duration: 1200,
-                position:  'top-right'
-            })
+        let thisWikiIndex = -1;
+        for(let i=0; i < myWikis.value.length; i++){
+            if(myWikis.value[i].id == wikiId.value){
+                thisWikiIndex = i
+            }
         }
-        return response;
+        console.log("user判定",myWikis.value, wikiId.value,thisWikiIndex)
+        // if(thisWikiIndex >= 0){
+            const memoResponse = await fetch('/api/memo', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: wikiId.value,
+                    title: title.value, 
+                    content: Content.value,
+                    })
+            }).catch((e) =>{
+                $toast.error("something wrong", {
+                    duration: 1200,
+                    position:  'top-right'
+                })
+                return e})
+            if(memoResponse != null && memoResponse.ok){
+                const allTags = Array.from(new Set(beforeTags.value.concat(selectTags.value)))
+                const deleteTags = allTags.filter(tag =>{
+                    return !selectTags.value.includes(tag);
+                })
+                const addTags = allTags.filter(tag =>{
+                    return !beforeTags.value.includes(tag)
+                })
+                if(addTags.length != 0 || deleteTags.length != 0){
+                    let tagResponse;
+                    let errorFlg = false;
+                    for(let i=0; i < Math.min(deleteTags.length, addTags.length); i++){
+                        tagResponse = await fetch("/api/wiki/tag", {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                wikiId: wikiId.value,
+                                tag: deleteTags[i],
+                                newTag: addTags[i]
+                                })
+                        }).catch((e) =>{
+                            errorFlg = true;
+                            return e
+                        })
+                    }
+                    if(addTags.length > deleteTags.length){
+                        for(let i=deleteTags.length; i < addTags.length; i++){
+                            tagResponse = await fetch("/api/wiki/tag", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    wikiId: wikiId.value,
+                                    tag: addTags[i],
+                                    })
+                            }).catch((e) =>{
+                                errorFlg = true;
+                                return e
+                            })
+                        }
+                    }else if(deleteTags.length > addTags.length){
+                        for(let i=addTags.length; i < deleteTags.length; i++){
+                            tagResponse = await fetch("/api/wiki/tag", {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    wikiId: wikiId.value,
+                                    tag: deleteTags[i],
+                                    })
+                            }).catch((e) =>{
+                                errorFlg = true;
+                                return e
+                            })
+                        }
+                    }
+                    if(tagResponse != null && tagResponse.ok && !errorFlg){
+                        $toast.success("saved!!", {
+                            duration: 1200,
+                            position:  'top-right'
+                        })
+                        myWikis.value[thisWikiIndex] = await tagResponse.json();
+                    }else{
+                        $toast.error("Some tags were not saved", {
+                            duration: 1200,
+                            position:  'top-right'
+                        })
+                    }
+                    return tagResponse;
+                }else{
+                    $toast.success("saved!!", {
+                        duration: 1200,
+                        position:  'top-right'
+                    })
+                    myWikis.value[thisWikiIndex] = await memoResponse.json();
+                }
+            }else{
+                $toast.error("memo were not saved", {
+                    duration: 1200,
+                    position:  'top-right'
+                })
+                return memoResponse
+            }
+           
+        // }else{
+        //     $toast.error("this memo isn't yours", {
+        //         duration: 1200,
+        //         position:  'top-right'
+        //     })
+        // }
     }
 }
 const Create = async(CreateButtonDown: boolean) =>{ 
@@ -591,7 +669,9 @@ const Create = async(CreateButtonDown: boolean) =>{
                     duration: 1200,
                     position:  'top-right'
                 });
-                if(CreateButtonDown)router.push("/memo/" + wikiAbstract.id);
+                myWikis.value.push(wikiAbstract)
+                beforeTags.value = selectTags.value;
+                if(CreateButtonDown)router.push("/wiki/memo/" + wikiAbstract.id);
             }
         }
     }
@@ -612,7 +692,6 @@ const Save = () =>{
 }
 const SendReply = async() =>{
     if(sendToRoom.value != null && Content.value != ""){
-        // sendRoomNumは？？？？？？？？？
         const res = await fetch('/api/anon-sodan/replies?wikiId=' + editSodanId.value.toString(), {
             method: 'POST',
             headers: {
@@ -634,7 +713,6 @@ const SendReply = async() =>{
             Content.value = "";
             sendToRoom.value = undefined;
             const cont = await res.json()
-            console.log(cont)
         }
     }else{
         $toast.info("please enter the room number and content", {
@@ -677,7 +755,6 @@ const SendSodan = async() =>{
     }
 }
 const Send = () =>{
-    console.log(editSodanId.value);
     
     if(type.value == 3){
         SendReply();
@@ -689,7 +766,7 @@ const Send = () =>{
 const Show = async() =>{
     const response = await Update();
     if(response && response.ok){
-        router.push("/memo/" + wikiId.value);
+        router.push("/wiki/memo/" + wikiId.value);
     }
 }
 
@@ -717,6 +794,7 @@ onMounted(async() =>{
             if(initMemo.value != null){
                 title.value = initMemo.value.title
                 selectTags.value = initMemo.value.tags
+                beforeTags.value = initMemo.value.tags
                 Content.value = initMemo.value.content
                 MarkedTitle.value = await marked.parse(title.value);
                 MarkedContent.value = await marked.parse(Content.value);
@@ -727,12 +805,17 @@ onMounted(async() =>{
             position:  'top-right'
             })
         }
+        const response = await fetch("/api/wiki/user")
+        if(response != null && response.ok){
+            myWikis.value = await response.json();
+        }
     }
     
     if(type.value == 2 || type.value == 1)tagSearch();
 })
 </script>
 <template>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
     <div :class="$style.buttons" v-if="type == 1">
         <button type="button" @click="Save">save</button>
         <button type="button" @click="Create(true)" v-if="wikiId < 0">create</button>
@@ -756,7 +839,7 @@ onMounted(async() =>{
                     v-on:keydown.meta.prevent.s="Save"
                     ></v-text-field>
                 </div>
-                <div v-else-if="type == 3">
+                <!-- <div v-else-if="type == 3">
                     <h3>送信先</h3>
                     <v-select
                     clearable
@@ -768,7 +851,7 @@ onMounted(async() =>{
                     v-on:keydown.ctrl.prevent.s="Send"  
                     v-on:keydown.meta.prevent.s="Send"
                     ></v-select>
-                </div>
+                </div> -->
                 <div v-if="type == 2">
                     <h3>tags</h3>
                     <v-combobox
@@ -804,17 +887,19 @@ onMounted(async() =>{
                     ></v-combobox>
                 </div>
                 <h3>contents</h3>
-                <button type="button" @click="ToBolds('**', false)"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
-                <button type="button" @click="ToBolds('*', false)"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
-                <button type="button" @click="ToBolds('~~', false)"><font-awesome-icon :icon="['fas', 'strikethrough']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('**','**')"><font-awesome-icon :icon="['fas', 'bold']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('*','*')"><font-awesome-icon :icon="['fas', 'italic']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('~~','~~')"><font-awesome-icon :icon="['fas', 'strikethrough']" transform="shrink-3" /></button>
+                <button type="button" @click="CreateLists('\n# header {#custom-id}\n[headerLink](#custom-id)')"><font-awesome-icon :icon="['fas', 'heading']" transform="shrink-3"  /></button>
                 <button type="button" @click="CreateLists('> ')"><font-awesome-icon :icon="['fas', 'quote-right']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('\n```c\n', '\n```')"><font-awesome-icon :icon="['fas', 'code']" transform="shrink-3" /></button>
                 <button type="button" @click="CreateLists('- ')"><font-awesome-icon :icon="['fas', 'list-ul']" transform="shrink-3" /></button>
                 <button type="button" @click="CreateLists('1. ')"><font-awesome-icon :icon="['fas', 'list-ol']" transform="shrink-3" /></button>
                 <button type="button" @click="CreateTable"><font-awesome-icon :icon="['fas', 'table']" transform="shrink-1" /></button>
                 <button type="button" @click="CreateLists('- [ ] ')"><font-awesome-icon :icon="['fas', 'square-check']" transform="shrink-3" /></button>
                 <button type="button" @click="DeleteContent"><font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" /></button>
-                <button type="button" @click="ToBolds('[', true)"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
-                <button type="button" @click="ToBolds('![', true)"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
+                <button type="button" @click="ToBolds('[', '](https://)')"><font-awesome-icon :icon="['fas', 'link']" transform="shrink-3" /></button>
+                <button type="button" @click="ToBolds('![', '](https://)')"><font-awesome-icon :icon="['fas', 'image']" transform="shrink-2" /></button>
             </div>   
             <v-textarea v-if="type == 1"
             name="input-7-1"
@@ -896,17 +981,55 @@ onMounted(async() =>{
     table-layout: fixed;
     margin: 0 auto; 
 }
+.viewer h1,h2{
+  border-bottom: 1px solid lightgray;
+  margin-bottom: 20px;
+  padding-top: 140px;
+  margin-top: -140px;
+  pointer-events: none;
+}
+.viewer h3,h4,h5,h6{
+  text-align: left;
+  padding-top: 140px;
+  margin-top: -140px;
+  pointer-events: none;
+}
+.viewer p{
+  line-height: 1.9em;
+}
+.viewer :not(pre) > code{
+  background-color: rgb(236, 236, 236);
+  border-radius: 5px;
+  padding: 2px 5px;
+  margin: 0px 2px;
+}
+.viewer pre > code{
+  margin: 10px 0px;
+  border-radius: 10px ;
+}
 .viewer ul{
-    padding-left: 20px;
+    padding-left: 30px;
     text-align: left;
 }
 .viewer li:has(input){
     list-style:none;
     text-align: left;
 }
+.viewer li > input{
+  margin-right: 10px
+}
+.viewer ol{
+  margin-left: 10px;
+}
+.viewer li{
+  padding-left: 10px;
+}
 .viewer blockquote{
     border-left: 3px solid lightgray;
     color: gray;
+}
+.viewer img{
+    max-width: 100%;
 }
 .title{
     border:1px solid lightgray;
@@ -938,9 +1061,12 @@ onMounted(async() =>{
     border-radius: 10px;
     margin-top: 80px;
     height: 100%;
+    text-align: left;
+    word-break: break-all;
 }
 .content{
     width:45%;
+    max-width: 45%;
     display:flex;
     flex-direction:column;
 }
@@ -949,6 +1075,15 @@ onMounted(async() =>{
 }
 .uppercontent button{
     color: rgb(90, 90, 90);
+}
+@media screen and (max-width: 960px) {
+  .editors{
+    display: block;
+  }
+  .content{
+    width: 100%;
+    max-width: 100%;
+  }
 }
 
 </style>
