@@ -3,13 +3,11 @@ import {ref, onMounted, watch} from 'vue'
 import { useRoute } from 'vue-router'
 import router from '../router'
 import MarkDownEditor from '../components/MarkDownEditor.vue'
-import { Marked } from 'marked'
-import hljs from 'highlight.js'
-import { markedHighlight } from 'marked-highlight'
 import 'highlight.js/styles/github-dark.css'
 import { useUserStore } from '../store/user.js';
 import TraqMessage from "../types/message";
 import Message from "../components/Message.vue";
+import Wiki from "../types/wiki";
 import {convertDate, convertDateTime} from "../lib/date";
 import getPassedTime from '../scripts/getPassedTime.js'
 import Info from '../components/Info.vue'
@@ -21,7 +19,8 @@ type Sodan = {
   title: string,
   tags: string[],
   questionMessage: TraqMessage,
-  answerMessages: TraqMessage[]
+  answerMessages: TraqMessage[],
+  favorites: number
 }
 const title = ref<string>("");
 const question = ref<string>("");
@@ -30,6 +29,8 @@ const myid = ref<string>("");
 const isClose = ref<boolean>(false);
 const passedYear = ref<string>("")
 const route = useRoute();
+const isLiking = ref<boolean>(false)
+const favorites = ref<Wiki[]>([])
 const sodan = ref<Sodan>({
   id: 0,
   title: "",
@@ -79,18 +80,17 @@ const sodan = ref<Sodan>({
         }
       ]
     }
-  ]
+  ],
+  favorites: 0
 });
 const messageReady = ref<boolean>(false);
 
 const Close = () =>{
   const updateDate = sodan.value.questionMessage.updatedAt.split(" ")
-  console.log(updateDate[0])
   const updateDates = updateDate[0].split("-")
   const now = new Date();
   const updateAt = new Date(Number(updateDates[0]), Number(updateDates[1]) - 1, Number(updateDates[2]), 0, 0, 0)
   updateAt.setDate(updateAt.getDate() + 7);
-  console.log(now, updateAt)
   return now > updateAt;
 }
 
@@ -106,6 +106,16 @@ onMounted(async () => {
   console.log("user判定", sodan.value.questionMessage.userTraqId, userStore, sodan.value.questionMessage.userTraqId == userStore.traqId)
   isClose.value = Close() && sodan.value.questionMessage.userTraqId == userStore.traqId;
   console.log("時間＆user判定", isClose.value)
+
+  const res = await fetch("/api/wiki/user/favorite");
+  if(res != null && res.ok){
+    favorites.value = await res.json();
+  }
+  favorites.value.forEach(favorite => {
+    if(sodan.value != null && favorite.id == sodan.value.id){
+      isLiking.value = true;
+    }
+  });
   sodan.value.questionMessage.createdAt = convertDateTime(sodan.value.questionMessage.createdAt)
   sodan.value.questionMessage.updatedAt = convertDateTime(sodan.value.questionMessage.updatedAt)
   for (let i = 0; i < sodan.value.answerMessages.length; i++) {
@@ -118,8 +128,33 @@ onMounted(async () => {
 const TagClick = (tag :string) => {
     router.push('/wiki/tag/' + tag.replace(/ /g, "+"))
 }
-// errorがユーザーに伝わるように
-// 
+const StartLiking = async (sodan: Sodan) => {
+  if (isLiking.value) {
+    isLiking.value = false;
+    await fetch("/api/wiki/user/favorite", {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        wikiId: sodan.id.toString()
+      })
+    });
+    sodan.favorites -= 1;
+  }else {
+    isLiking.value = true;
+    await fetch("/api/wiki/user/favorite", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        wikiId: sodan.id.toString()
+      })
+    });
+    sodan.favorites += 1;
+  }
+}
 </script>
 
 <template>
@@ -129,6 +164,16 @@ const TagClick = (tag :string) => {
     <div class="tagcontainer">
       <button type="button" @click="TagClick(tag)" v-for="tag in sodan.tags" :key="tag" class="tag">{{ tag }}</button>
     </div>
+    <button v-if="isLiking" class="iine" @click.stop="StartLiking(sodan)">
+      <font-awesome-icon :icon="['fas', 'heart']" />
+      <span>いいね！</span>
+      <span class="favorite_count">{{ sodan.favorites }}</span>
+    </button>
+    <button v-else class="iine" @click.stop="StartLiking(sodan)">
+      <font-awesome-icon :icon="['far', 'heart']" />
+      <span>いいね！</span>
+      <span class="favorite_count">{{ sodan.favorites }}</span>
+    </button>
     <div class="messages">
       <h2>Question:</h2>
       <message :message="sodan.questionMessage" v-if="messageReady" />
@@ -146,6 +191,7 @@ const TagClick = (tag :string) => {
 </template>
 
 <style scoped>
+
 .title{
     text-align: left;
     margin-top: 5px;

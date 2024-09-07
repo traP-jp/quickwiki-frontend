@@ -23,7 +23,6 @@ const iconUrl = ref<string>("")
 
 
 const SelectWiki = (wiki: Wiki) => {
-  console.log(wiki);
   if (wiki.type == "sodan") {
     router.push("/wiki/sodan/" + wiki.id.toString());
   } else if (wiki.type == "memo") {

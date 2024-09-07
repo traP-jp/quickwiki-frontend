@@ -13,6 +13,7 @@ import Info from '../components/Info.vue'
 import getPassedTime from '../scripts/getPassedTime'
 import { get } from 'http'
 import Memo from '../types/memo'
+import Wiki from "../types/wiki";
 
 const myid = ref<string>("")
 const title = ref<string>("");
@@ -21,6 +22,8 @@ const updatedAt = ref<string>("");
 const passedYear = ref<string>("")
 const route = useRoute();
 const userStore = useUserStore();
+const isLiking = ref<boolean>(false)
+const favorites = ref<Wiki[]>([])
 const marked = new Marked(markedHighlight({
       langPrefix: 'hljs language-',
       highlight(code, lang) {
@@ -54,6 +57,16 @@ onMounted(async () => {
   updatedAt.value = memo.value.updatedAt;
   myid.value = memo.value.ownerTraqId
   console.log("user判定", memo.value.ownerTraqId, userStore.traqId, memo.value.ownerTraqId == userStore.traqId);
+  
+  const res = await fetch("/api/wiki/user/favorite");
+  if(res != null && res.ok){
+    favorites.value = await res.json();
+  }
+  favorites.value.forEach(favorite => {
+    if(memo.value != null && favorite.id == memo.value.id){
+      isLiking.value = true;
+    }
+  });
   passedYear.value = getPassedTime(memo.value.updatedAt).year
 })
 const TagClick = (tag :string) => {
@@ -61,6 +74,33 @@ const TagClick = (tag :string) => {
 }
 const Edit = () =>{
   router.push("/wiki/editmemo/" + memo.value.id);
+}
+const StartLiking = async (memo: Memo) => {
+  if (isLiking.value) {
+    isLiking.value = false;
+    await fetch("/api/wiki/user/favorite", {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        wikiId: memo.id.toString()
+      })
+    });
+    memo.favorites -= 1;
+  }else {
+    isLiking.value = true;
+    await fetch("/api/wiki/user/favorite", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        wikiId: memo.id.toString()
+      })
+    });
+    memo.favorites += 1;
+  }
 }
 </script>
 
@@ -73,11 +113,29 @@ const Edit = () =>{
     <button type="button" @click="TagClick(tag)" v-for="tag in memo.tags" :key="tag" :class="$style.tag">{{ tag }}</button>
   </div>
   <br>
+  <br>
+  <button v-if="isLiking" :class="$style.iine" @click.stop="StartLiking(memo)">
+    <font-awesome-icon :icon="['fas', 'heart']" />
+    <span>いいね！</span>
+    <span :class="$style.favorite_count">{{ memo.favorites }}</span>
+  </button>
+  <button v-else :class="$style.iine" @click.stop="StartLiking(memo)">
+    <font-awesome-icon :icon="['far', 'heart']" />
+    <span>いいね！</span>
+    <span :class="$style.favorite_count">{{ memo.favorites }}</span>
+  </button>
+  <br>
   <div v-html="content" :class="$style.content"></div>
   <br>
   <br>
 </template>
 <style module>
+.iine{
+  background-color: rgb(245, 245, 245);
+  margin-left: 20px;
+  margin-top: -10px;
+  float: left;
+}
 .title{
     text-align: left;
     margin: 10px 10px;

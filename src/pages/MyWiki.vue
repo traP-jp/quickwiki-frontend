@@ -5,6 +5,7 @@ import 'vue-toast-notification/dist/theme-sugar.css';
 import WikiCard from '../components/WikiCard.vue';
 import router from "../router";
 import Wiki from "../types/wiki";
+import SearchBar from "../components/SearchBar.vue";
 
 const $toast = useToast();
 
@@ -73,9 +74,9 @@ onMounted(async () => {
     <main>
       <h1 :class="$style.head_text">QuickWiki</h1>
       <div>
-        <input v-model="SearchWord" type="search" @keypress.enter="Submit" :class="$style.text_box" size="50" placeholder="すべてのsodanとmemoを検索"/>
-        <button @click="Submit" :class="$style.search_button"><font-awesome-icon :icon="['fas', 'fa-search']" /></button>
+        <SearchBar :width="500" style="margin: 0 auto;" />
       </div>
+      
       <h2 :class="$style.anker" id="memo">自分の備忘録一覧</h2>
       <div>
         <WikiCard :wiki="memo" :isMyPage="true" v-for="memo in memos" :key="memo.id" />
