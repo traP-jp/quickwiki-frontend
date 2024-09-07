@@ -72,7 +72,7 @@ const routes = [
         }
       ] },
 
-  { path: '/apitest', name: 'apitest', component: ApiTest },
+  { path: '/test', name: 'apitest', component: ApiTest },
   { path: '/:path(.*)*', component: NotFound }
 ]
 
