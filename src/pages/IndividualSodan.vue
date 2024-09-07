@@ -182,7 +182,7 @@ const StartLiking = async (sodan: Sodan) => {
       <span>いいね！</span>
       <span class="favorite_count">{{ sodan.favorites }}</span>
     </button>
-    <p class="channel_name">in: {{ channelName }}</p>
+    <p class="channel_name">#{{ channelName }}</p>
     <div class="messages">
       <h2>Question:</h2>
       <message :message="sodan.questionMessage" v-if="messageReady" />

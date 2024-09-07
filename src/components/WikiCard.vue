@@ -136,12 +136,12 @@ const DeleteMemo = async(wiki: Wiki) =>{
         <button v-if="isLiking" :class="$style.iine" @click.stop="StartLiking(wiki)">
           <font-awesome-icon :icon="['fas', 'heart']" />
           <span>いいね！</span>
-          <span :class="$style.favorite_count">{{ wiki.favorites }}</span>
+          <span class="favorite_count">{{ wiki.favorites }}</span>
         </button>
         <button v-else :class="$style.iine" @click.stop="StartLiking(wiki)">
           <font-awesome-icon :icon="['far', 'heart']" />
           <span>いいね！</span>
-          <span :class="$style.favorite_count">{{ wiki.favorites }}</span>
+          <span class="favorite_count">{{ wiki.favorites }}</span>
         </button>
         <button v-if="canDelete" :class="$style.iine" @click.stop="DeleteMemo(wiki)">
           <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
