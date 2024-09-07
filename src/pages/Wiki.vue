@@ -23,7 +23,7 @@
 
 .view {
   width: 80%;
-  max-width: 170vh;
+  max-width: 100vw;
   margin: 0 auto;
 }
 

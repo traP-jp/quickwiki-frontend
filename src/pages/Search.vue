@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import WikiCard from '../components/WikiCard.vue';
 import {useToast} from 'vue-toast-notification';
@@ -11,8 +11,11 @@ const $toast = useToast();
 const getTags = ref<string[]>([]);
 const getKeywords = ref<string[]>([]);
 const route = useRoute();
+const searchLength = ref<number>(20)
 const wikis = ref<Wiki[]>([]);
 const pageNum = ref<number>(0);
+const sort = ref<string>("none");
+const sortMenu = ref<string>("関連順");
 
 async function Search(keywords :string[], tags :string[], startNum: number) {
   const filterTags = tags.filter(function(value){
@@ -29,8 +32,10 @@ async function Search(keywords :string[], tags :string[], startNum: number) {
         body: JSON.stringify({
           query: filterKeyWord[0], 
           tags: filterTags,
-          resultCount: 20,
-          from: startNum})
+          resultCount: searchLength.value,
+          from: startNum,
+          sort: sort.value
+        })
     }).catch((e) => {
         $toast.error("something wrong", {
             duration: 1200,
@@ -49,13 +54,16 @@ onMounted(() => {
     route.query.keywords != null &&
     route.query.tags != null &&
     route.query.page != null &&
+    route.query.sort != null &&
     typeof route.query.keywords == "string" &&
     typeof route.query.tags == "string" &&
-    typeof route.query.page == "string"
+    typeof route.query.page == "string" &&
+    typeof route.query.sort == "string"
   ) {
     getKeywords.value = route.query.keywords.split(",");
     getTags.value = route.query.tags.split(",");
     pageNum.value = Number(route.query.page);
+    sort.value = route.query.sort;
   }
   Search(getKeywords.value, getTags.value, pageNum.value * 20);
   document.getElementById("page").scrollTop = 0;
@@ -65,9 +73,11 @@ onBeforeRouteUpdate((to, from) => {
     to.query.keywords != null &&
     to.query.tags != null &&
     to.query.page != null &&
+    to.query.sort != null &&
     typeof to.query.keywords == "string" &&
     typeof to.query.tags == "string" &&
-    typeof to.query.page == "string"
+    typeof to.query.page == "string" &&
+    typeof to.query.sort == "string"
   ) {
     getKeywords.value = to.query.keywords.split(",");
     getTags.value = to.query.tags.split(",");
@@ -76,6 +86,9 @@ onBeforeRouteUpdate((to, from) => {
   Search(getKeywords.value, getTags.value, pageNum.value * 20);
   document.getElementById("page").scrollTop = 0;
 });
+watch(sortMenu, () => {
+  updateSort();
+})
 
 const nextPage = () =>{
   pageNum.value++;
@@ -84,7 +97,8 @@ const nextPage = () =>{
       "&keywords=" +
       getKeywords.value.join(",") +
       "&page=" + 
-      pageNum.value.toString()
+      pageNum.value.toString() +
+      "&sort=" + sort.value
     )
 }
 const backPage = () =>{
@@ -94,7 +108,25 @@ const backPage = () =>{
     "&keywords=" +
     getKeywords.value.join(",") +
     "&page=" + 
-    pageNum.value.toString()
+    pageNum.value.toString() +
+    "&sort=" + sort.value
+  )
+}
+const updateSort = () => {
+  if(sortMenu.value === "関連順"){
+    sort.value = "none";
+  }else if(sortMenu.value === "新しい順"){
+    sort.value = "createdAt_newest";
+  }else if(sortMenu.value === "古い順"){
+    sort.value = "createdAt_oldest";
+  }
+  router.push("/wiki/search?tags=" +
+      getTags.value.join(",") +
+      "&keywords=" +
+      getKeywords.value.join(",") +
+      "&page=" +
+      pageNum.value.toString() +
+      "&sort=" + sort.value
   )
 }
 </script>
@@ -114,8 +146,18 @@ const backPage = () =>{
         {{ tag }}
       </v-chip>
     </h1>
-    <p :class="$style.pagenum_text" v-if="wikis.length != 0">{{ pageNum + 1 }}ページ目 {{ pageNum * 20 + 1 }}～{{ pageNum * 20 + wikis.length }}件目を表示中</p>
-    <p v-else>検索結果が見つかりませんでした</p>
+    <div :class="$style.head_wrapper">
+      <p :class="$style.pagenum_text" v-if="wikis.length != 0">{{ pageNum + 1 }}ページ目 {{ pageNum * 20 + 1 }}～{{ pageNum * 20 + wikis.length }}件目を表示中</p>
+      <p v-else>検索結果が見つかりませんでした</p>
+      <v-sheet :class="$style.sort_selector">
+        <v-select
+            v-model="sortMenu"
+            :items="['関連順', '新しい順', '古い順']"
+            label="並べ替え"
+            variant="underlined"
+        ></v-select>
+      </v-sheet>
+    </div>
     <div>
       <WikiCard :wiki="wiki" :isMyPage="false" v-for="wiki in wikis" :key="wiki.id" :class="$style.card" />
     </div>
@@ -153,5 +195,13 @@ const backPage = () =>{
 .card {
   width: 100%;
   max-width: 170vh;
+}
+.head_wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.sort_selector {
+  width: 20%;
 }
 </style>

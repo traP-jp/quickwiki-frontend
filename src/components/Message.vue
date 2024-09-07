@@ -5,6 +5,7 @@ import {markedHighlight} from "marked-highlight";
 import hljs from "highlight.js";
 import TraqMessage from "../types/message";
 import {convertDate} from "../lib/date";
+import markedKatex from "marked-katex-extension";
 
 const props = defineProps<{
   message: TraqMessage
@@ -18,6 +19,9 @@ const marked = new Marked(markedHighlight({
         const language = hljs.getLanguage(lang) ? lang : 'js'
         return hljs.highlight(code, { language }).value
       }
+    })).use(markedKatex({
+          throwOnError: false,
+          nonStandard: true
     })
 );
 marked.setOptions({ breaks: true });
@@ -47,18 +51,12 @@ onMounted( async () => {
   }
 
   await extraceFileUrls()
-  message.value.createdAt = convertDate(message.value.createdAt)
-  message.value.updatedAt = convertDate(message.value.updatedAt)
-  for (let i = 0; i < message.value.citations.length; i++) {
-    message.value.citations[i].createdAt = convertDate(message.value.citations[i].createdAt)
-    message.value.citations[i].updatedAt = convertDate(message.value.citations[i].updatedAt)
-  }
   extractCitation()
 })
 
 const extraceFileUrls = async () => {
-  const re = new RegExp("https://q.trap.jp/files/[0-9a-zA-Z-]{36}");
-  const urls = content.value.match(re)
+  const re = /https:\/\/q.trap.jp\/files\/[0-9a-zA-Z-]{36}/g;
+  const urls = [...message.value.content.matchAll(re)].map((match) => match[0])
   if(urls === null) return
   for (const url of urls) {
     const fileId = url.slice("https://q.trap.jp/files/".length)
