@@ -692,7 +692,6 @@ const Save = () =>{
 }
 const SendReply = async() =>{
     if(sendToRoom.value != null && Content.value != ""){
-        // sendRoomNumは？？？？？？？？？
         const res = await fetch('/api/anon-sodan/replies?wikiId=' + editSodanId.value.toString(), {
             method: 'POST',
             headers: {
@@ -840,7 +839,7 @@ onMounted(async() =>{
                     v-on:keydown.meta.prevent.s="Save"
                     ></v-text-field>
                 </div>
-                <div v-else-if="type == 3">
+                <!-- <div v-else-if="type == 3">
                     <h3>送信先</h3>
                     <v-select
                     clearable
@@ -852,7 +851,7 @@ onMounted(async() =>{
                     v-on:keydown.ctrl.prevent.s="Send"  
                     v-on:keydown.meta.prevent.s="Send"
                     ></v-select>
-                </div>
+                </div> -->
                 <div v-if="type == 2">
                     <h3>tags</h3>
                     <v-combobox

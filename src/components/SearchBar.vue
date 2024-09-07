@@ -20,7 +20,7 @@ const isLoading = ref<boolean>(false);
 const $toast = useToast();
 const selectWords = ref<suggest[]>([]);
 const lockFlg = ref<boolean>(false);
-var istag = new RegExp('^#.*|^＃.*');
+var istag = new RegExp('^[#＃].*');
 var ishankaku = new RegExp('^#.*')
 
 const tagSearch = async() =>{
@@ -29,10 +29,10 @@ const tagSearch = async() =>{
     if(response && response.ok){
         const tagnames = await response.json(); 
         hankakuHashtags.value = tagnames.map(tagname =>{
-            return {name: tagname, title: "#" + tagname}
+            return {name: "tag:" + tagname, title: "#" + tagname}
         })
         zenkakuHashtags.value = tagnames.map(tagname =>{
-            return {name: tagname, title: "＃" + tagname}
+            return {name: "tag:" + tagname, title: "＃" + tagname}
         })
     }else{
         $toast.error("something wrong", {
@@ -98,8 +98,11 @@ const deleteDuplication = (target: suggest[], type: string) =>{
 watch(selectWords, () =>{
     if(!lockFlg.value){
         lockFlg.value = true;
+        console.log(selectWords.value);
         const tmpSelectWords = adjustSuggestType(selectWords.value)
+        console.log(tmpSelectWords);
         selectWords.value = deleteDuplication(tmpSelectWords, "tag:").concat(deleteDuplication(tmpSelectWords, "key:"))
+        console.log(selectWords.value)
     }else{
         lockFlg.value = false;
     }
@@ -131,6 +134,8 @@ const isSame = (target1: suggest[], target2: suggest[]) =>{
 }
 const Submit = () =>{
     if(isSame(beforeWords.value, selectWords.value)){
+        console.log("sub");
+        
         Search()
     }
     beforeWords.value = selectWords.value

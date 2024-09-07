@@ -28,6 +28,13 @@ const fileUrls = ref<string[]>([])
 onMounted( async () => {
   content.value = await marked.parse(message.value.content)
   content.value = content.value.replaceAll("<pre><code>",'<pre><code class="hljs language-js">')
+  const stamps = content.value.match(/:[\w-]+:/g)
+  // console.log(stamps)
+  // if(stamps != null){
+  //   const stampContents = stamps.map(async(stamp) =>{
+  //     ---------------stampid不明-------------
+  //   })
+  // }
   for(let i=0; i < message.value.citations.length; i++){
     const citation = await marked.parse(message.value.citations[i].content)
     message.value.citations[i].content = citation.replaceAll("<pre><code>",'<pre><code class="hljs language-js">')
