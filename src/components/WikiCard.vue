@@ -40,11 +40,13 @@ onMounted(async() =>{
   if(res != null && res.ok){
     favorites.value = await res.json();
   }
-  favorites.value.forEach(favorite => {
-    if(wiki.value != null && favorite.id == wiki.value.id){
-      isLiking.value = true;
-    }
-  });
+  if(favorites.value != null){
+    favorites.value.forEach(favorite => {
+      if(wiki.value != null && favorite.id == wiki.value.id){
+        isLiking.value = true;
+      }
+    });
+  }
   canDelete.value = wiki.value.type == "memo" && isMyPage.value
   if(wiki.value != null) passedTime.value = getPassedTime(wiki.value.updatedAt).card
   console.log(passedTime.value)
