@@ -117,11 +117,13 @@ onMounted(async () => {
   if(res != null && res.ok){
     favorites.value = await res.json();
   }
-  favorites.value.forEach(favorite => {
-    if(sodan.value != null && favorite.id == sodan.value.id){
-      isLiking.value = true;
-    }
-  });
+  if(favorites.value != null){
+    favorites.value.forEach(favorite => {
+      if(sodan.value != null && favorite.id == sodan.value.id){
+        isLiking.value = true;
+      }
+    });
+  }
   sodan.value.questionMessage.createdAt = convertDateTime(sodan.value.questionMessage.createdAt)
   sodan.value.questionMessage.updatedAt = convertDateTime(sodan.value.questionMessage.updatedAt)
   for (let i = 0; i < sodan.value.answerMessages.length; i++) {
@@ -130,6 +132,7 @@ onMounted(async () => {
   }
   passedYear.value = getPassedTime(sodan.value.questionMessage.updatedAt).year
   channelName.value = channelId2Name.get(sodan.value.channelId)
+  console.log("channelName", channelName.value)
 })
 
 const TagClick = (tag :string) => {

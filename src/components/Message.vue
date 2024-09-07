@@ -39,7 +39,7 @@ onMounted( async () => {
   //     ---------------stampid不明-------------
   //   })
   // }
-  for(let i=0; i < message.value.citations.length; i++){
+  for(let i=0; i < message.value.citations?.length; i++){
     const citation = await marked.parse(message.value.citations[i].content)
     message.value.citations[i].content = citation.replaceAll("<pre><code>",'<pre><code class="hljs language-js">')
   }
