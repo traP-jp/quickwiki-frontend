@@ -21,7 +21,7 @@ const index = async () => {
   if(user.value !== "kavos") {
     return;
   } else {
-    const re = await fetch('/setting/index')
+    const re = await fetch('/api/setting/index')
     if (re.ok) {
       pong.value = "OK"
     }
