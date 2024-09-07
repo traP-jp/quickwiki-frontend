@@ -17,12 +17,12 @@ onMounted(async () => {
     }
 })
 
-const index = () => {
+const index = async () => {
   if(user.value !== "kavos") {
-    return
+    return;
   } else {
-    const res = await fetch('/setting/index')
-    if (res.ok) {
+    const re = await fetch('/setting/index')
+    if (re.ok) {
       pong.value = "OK"
     }
   }
