@@ -1,5 +1,9 @@
 const getPassedTime = (update: string) =>{
   const now = new Date();
+  const re = /.*年.*月.*日.*/
+  if (re.test(update)){
+    return {year: "", card: update}
+  }
   console.log(update)
   console.log(now)
   const updateDate = update.split("T")

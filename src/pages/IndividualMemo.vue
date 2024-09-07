@@ -117,12 +117,12 @@ const StartLiking = async (memo: Memo) => {
   <button v-if="isLiking" :class="$style.iine" @click.stop="StartLiking(memo)">
     <font-awesome-icon :icon="['fas', 'heart']" />
     <span>いいね！</span>
-    <span :class="$style.favorite_count">{{ memo.favorites }}</span>
+    <span class="favorite_count">{{ memo.favorites }}</span>
   </button>
   <button v-else :class="$style.iine" @click.stop="StartLiking(memo)">
     <font-awesome-icon :icon="['far', 'heart']" />
     <span>いいね！</span>
-    <span :class="$style.favorite_count">{{ memo.favorites }}</span>
+    <span class="favorite_count">{{ memo.favorites }}</span>
   </button>
   <br>
   <div v-html="content" :class="$style.content"></div>

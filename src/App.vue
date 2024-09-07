@@ -31,7 +31,8 @@ onMounted(async() =>{
 </template>
 <style module>
 .page {
-  height: 100%;
+  height: fit-content;
+  min-height: 100%;
   scroll-behavior: smooth;
 }
 .contents {

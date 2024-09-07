@@ -3,6 +3,7 @@ type TraqMessage = {
     content: string,
     createdAt: string,
     updatedAt: string,
+    messageTraqId: string,
     stamps: [
         {
             stampId: string,
