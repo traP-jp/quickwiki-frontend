@@ -45,6 +45,8 @@ async function Search(keywords :string[], tags :string[], startNum: number) {
     })
     if(responce && responce.ok){
         wikis.value = await responce.json();
+    }else{
+      wikis.value = []
     }
 }
 onMounted(() => {
@@ -67,7 +69,6 @@ onMounted(() => {
   document.getElementById("page").scrollTop = 0;
 });
 onBeforeRouteUpdate((to, from) => {
-  console.log("search");
   if (
     to.query.keywords != null &&
     to.query.tags != null &&
@@ -132,9 +133,22 @@ const updateSort = () => {
 
 <template>
   <div>
-    <h1 :class="$style.head_text">検索結果: {{ getKeywords.join(",") }}</h1>
+    <h1 :class="$style.head_text">検索結果:
+      {{ getKeywords.join(",") }}
+      <v-chip 
+      density="default" 
+      size="large"
+      rounded="lg"
+      prepend-icon="mdi-tag-search-outline" 
+      :class="$style.chip"
+      v-for="tag in getTags" 
+      :key="tag">
+        {{ tag }}
+      </v-chip>
+    </h1>
     <div :class="$style.head_wrapper">
-      <p :class="$style.pagenum_text">{{ pageNum + 1 }}ページ目 {{ pageNum * 20 + 1 }}～{{ pageNum * 20 + wikis.length }}件目を表示中</p>
+      <p :class="$style.pagenum_text" v-if="wikis.length != 0">{{ pageNum + 1 }}ページ目 {{ pageNum * 20 + 1 }}～{{ pageNum * 20 + wikis.length }}件目を表示中</p>
+      <p v-else>検索結果が見つかりませんでした</p>
       <v-sheet :class="$style.sort_selector">
         <v-select
             v-model="sortMenu"
@@ -152,6 +166,9 @@ const updateSort = () => {
   </div>
 </template>
 <style module>
+.chip{
+  margin: 0 3px; 
+}
 .head_text {
   font-size: 50px;
   text-align: center;

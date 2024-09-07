@@ -5,7 +5,8 @@ type Memo = {
     content: string,
     createdAt: string,
     updatedAt: string,
-    tags: string[]
+    tags: string[],
+    favorites: number
 }
 
 export default Memo;

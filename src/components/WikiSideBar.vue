@@ -9,7 +9,6 @@ const props =defineProps<{
   isMyPage: Boolean
 }>();
 const mypage = ref<boolean>(false)
-console.log(props.isMyPage);
 
 const isSmallScreen = ref<boolean>(window.innerWidth <= 960);
 const isHideSidebar = ref<boolean>(false);

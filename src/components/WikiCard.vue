@@ -23,7 +23,6 @@ const iconUrl = ref<string>("")
 
 
 const SelectWiki = (wiki: Wiki) => {
-  console.log(wiki);
   if (wiki.type == "sodan") {
     router.push("/wiki/sodan/" + wiki.id.toString());
   } else if (wiki.type == "memo") {
@@ -206,7 +205,8 @@ const DeleteMemo = async(wiki: Wiki) =>{
   font-size: 22px;
   text-align: left;
   list-style: none;
-  overflow-wrap: anywhere;
+  word-break: break-all;
+
 }
 
 .title:hover {
