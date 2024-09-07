@@ -4,6 +4,9 @@ import { onBeforeRouteUpdate, useRoute } from "vue-router";
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import LectureSideBar from "../components/LectureSideBar.vue";
+import {Marked} from "marked";
+import {markedHighlight} from "marked-highlight";
+import hljs from "highlight.js";
 
 type Lecture = {
   id: number;
@@ -15,13 +18,24 @@ type Lecture = {
 const $toast = useToast();
 const lectures = ref<Lecture[]>();
 const getTeams = ref<string>("");
+const marked = new Marked(markedHighlight({
+  langPrefix: 'hljs language-',
+  highlight(code, lang) {
+    const language = hljs.getLanguage(lang) ? lang : 'js'
+    return hljs.highlight(code, { language }).value
+  }})
+);
+marked.setOptions({ breaks: true });
 
 onMounted(async () => {
   const res = await fetch(
-    "/api/lecture/byFolder/path?folderpath=" + useRoute().params.teams
+    "/api/lecture/byFolder/path?folderpath=lectures-2024-" + useRoute().params.teams
   );
   if (res.ok) {
     lectures.value = await res.json();
+    for (let i = 0; i < lectures.value.length; i++) {
+      lectures.value[i].content = await marked.parse(lectures.value[i].content);
+    }
   }
 });
 const isUrl = (url: string) => {
@@ -32,10 +46,13 @@ onBeforeRouteUpdate(async (to, from) => {
     getTeams.value = to.params.teams;
   }
   const res = await fetch(
-    "/api/lecture/byFolder/path?folderpath=" + getTeams.value
+    "/api/lecture/byFolder/path?folderpath=lectures-2024-" + getTeams.value
   );
   if (res.ok) {
     lectures.value = await res.json();
+    for (let i = 0; i < lectures.value.length; i++) {
+      lectures.value[i].content = await marked.parse(lectures.value[i].content);
+    }
   }else{
     $toast.error("something wrong", {
         duration: 1200,
@@ -64,7 +81,7 @@ onBeforeRouteUpdate(async (to, from) => {
           <div v-for="lecture in lectures" :key="lecture.id" :class="$style.card">
             <ul>
               <li :class="$style.title">{{ lecture.title }}</li>
-              <li :class="$style.content">講義資料URL : <a href="{{ lecture.content }}" :class="$style.link">{{ lecture.content }}</a></li>
+              <li :class="$style.content" v-html="lecture.content"></li>
             </ul>
           </div>
         </div>
