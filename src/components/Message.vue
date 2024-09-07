@@ -4,7 +4,7 @@ import {Marked} from "marked";
 import {markedHighlight} from "marked-highlight";
 import hljs from "highlight.js";
 import TraqMessage from "../types/message";
-import {convertDate} from "../lib/date";
+import {convertDate} from "../scripts/date";
 import markedKatex from "marked-katex-extension";
 
 const props = defineProps<{

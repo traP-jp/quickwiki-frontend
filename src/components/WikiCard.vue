@@ -5,7 +5,7 @@ import { useUserStore } from '../store/user.js';
 import getPassedTime from '../scripts/getPassedTime.js'
 import { useToast } from "vue-toast-notification";
 import Wiki from "../types/wiki";
-import { convertDate } from "../lib/date";
+import { convertDate } from "../scripts/date";
 
 const props = defineProps<{
   wiki: Wiki,
