@@ -109,9 +109,7 @@ onMounted(async () => {
   }
   title.value = sodan.value.title
   myid.value = sodan.value.questionMessage.userTraqId
-  console.log("user判定", sodan.value.questionMessage.userTraqId, userStore, sodan.value.questionMessage.userTraqId == userStore.traqId)
   isClose.value = Close() && sodan.value.questionMessage.userTraqId == userStore.traqId;
-  console.log("時間＆user判定", isClose.value)
 
   const res = await fetch("/api/wiki/user/favorite");
   if(res != null && res.ok){
@@ -195,7 +193,7 @@ const StartLiking = async (sodan: Sodan) => {
           <message :message="msg" v-if="messageReady" />
         </div>
       </div>
-      <div class="mdeditor">
+      <div class="mdeditor" v-if="isClose">
         <MarkDownEditor :editorType=3 :editSodanId="sodan.id" v-if="sodan.questionMessage.userTraqId == myid"/>
       </div>
     </div>

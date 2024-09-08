@@ -524,8 +524,7 @@ const Update = async() =>{
                 thisWikiIndex = i
             }
         }
-        console.log("user判定",myWikis.value, wikiId.value,thisWikiIndex)
-        // if(thisWikiIndex >= 0){
+        if(thisWikiIndex >= 0){
             const memoResponse = await fetch('/api/memo', {
                 method: 'PATCH',
                 headers: {
@@ -628,14 +627,13 @@ const Update = async() =>{
                     position:  'top-right'
                 })
                 return memoResponse
-            }
-           
-        // }else{
-        //     $toast.error("this memo isn't yours", {
-        //         duration: 1200,
-        //         position:  'top-right'
-        //     })
-        // }
+            }       
+        }else{
+            $toast.error("this memo isn't yours", {
+                duration: 1200,
+                position:  'top-right'
+            })
+        }
     }
 }
 const Create = async(CreateButtonDown: boolean) =>{ 

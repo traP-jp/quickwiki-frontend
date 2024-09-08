@@ -56,7 +56,6 @@ onMounted(async () => {
   content.value = await marked.parse(memo.value.content);
   updatedAt.value = memo.value.updatedAt;
   myid.value = memo.value.ownerTraqId
-  console.log("user判定", memo.value.ownerTraqId, userStore.traqId, memo.value.ownerTraqId == userStore.traqId);
   
   const res = await fetch("/api/wiki/user/favorite");
   if(res != null && res.ok){
@@ -108,7 +107,7 @@ const StartLiking = async (memo: Memo) => {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
   <div :class="$style.title" v-html="title"></div>
   <Info :year="passedYear" v-if="passedYear != ''" />
-  <button type="button" @click="Edit" :class="$style.editButton" v-if="myid == memo.ownerTraqId">edit</button>
+  <button type="button" @click="Edit" :class="$style.editButton" v-if="memo.ownerTraqId == userStore.traqId">edit</button>
   <div :class="$style.tagcontainer">
     <button type="button" @click="TagClick(tag)" v-for="tag in memo.tags" :key="tag" :class="$style.tag">{{ tag }}</button>
   </div>

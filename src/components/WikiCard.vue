@@ -83,26 +83,32 @@ const StartLiking = async (wiki: Wiki) => {
   }
 }
 const DeleteMemo = async(wiki: Wiki) =>{
-  console.log("user判定", wiki.ownerTraqId == userStore.traqId)
-  if(wiki.type == "memo"){
-    const response = await fetch("/api/memo",{
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        wikiId: wiki.id.toString()
-      })
-    }).catch((e) => {
-        $toast.error("something wrong", {
-            duration: 1200,
-            position:  'top-right'
+  if(wiki.ownerTraqId === userStore.traqId){
+    if(wiki.type == "memo"){
+      const response = await fetch("/api/memo",{
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          wikiId: wiki.id.toString()
         })
-        return e;   
-    })
-    if(response && response.ok){
-        hide.value = true;
+      }).catch((e) => {
+          $toast.error("something wrong", {
+              duration: 1200,
+              position:  'top-right'
+          })
+          return e;   
+      })
+      if(response && response.ok){
+          hide.value = true;
+      }
     }
+  }else{
+      $toast.error("this memo isn't yours", {
+          duration: 1200,
+          position:  'top-right'
+      })
   }
 }
 </script>
