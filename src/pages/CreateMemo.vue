@@ -3,7 +3,7 @@ import MarkDownEditor from '../components/MarkDownEditor.vue';
 </script>
 <template>
     <div :class="$style.contents">
-        <h1>CreateMemo</h1>
+        <h1>Wikiを書く</h1>
         <MarkDownEditor :editorType=1 />
     </div>
 </template>
