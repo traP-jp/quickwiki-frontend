@@ -8,15 +8,17 @@ import { useUserStore } from '../store/user.js';
 import TraqMessage from "../types/message";
 import Message from "../components/Message.vue";
 import Wiki from "../types/wiki";
-import {convertDate, convertDateTime} from "../lib/date";
+import {convertDate, convertDateTime} from "../scripts/date";
 import getPassedTime from '../scripts/getPassedTime.js'
 import Info from '../components/Info.vue'
+import {channelId2Name} from "../scripts/channelNameMap";
 
 const userStore = useUserStore();
 
 type Sodan = {
   id: number,
   title: string,
+  channelId: string,
   tags: string[],
   questionMessage: TraqMessage,
   answerMessages: TraqMessage[],
@@ -34,6 +36,7 @@ const favorites = ref<Wiki[]>([])
 const sodan = ref<Sodan>({
   id: 0,
   title: "",
+  channelId: "",
   tags: [
     ""
   ],
@@ -42,6 +45,7 @@ const sodan = ref<Sodan>({
     content: "",
     createdAt: "",
     updatedAt: "",
+    messageTraqId: "",
     stamps: [
       {
         stampId: "",
@@ -64,6 +68,7 @@ const sodan = ref<Sodan>({
       content: "",
       createdAt: "",
       updatedAt: "",
+      messageTraqId: "",
       stamps: [
         {
           stampId: "",
@@ -84,6 +89,7 @@ const sodan = ref<Sodan>({
   favorites: 0
 });
 const messageReady = ref<boolean>(false);
+const channelName = ref<string>("");
 
 const Close = () =>{
   const updateDate = sodan.value.questionMessage.updatedAt.split(" ")
@@ -111,11 +117,13 @@ onMounted(async () => {
   if(res != null && res.ok){
     favorites.value = await res.json();
   }
-  favorites.value.forEach(favorite => {
-    if(sodan.value != null && favorite.id == sodan.value.id){
-      isLiking.value = true;
-    }
-  });
+  if(favorites.value != null){
+    favorites.value.forEach(favorite => {
+      if(sodan.value != null && favorite.id == sodan.value.id){
+        isLiking.value = true;
+      }
+    });
+  }
   sodan.value.questionMessage.createdAt = convertDateTime(sodan.value.questionMessage.createdAt)
   sodan.value.questionMessage.updatedAt = convertDateTime(sodan.value.questionMessage.updatedAt)
   for (let i = 0; i < sodan.value.answerMessages.length; i++) {
@@ -123,6 +131,8 @@ onMounted(async () => {
     sodan.value.answerMessages[i].updatedAt = convertDateTime(sodan.value.answerMessages[i].updatedAt)
   }
   passedYear.value = getPassedTime(sodan.value.questionMessage.updatedAt).year
+  channelName.value = channelId2Name.get(sodan.value.channelId)
+  console.log("channelName", channelName.value)
 })
 
 const TagClick = (tag :string) => {
@@ -155,6 +165,7 @@ const StartLiking = async (sodan: Sodan) => {
     sodan.favorites += 1;
   }
 }
+
 </script>
 
 <template>
@@ -174,6 +185,7 @@ const StartLiking = async (sodan: Sodan) => {
       <span>いいね！</span>
       <span class="favorite_count">{{ sodan.favorites }}</span>
     </button>
+    <p class="channel_name">#{{ channelName }}</p>
     <div class="messages">
       <h2>Question:</h2>
       <message :message="sodan.questionMessage" v-if="messageReady" />
@@ -239,5 +251,8 @@ h2{
 .messages {
   margin-top: 50px;
   border-top: 1px solid #aaaaaa;
+}
+.channel_name {
+  text-align: right;
 }
 </style>

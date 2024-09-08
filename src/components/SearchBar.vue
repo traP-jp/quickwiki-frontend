@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
-import { useToast } from 'vue-toast-notification';
+import {onMounted, ref, watch} from 'vue';
+import {useToast} from 'vue-toast-notification';
 import router from '../router';
 
 type suggest = {
@@ -85,15 +85,13 @@ const deleteDuplication = (target: suggest[], type: string) =>{
         return tagObj.name.slice(4)
     })
     const tmparr = Array.from(new Set(contentTarget))
-    const returnarr = tmparr.map(tmp =>{
-        if(type === "tag:"){
-            return {name: "tag:" + tmp, title: "#" + tmp}
-        }else{
-            return {name: "key:" + tmp, title: tmp}
-        }
+  return tmparr.map(tmp => {
+      if (type === "tag:") {
+        return {name: "tag:" + tmp, title: "#" + tmp}
+      } else {
+        return {name: "key:" + tmp, title: tmp}
+      }
     })
-
-    return returnarr
 }
 watch(selectWords, () =>{
     if(!lockFlg.value){
@@ -126,7 +124,7 @@ const Search = () => {
     tags.join(",") +
     "&keywords=" +
     keywords.join(",") +
-    "&page=0"
+    "&page=0&sort=none"
     );
 };
 const isSame = (target1: suggest[], target2: suggest[]) =>{
@@ -142,23 +140,43 @@ const Submit = () =>{
 }
 </script>
 <template>
-<v-combobox
-id="searchBar"
-clearable
-append-icon="mdi-magnify"
-multiple
-:items="showtags"
-item-title="title"
-item-value="name"
-:return-object="true"
-v-model="selectWords"
-label="すべてのSodanとmemoを検索"
-:loading="isLoading"
-variant="outlined"
-rounded="xl"
-:width="width"
-@click:append="Submit"
-@keyup.enter="Submit"
-@update:search="tmpfunc"
-></v-combobox>
+  <div :class="$style.wrapper">
+    <v-combobox
+        id="searchBar"
+        clearable
+        append-icon="mdi-magnify"
+        multiple
+        :items="showtags"
+        item-title="title"
+        item-value="name"
+        :return-object="true"
+        v-model="selectWords"
+        label="すべてのSodanとmemoを検索"
+        :loading="isLoading"
+        variant="outlined"
+        rounded="xl"
+        :width="width"
+        @click:append="Submit"
+        @keyup.enter="Submit"
+        @update:search="tmpfunc"
+    ></v-combobox>
+    <p :class="$style.text">#を入力してタグ検索ができます</p>
+  </div>
 </template>
+<style module>
+.wrapper{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.text {
+  margin-top: -10px;
+  margin-bottom: 20px;
+  padding: 0;
+  text-align: center;
+  width: 100%;
+  font-weight: bold;
+  color: #666666;
+}
+</style>

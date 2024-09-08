@@ -5,7 +5,7 @@ import { useUserStore } from '../store/user.js';
 import getPassedTime from '../scripts/getPassedTime.js'
 import { useToast } from "vue-toast-notification";
 import Wiki from "../types/wiki";
-import { convertDate } from "../lib/date";
+import { convertDate } from "../scripts/date";
 
 const props = defineProps<{
   wiki: Wiki,
@@ -40,11 +40,13 @@ onMounted(async() =>{
   if(res != null && res.ok){
     favorites.value = await res.json();
   }
-  favorites.value.forEach(favorite => {
-    if(wiki.value != null && favorite.id == wiki.value.id){
-      isLiking.value = true;
-    }
-  });
+  if(favorites.value != null){
+    favorites.value.forEach(favorite => {
+      if(wiki.value != null && favorite.id == wiki.value.id){
+        isLiking.value = true;
+      }
+    });
+  }
   canDelete.value = wiki.value.type == "memo" && isMyPage.value
   if(wiki.value != null) passedTime.value = getPassedTime(wiki.value.updatedAt).card
   console.log(passedTime.value)
@@ -134,12 +136,12 @@ const DeleteMemo = async(wiki: Wiki) =>{
         <button v-if="isLiking" :class="$style.iine" @click.stop="StartLiking(wiki)">
           <font-awesome-icon :icon="['fas', 'heart']" />
           <span>いいね！</span>
-          <span :class="$style.favorite_count">{{ wiki.favorites }}</span>
+          <span class="favorite_count">{{ wiki.favorites }}</span>
         </button>
         <button v-else :class="$style.iine" @click.stop="StartLiking(wiki)">
           <font-awesome-icon :icon="['far', 'heart']" />
           <span>いいね！</span>
-          <span :class="$style.favorite_count">{{ wiki.favorites }}</span>
+          <span class="favorite_count">{{ wiki.favorites }}</span>
         </button>
         <button v-if="canDelete" :class="$style.iine" @click.stop="DeleteMemo(wiki)">
           <font-awesome-icon :icon="['fas', 'trash-can']" transform="shrink-2" />削除
