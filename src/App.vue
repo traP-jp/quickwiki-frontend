@@ -21,6 +21,7 @@ onMounted(async() =>{
       position:  'top-right'
     })
   }
+  userTraqId.value = userStore.traqId;
   finishSetting.value = true;
 
 })
