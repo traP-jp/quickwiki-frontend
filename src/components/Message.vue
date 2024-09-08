@@ -74,6 +74,7 @@ const extractCitation = () => {
 </script>
 
 <template>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
   <div :class="$style.msg">
     <div :class="$style.msg_body">
       <img :src="icon" width="40" height="40" alt="icon" :class="$style.icon">

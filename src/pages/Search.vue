@@ -7,6 +7,11 @@ import 'vue-toast-notification/dist/theme-sugar.css';
 import router from '../router';
 import Wiki from '../types/wiki';
 
+type Sort = {
+  title: String
+  content: String
+}
+
 const $toast = useToast();
 const getTags = ref<string[]>([]);
 const getKeywords = ref<string[]>([]);
@@ -14,8 +19,15 @@ const route = useRoute();
 const searchLength = ref<number>(20)
 const wikis = ref<Wiki[]>([]);
 const pageNum = ref<number>(0);
-const sort = ref<string>("none");
-const sortMenu = ref<string>("関連順");
+const sort = ref<Sort>({
+  title: "関連順",
+  content: "none"
+});
+const sortMenu = ref<Sort[]>([
+  {title: "関連順", content: "none"},
+  {title: "新しい順", content: "createdAt_newest"},
+  {title: "古い順", content: "createdAt_oldest"}
+]);
 
 async function Search(keywords :string[], tags :string[], startNum: number) {
   const filterTags = tags.filter(function(value){
@@ -34,7 +46,7 @@ async function Search(keywords :string[], tags :string[], startNum: number) {
           tags: filterTags,
           resultCount: searchLength.value,
           from: startNum,
-          sort: sort.value
+          sort: sort.value.content
         })
     }).catch((e) => {
         $toast.error("something wrong", {
@@ -62,8 +74,12 @@ onMounted(() => {
   ) {
     getKeywords.value = route.query.keywords.split(",");
     getTags.value = route.query.tags.split(",");
+    if(getKeywords.value[0] === "") getKeywords.value = []
+    if(getTags.value[0] === "") getTags.value = []
     pageNum.value = Number(route.query.page);
-    sort.value = route.query.sort;
+    sort.value = sortMenu.value.filter(menu =>{
+      return menu.content == route.query.sort
+    })[0]
   }
   Search(getKeywords.value, getTags.value, pageNum.value * 20);
   document.getElementById("page").scrollTop = 0;
@@ -81,12 +97,17 @@ onBeforeRouteUpdate((to, from) => {
   ) {
     getKeywords.value = to.query.keywords.split(",");
     getTags.value = to.query.tags.split(",");
+    if(getKeywords.value[0] === "") getKeywords.value = []
+    if(getTags.value[0] === "") getTags.value = []
     pageNum.value = Number(to.query.page);
+    sort.value = sortMenu.value.filter(menu =>{
+      return menu.content == to.query.sort
+    })[0]
   }
   Search(getKeywords.value, getTags.value, pageNum.value * 20);
   document.getElementById("page").scrollTop = 0;
 });
-watch(sortMenu, () => {
+watch(sort, () => {
   updateSort();
 })
 
@@ -98,7 +119,7 @@ const nextPage = () =>{
       getKeywords.value.join(",") +
       "&page=" + 
       pageNum.value.toString() +
-      "&sort=" + sort.value
+      "&sort=" + sort.value.content
     )
 }
 const backPage = () =>{
@@ -109,24 +130,17 @@ const backPage = () =>{
     getKeywords.value.join(",") +
     "&page=" + 
     pageNum.value.toString() +
-    "&sort=" + sort.value
+    "&sort=" + sort.value.content
   )
 }
 const updateSort = () => {
-  if(sortMenu.value === "関連順"){
-    sort.value = "none";
-  }else if(sortMenu.value === "新しい順"){
-    sort.value = "createdAt_newest";
-  }else if(sortMenu.value === "古い順"){
-    sort.value = "createdAt_oldest";
-  }
   router.push("/wiki/search?tags=" +
       getTags.value.join(",") +
       "&keywords=" +
       getKeywords.value.join(",") +
       "&page=" +
       pageNum.value.toString() +
-      "&sort=" + sort.value
+      "&sort=" + sort.value.content
   )
 }
 </script>
@@ -134,7 +148,16 @@ const updateSort = () => {
 <template>
   <div>
     <h1 :class="$style.head_text">検索結果:
-      {{ getKeywords.join(",") }}
+      <v-chip 
+      density="default" 
+      size="large"
+      rounded="lg"
+      prepend-icon="mdi-text-search" 
+      :class="$style.chip"
+      v-for="key in getKeywords" 
+      :key="key">
+        {{ key }}
+      </v-chip>
       <v-chip 
       density="default" 
       size="large"
@@ -151,8 +174,11 @@ const updateSort = () => {
       <p v-else>検索結果が見つかりませんでした</p>
       <v-sheet :class="$style.sort_selector">
         <v-select
-            v-model="sortMenu"
-            :items="['関連順', '新しい順', '古い順']"
+            v-model="sort"
+            :items="sortMenu"
+            item-title="title"
+            item-value="content"
+            return-object
             label="並べ替え"
             variant="underlined"
         ></v-select>

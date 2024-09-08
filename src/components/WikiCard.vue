@@ -49,7 +49,6 @@ onMounted(async() =>{
   }
   canDelete.value = wiki.value.type == "memo" && isMyPage.value
   if(wiki.value != null) passedTime.value = getPassedTime(wiki.value.updatedAt).card
-  console.log(passedTime.value)
   iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + wiki.value.ownerTraqId
   //iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
   wiki.value.createdAt = convertDate(wiki.value.createdAt)

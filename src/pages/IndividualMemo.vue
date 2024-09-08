@@ -43,7 +43,8 @@ const memo = ref<Memo>({
     content: "",
     createdAt: "",
     updatedAt: "",
-    tags: [""]
+    tags: [""],
+    favorites: 0
 });
 
 onMounted(async () => {
