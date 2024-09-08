@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {onMounted, ref, watch} from "vue";
 import router from "../router";
 import { useRoute, useRouter } from "vue-router";
 import '../styles/header.css';
@@ -18,6 +18,9 @@ onMounted(() => {
   iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + props.userTraqId;
   // iconUrl.value = "https://q.trap.jp/api/v3/public/icon/kavos"
 });
+watch(props, () =>{
+   iconUrl.value = "https://q.trap.jp/api/v3/public/icon/" + props.userTraqId;
+},{ deep: true })
 
 </script>
 <template>
