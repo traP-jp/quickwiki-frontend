@@ -9,8 +9,10 @@ const userStore = useUserStore();
 const existUser = ref<boolean>(false);
 const $toast = useToast();
 const userTraqId = ref<string>("");
+const finishSetting = ref<boolean>(false)
 
 onMounted(async() =>{
+  finishSetting.value = false;
   await userStore.setUser();
   existUser.value = userStore.traqId != "";
   if(!existUser.value){
@@ -19,13 +21,15 @@ onMounted(async() =>{
       position:  'top-right'
     })
   }
-  userTraqId.value = userStore.traqId;
+  userTraqId.value = "as";
+  finishSetting.value = true;
+
 })
 </script>
 
 <template>
-  <div :class="$style.page" id="page">
-    <Header :user-traq-id="userTraqId" />
+  <div :class="$style.page" id="page" v-if="finishSetting">
+    <Header :userTraqId="userTraqId" />
     <router-view :class="$style.contents" />
   </div>
 </template>

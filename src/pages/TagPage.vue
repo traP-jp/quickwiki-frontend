@@ -61,7 +61,17 @@ getTags.value.forEach(tag => {
 
 <template>
   <div>
-    <h1 :class="$style.head_text">タグ: {{ tagsString }} の一覧</h1>
+    <h1 :class="$style.head_text">
+      <v-chip 
+      density="default" 
+      size="large"
+      rounded="lg"
+      prepend-icon="mdi-tag-search-outline" 
+      :class="$style.chip"
+      v-for="tag in getTags" 
+      :key="tag">
+        {{ tag }}
+      </v-chip> の一覧</h1>
     <div>
       <WikiCard :wiki="wiki" :isMyPage=false v-for="wiki in wikis" :key="wiki.id" :class="$style.card" />
     </div>

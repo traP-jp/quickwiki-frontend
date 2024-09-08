@@ -96,11 +96,8 @@ const deleteDuplication = (target: suggest[], type: string) =>{
 watch(selectWords, () =>{
     if(!lockFlg.value){
         lockFlg.value = true;
-        console.log(selectWords.value);
         const tmpSelectWords = adjustSuggestType(selectWords.value)
-        console.log(tmpSelectWords);
         selectWords.value = deleteDuplication(tmpSelectWords, "tag:").concat(deleteDuplication(tmpSelectWords, "key:"))
-        console.log(selectWords.value)
     }else{
         lockFlg.value = false;
     }
@@ -131,9 +128,7 @@ const isSame = (target1: suggest[], target2: suggest[]) =>{
     return target1.length === Array.from(new Set(target1.concat(target2))).length
 }
 const Submit = () =>{
-    if(isSame(beforeWords.value, selectWords.value)){
-        console.log("sub");
-        
+    if(isSame(beforeWords.value, selectWords.value)){        
         Search()
     }
     beforeWords.value = selectWords.value
@@ -142,6 +137,8 @@ const Submit = () =>{
 <template>
   <div :class="$style.wrapper">
     <v-combobox
+        chips
+        small-chips
         id="searchBar"
         clearable
         append-icon="mdi-magnify"
