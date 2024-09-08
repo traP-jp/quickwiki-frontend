@@ -21,7 +21,6 @@ onMounted(async() =>{
       position:  'top-right'
     })
   }
-  userTraqId.value = "as";
   finishSetting.value = true;
 
 })
