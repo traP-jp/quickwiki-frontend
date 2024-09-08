@@ -131,8 +131,8 @@ onMounted(async () => {
     sodan.value.answerMessages[i].updatedAt = convertDateTime(sodan.value.answerMessages[i].updatedAt)
   }
   passedYear.value = getPassedTime(sodan.value.questionMessage.updatedAt).year
+
   channelName.value = channelId2Name.get(sodan.value.channelId)
-  console.log("channelName", channelName.value)
 })
 
 const TagClick = (tag :string) => {

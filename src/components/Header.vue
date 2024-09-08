@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
 import router from "../router";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import '../styles/header.css';
 import SearchBar from "./SearchBar.vue";
 import HeaderList from "./HeaderList.vue";
 
-const props = defineProps<{userTraqId: string}>();
+const props = defineProps({userTraqId: String});
 const iconUrl = ref<string>("");
 
 const SearchWord = ref<string>("");

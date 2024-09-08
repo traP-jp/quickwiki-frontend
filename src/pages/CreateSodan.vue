@@ -3,7 +3,7 @@ import MarkDownEditor from '../components/MarkDownEditor.vue';
 </script>
 <template>
     <div :class="$style.contents">
-        <h1>CreateSodan</h1>
+        <h1>匿名質問</h1>
         <MarkDownEditor :editorType=2 />
     </div>
 </template>

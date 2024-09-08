@@ -6,7 +6,7 @@ import '../styles/header.css';
 <template>
   <div :class="$style.header_list">
     <ul>
-      <header-list-items />
+      <header-list-items :isMyPage="false" :isSmallScreen="false" />
     </ul>
   </div>
 </template>
