@@ -401,7 +401,7 @@ const toMarkDown = async() =>{
             }
             contentHistory.value.unshift(Content.value);
             MarkedContent.value = await marked.parse(Content.value);
-            // if(corsorPos) editor.setSelectionRange(corsorPos,corsorPos)
+            if(corsorPos) editor.setSelectionRange(corsorPos,corsorPos)
             // editor.style.height = "auto";
             // if(editor.scrollHeight + 10 >= 200){
             //     editor.style.height = (editor.scrollHeight + 10).toString() + "px";
