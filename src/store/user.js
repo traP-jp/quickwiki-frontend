@@ -11,7 +11,7 @@ export const useUserStore = defineStore('uer', {
       const response = await fetch("/api/me");
       if(response && response.ok){
         const user = await response.json();
-        this.traqId = await user.traqId;
+        this.traqId = await user.userTraqId;
         this.name = await user.name;
         this.iconUri = await user.iconUri;
       }
